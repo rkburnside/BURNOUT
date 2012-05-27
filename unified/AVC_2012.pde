@@ -1,4 +1,4 @@
-/* MM 0.2
+/* Minuteman / Roadrunner competition code
 
 attempting to add multi-waypoint functionality
 
@@ -38,14 +38,14 @@ D13 - LED status
 #include <Servo.h>
 #include <EEPROM.h>
 
-#define DEBUG 0  						//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
-#define GYRO_CAL 8650000				//this has to be measured by rotating the gyro 360 deg. and reading the output
-#define GYRO_LIMIT 1000					//defines how many gyro samples are taken between angle calculations
-#define MODE 5							//digital pin for mode select
-#define TMISO 4							//digital pin for autopilot enable/disable
-#define CLICK_MAX 3						//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
-#define SERVO_LIM 300					//limits the swing of the servo so it does not get overstressed
-#define WP_SIZE 20 						//number of bytes for each waypoint
+#define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
+#define GYRO_CAL 8650000	//this has to be measured by rotating the gyro 360 deg. and reading the output
+#define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations
+#define MODE 5				//digital pin for mode select
+#define TMISO 4				//digital pin for autopilot enable/disable
+#define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
+#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed
+#define WP_SIZE 20 			//number of bytes for each waypoint
 
 //these are used for setting and clearing bits in special control registers on ATmega
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
@@ -59,7 +59,7 @@ long angle_last, angle_target, proximity, steer_us, angle_diff, speed, speed_old
 double x_wp[10], y_wp[10];
 double x=0, y=0;
 int wpr_count=1, wpw_count=1, wp_total;
-const int InterruptPin = 2 ;			//intterupt on digital pin 2
+const int InterruptPin = 2 ;		//intterupt on digital pin 2
 Servo steering, esc;
 
 
@@ -142,17 +142,17 @@ void calculate_parameters() {
 	if (automatic) steering.writeMicroseconds(steer_us);
 }
 
-ISR(ADC_vect) {    							//ADC interrupt
+ISR(ADC_vect) {			//ADC interrupt
 	
-	uint8_t high,low;						//I think uint8_t is the same as byte.
-	//low = ADCL;							//Make certain to read ADCL first, it locks the values
-	//high = ADCH;							//and ADCH releases them.
+	uint8_t high,low;	//I think uint8_t is the same as byte.
+	//low = ADCL;		//Make certain to read ADCL first, it locks the values
+	//high = ADCH;		//and ADCH releases them.
 	//aval = (high << 8) | low;
 	//the following also seems to work: aval = ADCL | (ADCH << 8);
 	
 	gyro_sum += ADCL | (ADCH << 8);
 	//adcbin = adcbin + aval;	//accumulate the ADC values
-	gyro_count++;    						//iterate the counter
+	gyro_count++;    			//iterate the counter
 
 	if (gyro_count == GYRO_LIMIT) {
 		angle += (gyro_sum - gyro_null);
@@ -166,19 +166,19 @@ ISR(ADC_vect) {    							//ADC interrupt
 
 void calculate_null() {
 	
-	cal_flag = true;						//tell ADC ISR that we are calibrating,
-	gyro_flag = false;						//this will be set, already, but need to begin on new cycle
-	while (!gyro_flag) ;					//wait for start of new cycle
-	angle = 0;								//reset the angle. angle will act as accumulator for null calculation
-	gyro_null = 0;							//make sure to not subract any nulls here
+	cal_flag = true;		//tell ADC ISR that we are calibrating,
+	gyro_flag = false;		//this will be set, already, but need to begin on new cycle
+	while (!gyro_flag) ;	//wait for start of new cycle
+	angle = 0;				//reset the angle. angle will act as accumulator for null calculation
+	gyro_null = 0;			//make sure to not subract any nulls here
 
 	for (int i=0; i <= 50; i++){
 		while (!gyro_flag);
-		gyro_flag = false;					//start another round
+		gyro_flag = false;	//start another round
 	}
 	
-	gyro_null = angle/50;					//calculate the null
-	cal_flag = false;						//stop calibration
+	gyro_null = angle/50;	//calculate the null
+	cal_flag = false;		//stop calibration
 	angle = 0;
 
 	//should print null here
@@ -194,18 +194,18 @@ void calibrate_gyro() {
 	lcd.setCursor(0, 1);
 	set_gyro_adc();
 	delay(5000);
-	cal_flag = true;						//tell ADC ISR that we are calibrating,
-	gyro_flag = false;						//this will be set, already, but need to begin on new cycle
-	while (!gyro_flag) ;					//wait for start of new cycle
-	angle = 0;								//reset the angle
+	cal_flag = true;		//tell ADC ISR that we are calibrating,
+	gyro_flag = false;		//this will be set, already, but need to begin on new cycle
+	while (!gyro_flag) ;	//wait for start of new cycle
+	angle = 0;				//reset the angle
 
 	do {
 		get_mode();
 		lcd.clear();
 		lcd.print(angle);
 		delay(20);
-	} while (aux);							//keep summing unitil we turn the mode switch off. angle will  not roll-over
-	cal_flag = false;						//stop calibration
+	} while (aux);			//keep summing unitil we turn the mode switch off. angle will  not roll-over
+	cal_flag = false;		//stop calibration
 
 	//should print angle here
 	lcd.clear();
@@ -225,7 +225,7 @@ void watch_angle() {
 		lcd.clear();
 		lcd.print(angle*360.0/GYRO_CAL);
 		delay(100);
-	} while (aux);							//keep summing unitil we turn the mode switch off.
+	} while (aux);		//keep summing unitil we turn the mode switch off.
 }
 
 void get_mode() {
@@ -249,20 +249,20 @@ void get_mode() {
 void set_gyro_adc() {
 	//ADMUX should default to 000, which selects internal reference.
 	ADMUX = B0;   //completely reset the MUX. should be sampling only on A0, now
-	ADMUX |= (1 << REFS0);					//use internal ref, AVcc
+	ADMUX |= (1 << REFS0);		//use internal ref, AVcc
 	//this section sets the prescalar for the ADC. 111 = 128 = 9.6kSps, 011 = 64 = 19.2kSps, 101=38.4ksps
-	ADCSRA |= (1 << ADPS0);					//set prescale bit 0
-	ADCSRA |= (1 << ADPS1);					//set prescale bit 1
-	ADCSRA |= (1 << ADPS2);					//set prescale bit 2
+	ADCSRA |= (1 << ADPS0);		//set prescale bit 0
+	ADCSRA |= (1 << ADPS1);		//set prescale bit 1
+	ADCSRA |= (1 << ADPS2);		//set prescale bit 2
 	//maybe try this instead:
 	//ADCSRA |= B111;   //sets the prescalar 111=128, 110=64, 101=32, 100=16
 
-	ADCSRA |= (1 << ADEN);					//Enable ADC
-	ADCSRA |= (1 << ADATE);					//Enable auto-triggering
+	ADCSRA |= (1 << ADEN);		//Enable ADC
+	ADCSRA |= (1 << ADATE);		//Enable auto-triggering
 
-	ADCSRA |= (1 << ADIE);					//Enable ADC Interrupt
-	sei();									//Enable Global Interrupts
-	ADCSRA |= (1 << ADSC);					//Start A2D Conversions
+	ADCSRA |= (1 << ADIE);		//Enable ADC Interrupt
+	sei();						//Enable Global Interrupts
+	ADCSRA |= (1 << ADSC);		//Start A2D Conversions
 	delay(100);
 	
 	/* alternatively, use:  (not tested yet)
@@ -326,8 +326,8 @@ void setup() {
 	//Pin assignments:
 	pinMode(TMISO, INPUT);
 	pinMode(MODE, INPUT);
-	lcd.begin(16, 2);						//set up the LCD's number of columns and rows:
-	lcd.print("Minuteman!");				//Print a message to the LCD.
+	lcd.begin(16, 2);			//set up the LCD's number of columns and rows:
+	lcd.print("Minuteman!");	//Print a message to the LCD.
 	
 	pinMode(InterruptPin, INPUT);	 
 	attachInterrupt(0, encoder_interrupt, CHANGE);	//interrupt 0 is on digital pin 2
@@ -337,7 +337,7 @@ void setup() {
 	//get_mode();
 	load_waypoints();
 	wpr_count = 1;
-	set_gyro_adc();							//sets up free running ADC for gyro
+	set_gyro_adc();		//sets up free running ADC for gyro
 	calculate_null();
 	steering.attach(10);
 	esc.attach(11);
