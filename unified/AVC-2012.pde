@@ -390,8 +390,8 @@ for it to reach CLICK_MAX, then calculate position and such.
    	 temp = millis();
    	 while (aux) get_mode();
    	 temp = millis() - temp;
-   	 if (temp > 500 && temp < 1500) set_waypoint();
-   	 if (temp >= 1500) read_waypoint();
+   	 if (temp > 500 && temp < 2500) set_waypoint();
+   	 if (temp >= 2500) read_waypoint();
     }
     
     if (aux && DEBUG == 4) {
