@@ -158,18 +158,6 @@ void calculate_parameters() {
     //lcd.print(proximity);
 }
 
-void navigate_waypoint() {
-    angle_diff = angle - angle_target;
-    if (angle_diff < -GYRO_CAL/2) angle_diff += GYRO_CAL;
-    if (angle_diff > GYRO_CAL/2) angle_diff -= GYRO_CAL;
-    map(steer_us, -GYRO_CAL, GYRO_CAL, -SERVO_LIM, SERVO_LIM);
-    steering.writeMicroseconds(steer_us);
-}
-
-void store_waypoint() {
-
-}
-
 ISR(ADC_vect) {    	//ADC interrupt
 
     uint8_t high,low;	// I think uint8_t is the same as byte.
@@ -258,13 +246,6 @@ void watch_angle() {
     } while (aux);    	// keep summing unitil we turn the mode switch off.
 }
 
-/*void get_temp() {
-    for (int i=0; i <= 500; i++){
-   	 temperature += analogRead(1);
-    }
-    temperature /= 500;
-}  */
-
 void get_mode() {
     if (!digitalRead(TMISO)) {
    	 manual = true;
@@ -312,45 +293,6 @@ void set_gyro_adc() {
     sei();
     sbi(ADCSRA, ADSC);
     */
-}
-
-int get_temp() {
-    //ADMUX should default to 000, which selects internal reference.
-    ADMUX = B0;   //completely reset the MUX. should be sampling only on A0, now
-    ADMUX |= (1 << MUX0);  // sample only on A1
-    ADMUX |= (1 << REFS0);  // use internal ref, AVcc
-    //this section sets the prescalar for the ADC. 111 = 128 = 9.6kSps, 011 = 64 = 19.2kSps, 101=38.4ksps
-    ADCSRA |= (1 << ADPS0);  // set prescale bit 0
-    ADCSRA |= (1 << ADPS1);  // set prescale bit 1
-    ADCSRA |= (1 << ADPS2);  // set prescale bit 2
-    //maybe try this instead:
-    //ADCSRA |= B111;   // sets the prescalar 111=128, 110=64, 101=32, 100=16
-    ADCSRA |= (1 << ADSC);  // Start A2D Conversions
-	delay(100);
-	analogReference(DEFAULT);
-	delay(100);
-	int temp = 0;
-	for(int i = 0; i<100; i++) {
-		temp += analogRead(2);
-	}
-	return temp/100;
-
-    /* alternatively, use:  (not tested yet)
-    sbi(ADCSRA, ADPS0);
-    sbi(ADCSRA, ADPS1);
-    sbi(ADCSRA, ADPS2);
-    sbi(ADCSRA, ADEN);
-    sbi(ADCSRA, ADATE);
-    sbi(ADCSRA, ADIE);
-    sei();
-    sbi(ADCSRA, ADSC);
-    */
-}
-
-void print_here() {
-    lcd.clear();
-    lcd.print("I'm here!");
-    while (true);
 }
 
 void set_waypoint() {
