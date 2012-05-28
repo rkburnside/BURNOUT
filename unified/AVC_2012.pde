@@ -37,9 +37,9 @@ D13 - LED status
 #include <LiquidCrystal.h>
 #include <Servo.h>
 #include <EEPROM.h>
+#include "AVC_2012.h"
 
 #define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
-#define GYRO_CAL 8650000	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations
 #define MODE 5				//digital pin for mode select
 #define TMISO 4				//digital pin for autopilot enable/disable
@@ -124,7 +124,7 @@ void calculate_parameters() {
 	//int temp =
 	//if (steer_us < -
 	
-	steer_us += 1425;  //1407
+	steer_us += STEER_ADJUST;  //1407
 	
 	//waypoint acceptance and move to next waypoint
 	if (proximity < 25) {
@@ -327,7 +327,7 @@ void setup() {
 	pinMode(TMISO, INPUT);
 	pinMode(MODE, INPUT);
 	lcd.begin(16, 2);			//set up the LCD's number of columns and rows:
-	lcd.print("Minuteman!");	//Print a message to the LCD.
+	lcd.print("CAR_NAME");	//Print a message to the LCD.
 	
 	pinMode(InterruptPin, INPUT);	 
 	attachInterrupt(0, encoder_interrupt, CHANGE);	//interrupt 0 is on digital pin 2
@@ -341,7 +341,7 @@ void setup() {
 	calculate_null();
 	steering.attach(10);
 	esc.attach(11);
-	steering.writeMicroseconds(1425);
+	steering.writeMicroseconds(STEER_ADJUST);
 	esc.writeMicroseconds(1503);
 	wp_total = EEPROM.read(0);
 }
@@ -372,3 +372,4 @@ void loop() {
 		read_waypoint();
 	}
 }
+
