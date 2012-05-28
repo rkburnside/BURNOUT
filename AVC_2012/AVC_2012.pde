@@ -49,7 +49,7 @@ D13 - LED status
 #define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations
 #define MODE 5				//digital pin for mode select
 #define TMISO 4				//digital pin for autopilot enable/disable
-#define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
+#define CLICK_MAX 3		//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed
 #define WP_SIZE 20 			//number of bytes for each waypoint
 
@@ -89,7 +89,12 @@ template <class T> int EEPROM_readAnything(int ee, T& value)
 
 struct position_structure {
 
-/* Using structures to contain location information. Will record old position and new position. The actual structures will be position[0] and position[1], but will use pointers old_pos and new_pos to access them. This way we can simply swap the pointers instead of copying entire structure from one to the other. Access data in the structures as follows: old_pos->x or new_pos->time, etc. this is equivalent to (*old_pos).x.*/
+/* Using structures to contain location information. Will record old position 
+and new position. The actual structures will be position[0] and position[1], 
+but will use pointers old_pos and new_pos to access them. This way we can simply
+swap the pointers instead of copying entire structure from one to the other. Access
+data in the structures as follows: old_pos->x or new_pos->time, etc. this is equivalent
+to (*old_pos).x.*/
 
     double x;
     double y;
@@ -125,10 +130,6 @@ void calculate_parameters() {
 	//steer_us=map(angle_diff, -GYRO_CAL/2, GYRO_CAL/2, -SERVO_LIM, SERVO_LIM);
 	//steer_us = (angle_diff + GYRO_CAL/2.0) * (SERVO_LIM + SERVO_LIM) / (GYRO_CAL/2.0 + GYRO_CAL/2.0) + SERVO_LIM;    
 	steer_us = (float)angle_diff/GYRO_CAL*SERVO_LIM*4.0;
-	
-	//int temp =
-	//if (steer_us < -
-	
 	steer_us += STEER_ADJUST;  //1407
 	
 	//waypoint acceptance and move to next waypoint
@@ -214,6 +215,27 @@ void calibrate_gyro() {
 	angle = 0;
 	gyro_count = 0;
 	while (true);
+}
+
+long get_temp() {
+	double temp = 0;
+    for (int i=0; i <= 500; i++){
+   	 temp += analogRead(1);
+    }
+    return temp;
+}
+
+void stab_temp() {
+	lcd.clear();
+	lcd.print("Temperature");
+	lcd.setCursor(0, 1);
+	lcd.print("Stabilizing...");
+	delay(1000);
+	while (true) {
+		lcd.clear();
+		lcd.print(get_temp());
+		delay(200);
+	}
 }
 
 void watch_angle() {
@@ -315,8 +337,9 @@ void setup() {
 	pinMode(TMISO, INPUT);
 	pinMode(MODE, INPUT);
 	lcd.begin(16, 2);			//set up the LCD's number of columns and rows:
-	lcd.print("CAR_NAME");	//Print a message to the LCD.
-	
+	lcd.print(CAR_NAME);	//Print a message to the LCD.
+	delay(1500);
+	//stab_temp();			// uncomment to watch temperature stabilization
 	pinMode(InterruptPin, INPUT);	 
 	attachInterrupt(0, encoder_interrupt, CHANGE);	//interrupt 0 is on digital pin 2
 	//print_here();
