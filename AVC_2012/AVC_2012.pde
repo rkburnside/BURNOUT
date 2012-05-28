@@ -349,7 +349,7 @@ void setup() {
 	pinMode(TMISO, INPUT);
 	pinMode(MODE, INPUT);
 	lcd.begin(16, 2);			//set up the LCD's number of columns and rows:
-	lcd.print("CAR_NAME");	//Print a message to the LCD.
+	lcd.print(CAR_NAME);	//Print a message to the LCD.
 	delay(1500);
 	//stab_temp();			// uncomment to watch temperature stabilization
 	pinMode(InterruptPin, INPUT);	 
