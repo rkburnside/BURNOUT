@@ -1,3 +1,5 @@
+#define MM
+
 /* Minuteman / Roadrunner competition code
 
 attempting to add multi-waypoint functionality
@@ -33,6 +35,10 @@ D11 - ESC control out (connect to MUX 3)
 D12 - LED status
 D13 - LED status
 */
+
+#if ARDUINO > 21
+#error "Oops! We need Arduino 21 or earlier"
+#endif
 
 #include <LiquidCrystal.h>
 #include <Servo.h>
