@@ -1,4 +1,4 @@
-#define MM
+#define RR
 
 /* Minuteman / Roadrunner competition code
 
@@ -133,7 +133,7 @@ void calculate_parameters() {
 	steer_us += STEER_ADJUST;  //1407
 	
 	//waypoint acceptance and move to next waypoint
-	if (proximity < 25) {
+	if (proximity < WAYPOINT_ACCEPT) {
 		wpr_count++;
 		lcd.clear();
 		lcd.print("read WP # ");
@@ -332,12 +332,24 @@ void read_waypoint() {
 	lcd.print(micros() - temp);
 }    
 
+//EEPROM Clear
+void eeprom_clear(){
+	// write a 0 to all 512 bytes of the EEPROM
+	for (int i = 0; i < 512; i++) EEPROM.write(i, 0);
+
+	// turn the LED on when we're done
+	lcd.clear();
+	lcd.print("EEPROM clear");
+	digitalWrite(13, HIGH);
+	delay(5000);
+}
+
 void setup() {
 	//Pin assignments:
 	pinMode(TMISO, INPUT);
 	pinMode(MODE, INPUT);
 	lcd.begin(16, 2);			//set up the LCD's number of columns and rows:
-	lcd.print(CAR_NAME);	//Print a message to the LCD.
+	lcd.print("CAR_NAME");	//Print a message to the LCD.
 	delay(1500);
 	//stab_temp();			// uncomment to watch temperature stabilization
 	pinMode(InterruptPin, INPUT);	 
@@ -374,7 +386,8 @@ void loop() {
 		while (aux) get_mode();
 		temp = millis() - temp;
 		if (temp > 500 && temp < 2500) set_waypoint();
-		if (temp >= 2500) read_waypoint();
+		if (temp >= 2500 && temp < 3500) read_waypoint();
+		if (temp > 3500) eeprom_clear();
 	}
 	
 	if (aux && DEBUG == 3) {
