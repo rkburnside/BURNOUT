@@ -87,7 +87,6 @@ template <class T> int EEPROM_readAnything(int ee, T& value)
 	return i;
 }
 
-
 struct position_structure {
 
 /* Using structures to contain location information. Will record old position and new position. The actual structures will be position[0] and position[1], but will use pointers old_pos and new_pos to access them. This way we can simply swap the pointers instead of copying entire structure from one to the other. Access data in the structures as follows: old_pos->x or new_pos->time, etc. this is equivalent to (*old_pos).x.*/
