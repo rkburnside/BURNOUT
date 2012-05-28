@@ -145,13 +145,7 @@ void calculate_parameters() {
 ISR(ADC_vect) {			//ADC interrupt
 	
 	uint8_t high,low;	//I think uint8_t is the same as byte.
-	//low = ADCL;		//Make certain to read ADCL first, it locks the values
-	//high = ADCH;		//and ADCH releases them.
-	//aval = (high << 8) | low;
-	//the following also seems to work: aval = ADCL | (ADCH << 8);
-	
-	gyro_sum += ADCL | (ADCH << 8);
-	//adcbin = adcbin + aval;	//accumulate the ADC values
+	gyro_sum += ADCL | (ADCH << 8);  //read and accumulate high and low bytes of adc
 	gyro_count++;    			//iterate the counter
 
 	if (gyro_count == GYRO_LIMIT) {
@@ -263,18 +257,7 @@ void set_gyro_adc() {
 	ADCSRA |= (1 << ADIE);		//Enable ADC Interrupt
 	sei();						//Enable Global Interrupts
 	ADCSRA |= (1 << ADSC);		//Start A2D Conversions
-	delay(100);
-	
-	/* alternatively, use:  (not tested yet)
-	sbi(ADCSRA, ADPS0);
-	sbi(ADCSRA, ADPS1);
-	sbi(ADCSRA, ADPS2);
-	sbi(ADCSRA, ADEN);
-	sbi(ADCSRA, ADATE);
-	sbi(ADCSRA, ADIE);
-	sei();
-	sbi(ADCSRA, ADSC);
-	*/
+	delay(100);					//small delay to let ADC "warm up" (don't know if it's necessary)
 }
 
 void set_waypoint() {
