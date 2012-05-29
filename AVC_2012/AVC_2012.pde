@@ -49,7 +49,7 @@ D13 - LED status
 #define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations
 #define MODE 5				//digital pin for mode select
 #define TMISO 4				//digital pin for autopilot enable/disable
-#define CLICK_MAX 3		//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
+#define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed
 #define WP_SIZE 20 			//number of bytes for each waypoint
 
@@ -333,7 +333,7 @@ void read_waypoint() {
 }    
 
 //EEPROM Clear
-void eeprom_clear(){
+void eeprom_clear() {
 	// write a 0 to all 512 bytes of the EEPROM
 	for (int i = 0; i < 512; i++) EEPROM.write(i, 0);
 
@@ -342,6 +342,23 @@ void eeprom_clear(){
 	lcd.print("EEPROM clear");
 	digitalWrite(13, HIGH);
 	delay(5000);
+}
+
+void import_waypoints() {
+	int i=0;
+	float from_excel[3][2] = {{0,600}, {600,600}, {0,0}};
+	eeprom_clear();
+	
+	while(i<3) {
+		waypoint.x = from_excel[i][0];
+		waypoint.y = from_excel[i][1];
+		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
+		i++;
+	}
+
+	lcd.clear();
+	lcd.print("all points imported");
+	delay(1500);
 }
 
 void setup() {
@@ -358,15 +375,29 @@ void setup() {
 	get_mode();
 	//read_waypoint();
 	//get_mode();
+
+	
+	//import waypoints
+	import_waypoints();
+/*	lcd.clear();
+	lcd.print("IMPORT WAYPOINTS?");
+	lcd.setCursor(0, 1);
+	lcd.print("set aux @ +100")
+*/
 	load_waypoints();
 	wpr_count = 1;
+
 	set_gyro_adc();		//sets up free running ADC for gyro
 	calculate_null();
+
 	steering.attach(10);
-	esc.attach(11);
 	steering.writeMicroseconds(STEER_ADJUST);
+
+	esc.attach(11);
 	esc.writeMicroseconds(1503);
+
 	wp_total = EEPROM.read(0);
+	
 }
 
 void loop() {
@@ -396,4 +427,3 @@ void loop() {
 		read_waypoint();
 	}
 }
-
