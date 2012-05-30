@@ -45,6 +45,8 @@ D13 - LED status
 #include <EEPROM.h>
 #include "AVC_2012.h"
 
+<<<<<<< .mine
+=======
 #define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
 #define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations
 #define MODE 5				//digital pin for mode select
@@ -53,6 +55,7 @@ D13 - LED status
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed
 #define WP_SIZE 20 			//number of bytes for each waypoint
 
+>>>>>>> .r58
 //these are used for setting and clearing bits in special control registers on ATmega
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
