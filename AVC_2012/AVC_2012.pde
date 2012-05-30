@@ -346,7 +346,7 @@ void eeprom_clear() {
 
 void import_waypoints() {
 	int i=0;
-	float from_excel[3][2] = {{0,600}, {600,600}, {0,0}};
+	float from_excel[3][2] = {{0,200}, {200,200}, {0,0}};
 	eeprom_clear();
 	
 	while(i<3) {
@@ -354,6 +354,7 @@ void import_waypoints() {
 		waypoint.y = from_excel[i][1];
 		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
 		i++;
+		wpw_count++;
 	}
 
 	lcd.clear();
@@ -379,11 +380,9 @@ void setup() {
 	
 	//import waypoints
 //	import_waypoints();
-/*	lcd.clear();
-	lcd.print("IMPORT WAYPOINTS?");
-	lcd.setCursor(0, 1);
-	lcd.print("set aux @ +100")
-*/
+//	lcd.clear();
+//	lcd.print("IMPORT WAYPOINTS?");
+
 	load_waypoints();
 	wpr_count = 1;
 
