@@ -378,7 +378,7 @@ void setup() {
 
 	
 	//import waypoints
-	import_waypoints();
+//	import_waypoints();
 /*	lcd.clear();
 	lcd.print("IMPORT WAYPOINTS?");
 	lcd.setCursor(0, 1);
