@@ -343,7 +343,7 @@ void import_waypoints() {
 	delay(1500);
 
 int i=0, j=19;
-double excel_waypoints[19][2] = {{0, 500}, {-100, 1000}, {0, 500}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+double excel_waypoints[19][2] = {{32, 500}, {-100, 1000}, {0, 500}, {15, 0}, {5, 0}, {4, 0}, {3, 0}, {1, 0}, {6, 0}, {7, 0}, {7, 45734573}, {4536, 0}, {0, 3}, {3, 5}, {62, 0}, {26, 5665}, {456, 4}, {456, 2645}, {645, 0}};
 	
 	while(i<j) {
 		waypoint.x = excel_waypoints[i][0];
@@ -354,10 +354,32 @@ double excel_waypoints[19][2] = {{0, 500}, {-100, 1000}, {0, 500}, {0, 0}, {0, 0
 	}
 
 	lcd.clear();
-	lcd.print("all points");
+	lcd.print("ALL POINTS");
 	lcd.setCursor(0, 1);
-	lcd.print("imported");
+	lcd.print("IMPORTED");
 	delay(1500);
+}
+
+void export_waypoints() {
+	Serial.begin(115200);
+
+	for(int i=0; i<20; i++) {
+		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
+		Serial.print("waypoint #");
+		Serial.print(wpr_count);
+		Serial.print(":\t");
+		Serial.print(waypoint.x);
+		Serial.print("\t");
+		Serial.println(waypoint.y);
+		wpr_count++;
+	}
+
+	lcd.clear();
+	lcd.print("ALL POINTS");
+	lcd.setCursor(0, 1);
+	lcd.print("EXPORTED");
+	delay(1500);
+	Serial.end();
 }
 
 void setup() {
@@ -375,11 +397,39 @@ void setup() {
 	//read_waypoint();
 	//get_mode();
 
-//import waypoints
-	import_waypoints();
+	//import/export waypoints from excel
+	lcd.clear();
+	lcd.print("IMPORT = AUX");
+	lcd.setCursor(0, 1);
+	lcd.print("EXPORT = AUTO");
+	delay(1500);
+	get_mode();
+	if(aux == true) import_waypoints();
+	else if(automatic == true) export_waypoints();
 
+	//load waypoints
+	lcd.clear();
+	lcd.print("LOADING POINTS");
 	load_waypoints();
-	wpr_count = 1;
+	delay(1500);
+	lcd.clear();
+	lcd.print("ALL POINTS");
+	lcd.setCursor(0, 1);
+	lcd.print("LOADED");
+	delay(1500);
+
+	//verify that car is in manual mode prior to starting null calculation
+	lcd.clear();
+	lcd.print("SET CAR TO");
+	lcd.setCursor(0, 1);
+	lcd.print("MANUAL MODE!");
+	while(manual == false) get_mode();
+	delay(500);
+	
+	lcd.clear();
+	lcd.print("CALCULATING NULL");
+
+	wpr_count = 1;		//set waypoint read counter to first waypoint
 
 	set_gyro_adc();		//sets up free running ADC for gyro
 	calculate_null();
@@ -391,7 +441,9 @@ void setup() {
 	esc.writeMicroseconds(1503);
 
 	wp_total = EEPROM.read(0);
-	
+
+	lcd.setCursor(0, 1);
+	lcd.print("**READY TO RUN**");
 }
 
 void loop() {
