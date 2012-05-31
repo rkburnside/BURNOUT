@@ -338,8 +338,12 @@ void eeprom_clear() {
 void import_waypoints() {
 	eeprom_clear();
 
-	int i=0, j=19;
-	double excel_waypoints[19][2] = {{0, 0}, {0, 600}, {600, 600}, {600, -600}, {0, -600}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}};
+	lcd.clear();
+	lcd.print("IMPORT WAYPOINTS?");
+	delay(1500);
+
+int i=0, j=19;
+double excel_waypoints[19][2] = {{0, 500}, {-100, 1000}, {0, 500}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
 	
 	while(i<j) {
 		waypoint.x = excel_waypoints[i][0];
@@ -371,11 +375,8 @@ void setup() {
 	//read_waypoint();
 	//get_mode();
 
-	
-	//import waypoints
-//	import_waypoints();
-//	lcd.clear();
-//	lcd.print("IMPORT WAYPOINTS?");
+//import waypoints
+	import_waypoints();
 
 	load_waypoints();
 	wpr_count = 1;
