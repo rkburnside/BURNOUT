@@ -362,7 +362,7 @@ double excel_waypoints[19][2] = {{32, 500}, {-100, 1000}, {0, 500}, {15, 0}, {5,
 
 void export_waypoints() {
 	Serial.begin(115200);
-
+	
 	for(int i=0; i<20; i++) {
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		Serial.print("waypoint #");
