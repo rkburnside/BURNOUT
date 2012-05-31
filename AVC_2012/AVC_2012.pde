@@ -1,4 +1,4 @@
-#define RR
+#define MM
 
 /* Minuteman / Roadrunner competition code
 
@@ -51,7 +51,7 @@ D13 - LED status
 
 LiquidCrystal lcd(A3, A4, A5, 8, 7, 6);
 volatile boolean gyro_flag = false, cal_flag;
-boolean manual, automatic, aux=false;
+boolean manual, automatic, aux=false, running=false;
 volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, angle=0, clicks = 0;
 long angle_last, angle_target, proximity, steer_us, angle_diff, speed, speed_old, speed_new;
 double x_wp[10], y_wp[10];
@@ -438,7 +438,7 @@ void setup() {
 	steering.writeMicroseconds(STEER_ADJUST);
 
 	esc.attach(11);
-	esc.writeMicroseconds(1503);
+	esc.writeMicroseconds(S1);
 
 	wp_total = EEPROM.read(0);
 
@@ -457,6 +457,15 @@ void loop() {
 	
 	if (aux && DEBUG == 1) calibrate_gyro();
 	if (aux && DEBUG == 2) watch_angle();
+	
+	if (automatic) {
+		if (!running) {
+			esc.writeMicroseconds(S2);
+			running = true;
+		}
+	}
+
+		
 	
 	if (aux && DEBUG == 0) {
 		temp = millis();
