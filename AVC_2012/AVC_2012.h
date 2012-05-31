@@ -32,5 +32,7 @@
 #define CLICK_MAX 3		//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed
 #define WP_SIZE 20 			//number of bytes for each waypoint
+#define S1 1500
+#define S2 1560
 
 #endif
