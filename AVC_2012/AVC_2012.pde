@@ -45,17 +45,6 @@ D13 - LED status
 #include <EEPROM.h>
 #include "AVC_2012.h"
 
-<<<<<<< .mine
-=======
-#define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
-#define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations
-#define MODE 5				//digital pin for mode select
-#define TMISO 4				//digital pin for autopilot enable/disable
-#define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed
-#define WP_SIZE 20 			//number of bytes for each waypoint
-
->>>>>>> .r58
 //these are used for setting and clearing bits in special control registers on ATmega
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
@@ -343,25 +332,27 @@ void eeprom_clear() {
 	// turn the LED on when we're done
 	lcd.clear();
 	lcd.print("EEPROM clear");
-	digitalWrite(13, HIGH);
-	delay(5000);
+	delay(1500);
 }
 
 void import_waypoints() {
-	int i=0;
-	float from_excel[3][2] = {{0,200}, {200,200}, {0,0}};
 	eeprom_clear();
+
+	int i=0, j=19;
+	double excel_waypoints[19][2] = {{0, 0}, {0, 600}, {600, 600}, {600, -600}, {0, -600}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}, {0, 200}};
 	
-	while(i<3) {
-		waypoint.x = from_excel[i][0];
-		waypoint.y = from_excel[i][1];
+	while(i<j) {
+		waypoint.x = excel_waypoints[i][0];
+		waypoint.y = excel_waypoints[i][1];
 		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
 		i++;
 		wpw_count++;
 	}
 
 	lcd.clear();
-	lcd.print("all points imported");
+	lcd.print("all points");
+	lcd.setCursor(0, 1);
+	lcd.print("imported");
 	delay(1500);
 }
 
