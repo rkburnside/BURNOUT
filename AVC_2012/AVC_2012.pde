@@ -262,23 +262,28 @@ void get_mode() {
 }
 
 void set_gyro_adc() {
-	//ADMUX should default to 000, which selects internal reference.
-	ADMUX = B0;   //completely reset the MUX. should be sampling only on A0, now
-	ADMUX |= (1 << REFS0);		//use internal ref, AVcc
-	//this section sets the prescalar for the ADC. 111 = 128 = 9.6kSps, 011 = 64 = 19.2kSps, 101=38.4ksps
-	ADCSRA |= (1 << ADPS0);		//set prescale bit 0
-	ADCSRA |= (1 << ADPS1);		//set prescale bit 1
-	ADCSRA |= (1 << ADPS2);		//set prescale bit 2
-	//maybe try this instead:
-	//ADCSRA |= B111;   //sets the prescalar 111=128, 110=64, 101=32, 100=16
+    //ADMUX should default to 000, which selects internal reference.
+    ADMUX = B0;   //completely reset the MUX. should be sampling only on A0, now
+    sbi(ADMUX, REFS0);  //use internal ref, AVcc
+    //this section sets the prescalar for the ADC. 111 = 128 = 9.6kSps, 011 = 64 = 19.2kSps, 101=38.4ksps
+    //tests show sss = 19ksps, css = 38.4ksps, scs = 76.8ksps
+    sbi(ADCSRA, ADPS0);
+    sbi(ADCSRA, ADPS1);
+    sbi(ADCSRA, ADPS2);
 
-	ADCSRA |= (1 << ADEN);		//Enable ADC
-	ADCSRA |= (1 << ADATE);		//Enable auto-triggering
+    sbi(ADCSRA, ADEN);              //Enable ADC
+    sbi(ADCSRA, ADATE);             //Enable auto-triggering
+    sbi(ADCSRA, ADIE);              //Enable ADC Interrupt
+    sei();                                  //Enable Global Interrupts
+    sbi(ADCSRA, ADSC);              //Start A2D Conversions
 
-	ADCSRA |= (1 << ADIE);		//Enable ADC Interrupt
-	sei();						//Enable Global Interrupts
-	ADCSRA |= (1 << ADSC);		//Start A2D Conversions
-	delay(100);					//small delay to let ADC "warm up" (don't know if it's necessary)
+    // lcd.clear();
+    // lcd.print(ADCSRA, BIN);
+    // lcd.setCursor(0, 1);
+    // lcd.print(ADMUX, BIN);
+    // while (true) ;
+        
+    delay(100);                                     //small delay to let ADC "warm up" (don't know if it's necessary)
 }
 
 void set_waypoint() {
