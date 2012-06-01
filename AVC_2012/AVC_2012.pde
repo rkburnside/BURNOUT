@@ -240,7 +240,7 @@ void watch_angle() {
 		lcd.clear();
 		lcd.print(angle*360.0/GYRO_CAL);
 		delay(100);
-	} while (aux);		//keep summing unitil we turn the mode switch off.
+	} while (manual);		//keep summing unitil we turn the mode switch off.
 }
 
 void get_mode() {
@@ -384,6 +384,62 @@ void export_waypoints() {
 	Serial.end();
 }
 
+void root_menu(){
+    char* value_list[]={"ROOT MENU", "RESET", "IMPORT WP", "EXPORT WP", "WATCH ANGLE"};
+    byte selection;
+    selection = menu_list(4, value_list);   // try using sizeof(value_list) here
+    switch (selection) {
+    case 1:
+       // statements
+       break;
+    case 2:
+		import_waypoints();
+       //waypoint_menu();
+       // statements
+       break;
+    case 3:
+		export_waypoints();
+       //variable_menu();
+       // statements
+       break;
+    case 4:
+		watch_angle();
+       //calibration_menu();
+       // statements
+       break;
+    default:
+       return;
+       // statements
+    }
+}
+
+byte menu_list(byte items, char* value_list[]) {
+    int pulse_length, adjust = 1, temp = 0;
+    while (true) {
+       pulse_length = pulseIn(3,HIGH);
+       if (pulse_length - STEER_ADJUST > 50) adjust++;
+       else if (pulse_length - STEER_ADJUST < -50) adjust--;
+       if (adjust > items) adjust -= items;
+       if (adjust < 1) adjust += items;
+       get_mode();
+       if (aux) {
+           temp = millis();
+           while (aux) get_mode();
+           temp -= millis();
+           if (temp < 500) return adjust;
+           else return 0;
+       }
+       //delay(500);
+       delay(map(abs(pulse_length-STEER_ADJUST), 0, 300, 700, 100));
+       lcd.clear();
+       lcd.print(value_list[0]);
+       lcd.setCursor(0, 1);
+       lcd.print(value_list[adjust]);
+
+       //lcd.print(adjust);
+    }    
+}
+
 void setup() {
 	//Pin assignments:
 	pinMode(TMISO, INPUT);
@@ -398,16 +454,16 @@ void setup() {
 	get_mode();
 	//read_waypoint();
 	//get_mode();
-
+	root_menu();
 	//import/export waypoints from excel
-	lcd.clear();
-	lcd.print("IMPORT = AUX");
-	lcd.setCursor(0, 1);
-	lcd.print("EXPORT = AUTO");
-	delay(1500);
-	get_mode();
-	if(aux == true) import_waypoints();
-	else if(automatic == true) export_waypoints();
+	// lcd.clear();
+	// lcd.print("IMPORT = AUX");
+	// lcd.setCursor(0, 1);
+	// lcd.print("EXPORT = AUTO");
+	// delay(1500);
+	// get_mode();
+	// if(aux == true) import_waypoints();
+	// else if(automatic == true) export_waypoints();
 
 	//load waypoints
 	lcd.clear();
