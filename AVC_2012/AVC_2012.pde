@@ -1,4 +1,4 @@
-#define MM
+#define RR
 
 /* Minuteman / Roadrunner competition code
 
@@ -110,11 +110,13 @@ void calculate_parameters() {
 	proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
 	
 	//print stuff to LCD
-	lcd.clear();
+/*	lcd.clear();
 	lcd.print(x);
 	lcd.print(",");
 	lcd.print(y);
-	
+	lcd.setCursor(0, 1);
+	lcd.print(proximity);
+*/
 	//calculate and write angles for steering
 	angle_diff = angle_target - angle;
 	if (angle_diff < -GYRO_CAL/2) angle_diff += GYRO_CAL;
@@ -343,7 +345,7 @@ void import_waypoints() {
 	delay(1500);
 
 int i=0, j=19;
-double excel_waypoints[19][2] = {{32, 500}, {-100, 1000}, {0, 500}, {15, 0}, {5, 0}, {4, 0}, {3, 0}, {1, 0}, {6, 0}, {7, 0}, {7, 45734573}, {4536, 0}, {0, 3}, {3, 5}, {62, 0}, {26, 5665}, {456, 4}, {456, 2645}, {645, 0}};
+double excel_waypoints[19][2] = {{0, 0}, {0, 2676.29}, {2298.91, 2676.29}, {0, 2676.29}, {0, 192.54}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
 	
 	while(i<j) {
 		waypoint.x = excel_waypoints[i][0];

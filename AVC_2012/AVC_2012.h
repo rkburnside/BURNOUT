@@ -21,9 +21,9 @@
 #ifdef RR
 #define GYRO_CAL 8700000	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define TIRE_CAL 0.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
-#define STEER_ADJUST 1515	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
+#define STEER_ADJUST 1475	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define CAR_NAME "***ROADRUNNER***" //car name
-#define WAYPOINT_ACCEPT 35	//waypoint acceptance radius
+#define WAYPOINT_ACCEPT 50	//waypoint acceptance radius
 
 #define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
 #define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations
