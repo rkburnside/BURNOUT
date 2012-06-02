@@ -1,5 +1,3 @@
-#define RR
-
 /* Minuteman / Roadrunner competition code
 
 attempting to add multi-waypoint functionality
@@ -350,7 +348,7 @@ void import_waypoints() {
 	delay(1500);
 
 int i=0, j=19;
-double excel_waypoints[19][2] = {{0, 0}, {0, 2676.29}, {2298.91, 2676.29}, {0, 2676.29}, {0, 192.54}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+WAYPOINTS_STRING    //edit this in header file to change waypoints
 	
 	while(i<j) {
 		waypoint.x = excel_waypoints[i][0];
@@ -434,8 +432,8 @@ byte menu_list(byte items, char* value_list[]) {
            if (temp < 500) return adjust;
            else return 0;
        }
-       //delay(500);
-       delay(map(abs(pulse_length-STEER_ADJUST), 0, 300, 700, 100));
+       delay(500);
+       //delay(map(abs(pulse_length-STEER_ADJUST), 0, 300, 700, 100));
        lcd.clear();
        lcd.print(value_list[0]);
        lcd.setCursor(0, 1);

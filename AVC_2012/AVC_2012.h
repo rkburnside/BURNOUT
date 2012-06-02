@@ -1,4 +1,9 @@
 //Header file variable
+#define MM
+
+#define WAYPOINTS_STRING \
+double excel_waypoints[19][2] = {{0, 0}, {0, 2676.29}, {2298.91, 2676.29}, {0, 2676.29}, {0, 192.54}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+
 #ifdef MM
 #define GYRO_CAL 8650000	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define TIRE_CAL 1.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
