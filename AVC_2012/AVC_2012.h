@@ -1,9 +1,11 @@
 //Header file variable
 #define RR
 
-#define WAYPOINT_COUNT 5
+#define WAYPOINT_COUNT 10
 #define WAYPOINTS_STRING \
-double excel_waypoints[5][2] = {{0, 0}, {0, 250}, {0, 500}, {0, 750}, {0, 1000}};
+int excel_waypoints[10][2] = {{0, 0}, {0, 250}, {0, 500}, {0, 750}, {0, 1000}, {0, 1250}, {0, 1500}, {0, 1750}, {0, 2000}, {0, 2250}};
+
+//int excel_waypoints[19][2] = {{0, 0}, {0, 250}, {0, 500}, {0, 750}, {0, 1000}, {0, 1250}, {0, 1500}, {0, 1750}, {0, 2000}, {0, 2250}, {0, 2500}, {0, 2750}, {0, 3000}, {0, 3250}, {0, 3500}, {0, 3750}, {0, 4000}, {0, 4250}, {0, 4500}};
 
 #ifdef MM
 #define GYRO_CAL 8650000	//this has to be measured by rotating the gyro 360 deg. and reading the output

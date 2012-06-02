@@ -384,15 +384,16 @@ WAYPOINTS_STRING    //edit this in header file to change waypoints
 
 void export_waypoints() {
 	Serial.begin(115200);
+	load_waypoints();
 	
 	for(int i=0; i<WAYPOINT_COUNT; i++) {
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		Serial.print("waypoint #");
 		Serial.print(wpr_count);
 		Serial.print(":\t");
-		Serial.print(waypoint.x);
+		Serial.print(x_wp[i]);
 		Serial.print("\t");
-		Serial.println(waypoint.y);
+		Serial.println(y_wp[i]);
 		wpr_count++;
 	}
 
@@ -467,8 +468,7 @@ void setup() {
 	attachInterrupt(0, encoder_interrupt, CHANGE);	//interrupt 0 is on digital pin 2
 
 	get_mode();
-//	root_menu();
-	import_waypoints();
+	root_menu();
 
 	//load waypoints
 	lcd.clear();
