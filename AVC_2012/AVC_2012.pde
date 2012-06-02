@@ -51,7 +51,7 @@ LiquidCrystal lcd(A3, A4, A5, 8, 7, 6);
 volatile boolean gyro_flag = false, cal_flag;
 boolean manual, automatic, aux=false, running=false;
 volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, angle=0, clicks = 0;
-long angle_last, angle_target, proximity, steer_us, angle_diff;
+long angle_last, angle_target, proximity, steer_us, angle_diff, previous_proximity;
 double x_wp[WAYPOINT_COUNT], y_wp[WAYPOINT_COUNT];
 double x=0, y=0;
 int wpr_count=1, wpw_count=1, wp_total;
@@ -134,19 +134,16 @@ void calculate_parameters() {
 		lcd.print(x_wp[wpr_count]);
 		lcd.print(" , ");
 		lcd.print(y_wp[wpr_count]);
-//		proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
-//		previous_proximity = proximity;
+		proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
+		previous_proximity = proximity;
 	}
 	
 	get_mode();
 	if (automatic) steering.writeMicroseconds(steer_us);
-//	if (automatic) speed();
-
+	if (automatic) speed();
 }
 
-/*
 void speed() {
-
 // test to see how close we are to the previous waypoint
 if((previous_proximity - proximity) <= 100) esc.writeMicroseconds(S2); //allow car to line up with the next point
 else if(proximity < 50) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
@@ -155,7 +152,6 @@ else if(proximity >= 150 && proximity < 500) esc.writeMicroseconds(S4); //slow d
 else if(proximity >= 500) esc.writeMicroseconds(S5); //go wide open
 
 }
-*/
 
 ISR(ADC_vect) {			//ADC interrupt
 	
@@ -526,7 +522,7 @@ void loop() {
 	
 	if (automatic) {	//this function makes the car be stationary when in manual waypoint setting mode
 		if (!running) {
-			esc.writeMicroseconds(S1);	//i changed this to S1 so the car is stationary?
+			esc.write(60);	//i changed this to S1 so the car is stationary?
 			running = true;
 		}
 	}
