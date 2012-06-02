@@ -388,31 +388,24 @@ void export_waypoints() {
 }
 
 void root_menu(){
-    char* value_list[]={"ROOT MENU", "RESET", "IMPORT WP", "EXPORT WP", "WATCH ANGLE"};
+    char* value_list[]={"ROOT MENU", "TEMPERATURE STAB", "IMPORT WP", "EXPORT WP", "WATCH ANGLE"};
     byte selection;
     selection = menu_list(4, value_list);   // try using sizeof(value_list) here
     switch (selection) {
     case 1:
-       // statements
+		stab_temp();
        break;
     case 2:
 		import_waypoints();
-       //waypoint_menu();
-       // statements
        break;
     case 3:
 		export_waypoints();
-       //variable_menu();
-       // statements
        break;
     case 4:
 		watch_angle();
-       //calibration_menu();
-       // statements
        break;
     default:
        return;
-       // statements
     }
 }
 
