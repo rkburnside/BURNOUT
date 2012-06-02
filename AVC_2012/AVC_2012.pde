@@ -52,7 +52,7 @@ volatile boolean gyro_flag = false, cal_flag;
 boolean manual, automatic, aux=false, running=false;
 volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, angle=0, clicks = 0;
 long angle_last, angle_target, proximity, steer_us, angle_diff;
-double x_wp[10], y_wp[10];
+double x_wp[WAYPOINT_COUNT], y_wp[WAYPOINT_COUNT];
 double x=0, y=0;
 int wpr_count=1, wpw_count=1, wp_total;
 const int InterruptPin = 2 ;		//intterupt on digital pin 2
@@ -319,7 +319,7 @@ void set_waypoint() {
 
 void load_waypoints() {
 	int temp = 1;
-	while (temp <= WAYPOINT_COUNT) { //only 15 waypoints may be loaded
+	while (temp <= WAYPOINT_COUNT) {
 		EEPROM_readAnything(temp*WP_SIZE, waypoint);
 		x_wp[temp] = waypoint.x;
 		y_wp[temp] = waypoint.y;
@@ -360,12 +360,8 @@ void eeprom_clear() {
 void import_waypoints() {
 	eeprom_clear();
 
-	lcd.clear();
-	lcd.print("IMPORT WAYPOINTS?");
-	delay(1500);
-
-int i=0, j=WAYPOINT_COUNT;
-WAYPOINTS_STRING    //edit this in header file to change waypoints
+	int i=0, j=WAYPOINT_COUNT;
+	WAYPOINTS_STRING    //edit this in header file to change waypoints
 	
 	while(i<j) {
 		waypoint.x = excel_waypoints[i][0];
@@ -386,14 +382,14 @@ void export_waypoints() {
 	Serial.begin(115200);
 	load_waypoints();
 	
-	for(int i=0; i<WAYPOINT_COUNT; i++) {
+	for(int i=0; i<19; i++) {
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		Serial.print("waypoint #");
 		Serial.print(wpr_count);
 		Serial.print(":\t");
-		Serial.print(x_wp[i]);
+		Serial.print(waypoint.x);
 		Serial.print("\t");
-		Serial.println(y_wp[i]);
+		Serial.println(waypoint.y);
 		wpr_count++;
 	}
 
@@ -469,6 +465,7 @@ void setup() {
 
 	get_mode();
 	root_menu();
+//	import_waypoints();
 
 	//load waypoints
 	lcd.clear();
@@ -480,6 +477,7 @@ void setup() {
 	lcd.setCursor(0, 1);
 	lcd.print("LOADED");
 	delay(1500);
+
 
 	//verify that car is in manual mode prior to starting null calculation
 	get_mode();
@@ -510,6 +508,7 @@ void setup() {
 
 	lcd.setCursor(0, 1);
 	lcd.print("**READY TO RUN**");
+	x=0; y=0;
 }
 
 void loop() {
