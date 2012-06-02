@@ -51,16 +51,15 @@ LiquidCrystal lcd(A3, A4, A5, 8, 7, 6);
 volatile boolean gyro_flag = false, cal_flag;
 boolean manual, automatic, aux=false, running=false;
 volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, angle=0, clicks = 0;
-long angle_last, angle_target, proximity, steer_us, angle_diff, speed, speed_old, speed_new;
+long angle_last, angle_target, proximity, steer_us, angle_diff;
 double x_wp[10], y_wp[10];
 double x=0, y=0;
 int wpr_count=1, wpw_count=1, wp_total;
 const int InterruptPin = 2 ;		//intterupt on digital pin 2
 Servo steering, esc;
+long time=0;
 
-
-template <class T> int EEPROM_writeAnything(int ee, const T& value)
-{
+template <class T> int EEPROM_writeAnything(int ee, const T& value) {
 	const byte* p = (const byte*)(const void*)&value;
 	int i;
 	for (i = 0; i < sizeof(value); i++)
@@ -68,8 +67,7 @@ template <class T> int EEPROM_writeAnything(int ee, const T& value)
 	return i;
 }
 
-template <class T> int EEPROM_readAnything(int ee, T& value)
-{
+template <class T> int EEPROM_readAnything(int ee, T& value) {
 	byte* p = (byte*)(void*)&value;
 	int i;
 	for (i = 0; i < sizeof(value); i++)
@@ -96,10 +94,7 @@ void encoder_interrupt() {
 }
 
 void calculate_parameters() {
-	speed_new = millis();
-	speed = speed_old - speed_new;
-	speed_old = speed_new;
-	
+
 	//calculate position
 	x += sin((angle + angle_last) * 3.14159/GYRO_CAL);
 	y += cos((angle + angle_last) * 3.14159/GYRO_CAL);
@@ -108,13 +103,18 @@ void calculate_parameters() {
 	proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
 	
 	//print stuff to LCD
-/*	lcd.clear();
-	lcd.print(x);
-	lcd.print(",");
-	lcd.print(y);
-	lcd.setCursor(0, 1);
-	lcd.print(proximity);
-*/
+	if((millis()-time)>1000) {
+		lcd.clear();
+		lcd.print(x_wp[wpr_count]);
+		lcd.print(" , ");
+		lcd.print(y_wp[wpr_count]);
+		lcd.setCursor(0, 1);
+		lcd.print(x);
+		lcd.print(" , ");
+		lcd.print(y);
+		time = millis();
+	}
+
 	//calculate and write angles for steering
 	angle_diff = angle_target - angle;
 	if (angle_diff < -GYRO_CAL/2) angle_diff += GYRO_CAL;
@@ -122,8 +122,8 @@ void calculate_parameters() {
 	//steer_us=map(angle_diff, -GYRO_CAL/2, GYRO_CAL/2, -SERVO_LIM, SERVO_LIM);
 	//steer_us = (angle_diff + GYRO_CAL/2.0) * (SERVO_LIM + SERVO_LIM) / (GYRO_CAL/2.0 + GYRO_CAL/2.0) + SERVO_LIM;    
 	steer_us = (float)angle_diff/GYRO_CAL*SERVO_LIM*4.0;
-	steer_us += STEER_ADJUST;  //1407
-	
+	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
+
 	//waypoint acceptance and move to next waypoint
 	if (proximity < WAYPOINT_ACCEPT) {
 		wpr_count++;
@@ -134,11 +134,28 @@ void calculate_parameters() {
 		lcd.print(x_wp[wpr_count]);
 		lcd.print(" , ");
 		lcd.print(y_wp[wpr_count]);
+//		proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
+//		previous_proximity = proximity;
 	}
 	
 	get_mode();
 	if (automatic) steering.writeMicroseconds(steer_us);
+//	if (automatic) speed();
+
 }
+
+/*
+void speed() {
+
+// test to see how close we are to the previous waypoint
+if((previous_proximity - proximity) <= 100) esc.writeMicroseconds(S2); //allow car to line up with the next point
+else if(proximity < 50) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
+else if(proximity >= 50 && proximity < 150) esc.writeMicroseconds(S3); //slow way down
+else if(proximity >= 150 && proximity < 500) esc.writeMicroseconds(S4); //slow down
+else if(proximity >= 500) esc.writeMicroseconds(S5); //go wide open
+
+}
+*/
 
 ISR(ADC_vect) {			//ADC interrupt
 	
@@ -155,6 +172,31 @@ ISR(ADC_vect) {			//ADC interrupt
 		gyro_flag = true;
 	}
 }  
+
+void set_gyro_adc() {
+    //ADMUX should default to 000, which selects internal reference.
+    ADMUX = B0;   //completely reset the MUX. should be sampling only on A0, now
+    sbi(ADMUX, REFS0);  //use internal ref, AVcc
+    //this section sets the prescalar for the ADC. 111 = 128 = 9.6kSps, 011 = 64 = 19.2kSps, 101=38.4ksps
+    //tests show sss = 19ksps, css = 38.4ksps, scs = 76.8ksps
+    sbi(ADCSRA, ADPS0);
+    sbi(ADCSRA, ADPS1);
+    sbi(ADCSRA, ADPS2);
+
+    sbi(ADCSRA, ADEN);              //Enable ADC
+    sbi(ADCSRA, ADATE);             //Enable auto-triggering
+    sbi(ADCSRA, ADIE);              //Enable ADC Interrupt
+    sei();                                  //Enable Global Interrupts
+    sbi(ADCSRA, ADSC);              //Start A2D Conversions
+
+    // lcd.clear();
+    // lcd.print(ADCSRA, BIN);
+    // lcd.setCursor(0, 1);
+    // lcd.print(ADMUX, BIN);
+    // while (true) ;
+        
+    delay(100);                                     //small delay to let ADC "warm up" (don't know if it's necessary)
+}
 
 void calculate_null() {
 	
@@ -259,31 +301,6 @@ void get_mode() {
     }
 }
 
-void set_gyro_adc() {
-    //ADMUX should default to 000, which selects internal reference.
-    ADMUX = B0;   //completely reset the MUX. should be sampling only on A0, now
-    sbi(ADMUX, REFS0);  //use internal ref, AVcc
-    //this section sets the prescalar for the ADC. 111 = 128 = 9.6kSps, 011 = 64 = 19.2kSps, 101=38.4ksps
-    //tests show sss = 19ksps, css = 38.4ksps, scs = 76.8ksps
-    sbi(ADCSRA, ADPS0);
-    sbi(ADCSRA, ADPS1);
-    sbi(ADCSRA, ADPS2);
-
-    sbi(ADCSRA, ADEN);              //Enable ADC
-    sbi(ADCSRA, ADATE);             //Enable auto-triggering
-    sbi(ADCSRA, ADIE);              //Enable ADC Interrupt
-    sei();                                  //Enable Global Interrupts
-    sbi(ADCSRA, ADSC);              //Start A2D Conversions
-
-    // lcd.clear();
-    // lcd.print(ADCSRA, BIN);
-    // lcd.setCursor(0, 1);
-    // lcd.print(ADMUX, BIN);
-    // while (true) ;
-        
-    delay(100);                                     //small delay to let ADC "warm up" (don't know if it's necessary)
-}
-
 void set_waypoint() {
 	waypoint.x = x;
 	waypoint.y = y;
@@ -302,7 +319,7 @@ void set_waypoint() {
 
 void load_waypoints() {
 	int temp = 1;
-	while (temp <= 10) {
+	while (temp <= WAYPOINT_COUNT) { //only 15 waypoints may be loaded
 		EEPROM_readAnything(temp*WP_SIZE, waypoint);
 		x_wp[temp] = waypoint.x;
 		y_wp[temp] = waypoint.y;
@@ -347,7 +364,7 @@ void import_waypoints() {
 	lcd.print("IMPORT WAYPOINTS?");
 	delay(1500);
 
-int i=0, j=19;
+int i=0, j=WAYPOINT_COUNT;
 WAYPOINTS_STRING    //edit this in header file to change waypoints
 	
 	while(i<j) {
@@ -368,7 +385,7 @@ WAYPOINTS_STRING    //edit this in header file to change waypoints
 void export_waypoints() {
 	Serial.begin(115200);
 	
-	for(int i=0; i<20; i++) {
+	for(int i=0; i<WAYPOINT_COUNT; i++) {
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		Serial.print("waypoint #");
 		Serial.print(wpr_count);
@@ -388,20 +405,22 @@ void export_waypoints() {
 }
 
 void root_menu(){
-    char* value_list[]={"ROOT MENU", "TEMPERATURE STAB", "IMPORT WP", "EXPORT WP", "WATCH ANGLE"};
+    char* value_list[]={"ROOT MENU", "CONTINUE", "TEMPERATURE STAB", "IMPORT WP", "EXPORT WP", "WATCH ANGLE"};
     byte selection;
-    selection = menu_list(4, value_list);   // try using sizeof(value_list) here
+    selection = menu_list(5, value_list);   // try using sizeof(value_list) here
     switch (selection) {
-    case 1:
+	case 1:
+		break;
+    case 2:
 		stab_temp();
        break;
-    case 2:
+    case 3:
 		import_waypoints();
        break;
-    case 3:
+    case 4:
 		export_waypoints();
        break;
-    case 4:
+    case 5:
 		watch_angle();
        break;
     default:
@@ -443,23 +462,13 @@ void setup() {
 	lcd.begin(16, 2);			//set up the LCD's number of columns and rows:
 	lcd.print(CAR_NAME);	//Print a message to the LCD.
 	delay(1500);
-	//stab_temp();			// uncomment to watch temperature stabilization
+
 	pinMode(InterruptPin, INPUT);	 
 	attachInterrupt(0, encoder_interrupt, CHANGE);	//interrupt 0 is on digital pin 2
-	//print_here();
+
 	get_mode();
-	//read_waypoint();
-	//get_mode();
-	root_menu();
-	//import/export waypoints from excel
-	// lcd.clear();
-	// lcd.print("IMPORT = AUX");
-	// lcd.setCursor(0, 1);
-	// lcd.print("EXPORT = AUTO");
-	// delay(1500);
-	// get_mode();
-	// if(aux == true) import_waypoints();
-	// else if(automatic == true) export_waypoints();
+//	root_menu();
+	import_waypoints();
 
 	//load waypoints
 	lcd.clear();
@@ -473,10 +482,13 @@ void setup() {
 	delay(1500);
 
 	//verify that car is in manual mode prior to starting null calculation
-	lcd.clear();
-	lcd.print("SET CAR TO");
-	lcd.setCursor(0, 1);
-	lcd.print("MANUAL MODE!");
+	get_mode();
+	if(manual == false) {
+		lcd.clear();
+		lcd.print("SET CAR TO");
+		lcd.setCursor(0, 1);
+		lcd.print("MANUAL MODE!");
+	}
 	while(manual == false) get_mode();
 	delay(500);
 	
@@ -502,32 +514,30 @@ void setup() {
 
 void loop() {
 	long temp;
+
 	/* in the main loop here, we should wait for thing to happen, then act on them. Watch clicks and wait for it to reach CLICK_MAX, then calculate position and such.*/
 	get_mode();
 	if (clicks >= CLICK_MAX) {
 		clicks = 0;
 		calculate_parameters();
 	}
-	
+
 	if (aux && DEBUG == 1) calibrate_gyro();
 	if (aux && DEBUG == 2) watch_angle();
 	
-	if (automatic) {
+	if (automatic) {	//this function makes the car be stationary when in manual waypoint setting mode
 		if (!running) {
-			esc.writeMicroseconds(S2);
+			esc.writeMicroseconds(S1);	//i changed this to S1 so the car is stationary?
 			running = true;
 		}
 	}
-
-		
 	
 	if (aux && DEBUG == 0) {
 		temp = millis();
 		while (aux) get_mode();
 		temp = millis() - temp;
-		if (temp > 500 && temp < 2500) set_waypoint();
-		if (temp >= 2500 && temp < 3500) read_waypoint();
-		if (temp > 3500) eeprom_clear();
+		if (temp > 500 && temp < 5000) set_waypoint();
+		if (temp > 5000) read_waypoint();
 	}
 	
 	if (aux && DEBUG == 3) {
@@ -536,3 +546,4 @@ void loop() {
 		read_waypoint();
 	}
 }
+
