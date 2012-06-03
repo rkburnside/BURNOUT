@@ -90,7 +90,7 @@ void navigate() {
 	update_waypoint();
 	get_mode();
 	if (automatic) steering.writeMicroseconds(steer_us);
-	if (automatic) speed();
+//	if (automatic) speed();
 }
 
 void update_position() {
@@ -519,8 +519,15 @@ void loop() {
 	
 	if (automatic) {	//this function makes the car be stationary when in manual waypoint setting mode
 		if (!running) {
-			esc.write(S1);	//i changed this to S1 so the car is stationary?
+			esc.write(S2);	//i changed this to S1 so the car is stationary?
 			running = true;
+		}
+	}
+	
+	if (manual) {	//this function makes the car be stationary when in manual waypoint setting mode
+		if (running) {
+			esc.write(S1);	//i changed this to S1 so the car is stationary?
+			running = false;
 		}
 	}
 	
