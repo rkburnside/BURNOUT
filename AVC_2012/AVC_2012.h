@@ -13,11 +13,12 @@ double excel_waypoints[19][2] = {{0, 0}, {0, 1000}, {0, 1500}, {0, 2000}, {0, 25
 #define WAYPOINT_ACCEPT 25	//waypoint acceptance radius
 
 #define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
-#define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations
-#define MODE 5				//digital pin for mode select
-#define TMISO 4				//digital pin for autopilot enable/disable
-#define CLICK_MAX 3		//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed
+#define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations default 1000
+#define MODE 5				//digital pin for mode select, default 5
+#define TMISO 4				//digital pin for autopilot enable/disable, default 4
+#define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
+#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
+#define STEER_GAIN 4.0		// proportional gain, default it 4.0
 #define WP_SIZE 20 			//number of bytes for each waypoint
 #define S1 1500
 #define S2 1540
@@ -35,11 +36,12 @@ double excel_waypoints[19][2] = {{0, 0}, {0, 1000}, {0, 1500}, {0, 2000}, {0, 25
 #define WAYPOINT_ACCEPT 100	//waypoint acceptance radius
 
 #define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
-#define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations
-#define MODE 5				//digital pin for mode select
-#define TMISO 4				//digital pin for autopilot enable/disable
-#define CLICK_MAX 3		//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed
+#define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations default 1000
+#define MODE 5				//digital pin for mode select, default 5
+#define TMISO 4				//digital pin for autopilot enable/disable, default 4
+#define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
+#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
+#define STEER_GAIN 4.0		// proportional gain, default it 4.0
 #define WP_SIZE 20 			//number of bytes for each waypoint
 #define S1 1500
 #define S2 1625
