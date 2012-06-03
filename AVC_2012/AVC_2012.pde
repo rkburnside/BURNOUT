@@ -105,9 +105,12 @@ void update_position() {
 void update_steering() {
 	//calculate and write angles for steering
 	angle_diff = angle_target - angle;
-	if (angle_diff < -GYRO_CAL/2) angle_diff += GYRO_CAL;
-	if (angle_diff > GYRO_CAL/2) angle_diff -= GYRO_CAL;
-	steer_us = (float)angle_diff/GYRO_CAL*SERVO_LIM*STEER_GAIN;
+	if (angle_diff < -GYRO_CAL/2) angle_diff += GYRO_CAL;   //if angle is less than 180 deg, then add 360 deg
+	if (angle_diff > GYRO_CAL/2) angle_diff -= GYRO_CAL;	//if angle is greater than 180 deg, then subtract 360
+	//now, we have an angle as -180 < angle_diff < 180. 
+	steer_us = (float)angle_diff/GYRO_CAL*STEER_GAIN;
+	if (steer_us < -SERVO_LIM) steer_us = -SERVO_LIM;
+	if (steer_us > SERVO_LIM) steer_us = SERVO_LIM;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
 }
 

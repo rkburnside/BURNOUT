@@ -17,8 +17,8 @@ double excel_waypoints[19][2] = {{0, 0}, {0, 1000}, {0, 1500}, {0, 2000}, {0, 25
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 4.0		// proportional gain, default it 4.0
+#define SERVO_LIM 250		//limits the swing of the servo so it does not get overstressed, default 300
+#define STEER_GAIN 2000		// proportional gain, default it 4.0
 #define WP_SIZE 20 			//number of bytes for each waypoint
 #define S1 1500
 #define S2 1540
@@ -40,8 +40,8 @@ double excel_waypoints[19][2] = {{0, 0}, {0, 1000}, {0, 1500}, {0, 2000}, {0, 25
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 4.0		// proportional gain, default it 4.0
+#define SERVO_LIM 250		//limits the swing of the servo so it does not get overstressed, default 300
+#define STEER_GAIN 2000		// proportional gain, default it 4.0
 #define WP_SIZE 20 			//number of bytes for each waypoint
 #define S1 1500
 #define S2 1625
