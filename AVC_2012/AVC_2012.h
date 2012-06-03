@@ -3,9 +3,7 @@
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-//int excel_waypoints[5][2] = {{0, 0}, {0, 250}, {0, 500}, {0, 750}, {0, 1000}};
-
-int excel_waypoints[19][2] = {{0, 0}, {0, 250}, {0, 500}, {0, 750}, {0, 1000}, {0, 1250}, {0, 1500}, {0, 1750}, {0, 2000}, {0, 2250}, {0, 2500}, {0, 2750}, {0, 3000}, {0, 3250}, {0, 3500}, {0, 3750}, {0, 4000}, {0, 4250}, {0, 4500}};
+double excel_waypoints[19][2] = {{0, 0}, {0, 1000}, {0, 1500}, {0, 2000}, {0, 2500}, {0, 3000}, {0, 3500}, {0, 4000}, {0, 4500}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
 
 #ifdef MM
 #define GYRO_CAL 8650000	//this has to be measured by rotating the gyro 360 deg. and reading the output
@@ -34,7 +32,7 @@ int excel_waypoints[19][2] = {{0, 0}, {0, 250}, {0, 500}, {0, 750}, {0, 1000}, {
 #define TIRE_CAL 0.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define STEER_ADJUST 1475	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define CAR_NAME "***ROADRUNNER***" //car name
-#define WAYPOINT_ACCEPT 250	//waypoint acceptance radius
+#define WAYPOINT_ACCEPT 100	//waypoint acceptance radius
 
 #define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
 #define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations
@@ -43,11 +41,10 @@ int excel_waypoints[19][2] = {{0, 0}, {0, 250}, {0, 500}, {0, 750}, {0, 1000}, {
 #define CLICK_MAX 3		//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed
 #define WP_SIZE 20 			//number of bytes for each waypoint
-#define S1 1580
-#define S2 1600
+#define S1 1500
+#define S2 1625
 #define S3 1650
-#define S4 1700
-#define S5 1750
+#define S4 1750
 
 #endif
 

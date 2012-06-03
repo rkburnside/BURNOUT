@@ -44,7 +44,7 @@ volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, angle=0, clicks = 0;
 long angle_last, angle_target, proximity, steer_us, angle_diff, previous_proximity;
 double x_wp[WAYPOINT_COUNT], y_wp[WAYPOINT_COUNT];
 double x=0, y=0;
-int wpr_count=1, wpw_count=1, wp_total;
+int wpr_count=1, wpw_count=1;
 const int InterruptPin = 2 ;		//intterupt on digital pin 2
 Servo steering, esc;
 long time=0;
@@ -147,10 +147,9 @@ void print_coordinates() {
 void speed() {
 // test to see how close we are to the previous waypoint
 if((previous_proximity - proximity) <= 100) esc.writeMicroseconds(S2); //allow car to line up with the next point
-else if(proximity < 50) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
-else if(proximity >= 50 && proximity < 150) esc.writeMicroseconds(S3); //slow way down
-else if(proximity >= 150 && proximity < 500) esc.writeMicroseconds(S4); //slow down
-else if(proximity >= 500) esc.writeMicroseconds(S5); //go wide open
+else if(proximity < 200) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
+else if(proximity >= 200 && proximity < 500) esc.writeMicroseconds(S3); //slow way down
+else if(proximity >= 500) esc.writeMicroseconds(S4); //go wide open
 
 }
 
@@ -196,7 +195,9 @@ void set_gyro_adc() {
 }
 
 void calculate_null() {
-	
+	lcd.clear();
+	lcd.print("CALCULATING NULL");
+
 	cal_flag = true;		//tell ADC ISR that we are calibrating,
 	gyro_flag = false;		//this will be set, already, but need to begin on new cycle
 	while (!gyro_flag) ;	//wait for start of new cycle
@@ -316,12 +317,22 @@ void set_waypoint() {
 
 void load_waypoints() {
 	int temp = 1;
+	lcd.clear();
+	lcd.print("LOADING POINTS");
+	delay(1500);
+
 	while (temp <= WAYPOINT_COUNT) {
 		EEPROM_readAnything(temp*WP_SIZE, waypoint);
 		x_wp[temp] = waypoint.x;
 		y_wp[temp] = waypoint.y;
 		temp++;
 	}
+
+	lcd.clear();
+	lcd.print("ALL POINTS");
+	lcd.setCursor(0, 1);
+	lcd.print("LOADED");
+	delay(1500);
 }
 
 void read_waypoint() {
@@ -461,19 +472,7 @@ void setup() {
 
 	get_mode();
 	root_menu();
-//	import_waypoints();
-
-	//load waypoints
-	lcd.clear();
-	lcd.print("LOADING POINTS");
 	load_waypoints();
-	delay(1500);
-	lcd.clear();
-	lcd.print("ALL POINTS");
-	lcd.setCursor(0, 1);
-	lcd.print("LOADED");
-	delay(1500);
-
 
 	//verify that car is in manual mode prior to starting null calculation
 	get_mode();
@@ -485,11 +484,6 @@ void setup() {
 	}
 	while(manual == false) get_mode();
 	delay(500);
-	
-	lcd.clear();
-	lcd.print("CALCULATING NULL");
-
-	wpr_count = 1;		//set waypoint read counter to first waypoint
 
 	set_gyro_adc();		//sets up free running ADC for gyro
 	calculate_null();
@@ -500,11 +494,13 @@ void setup() {
 	esc.attach(11);
 	esc.writeMicroseconds(S1);
 
-	wp_total = EEPROM.read(0);
-
 	lcd.setCursor(0, 1);
 	lcd.print("**READY TO RUN**");
-	x=0; y=0;
+	wpr_count = 1;		//set waypoint read counter to first waypoint
+	x=0;
+	y=0;
+	angle=0;
+	clicks = 0;
 }
 
 void loop() {
@@ -522,7 +518,7 @@ void loop() {
 	
 	if (automatic) {	//this function makes the car be stationary when in manual waypoint setting mode
 		if (!running) {
-			esc.write(60);	//i changed this to S1 so the car is stationary?
+			esc.write(S1);	//i changed this to S1 so the car is stationary?
 			running = true;
 		}
 	}
