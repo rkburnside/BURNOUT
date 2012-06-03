@@ -21,11 +21,11 @@ int excel_waypoints[19][2] = {{0, 0}, {0, 250}, {0, 500}, {0, 750}, {0, 1000}, {
 #define CLICK_MAX 3		//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed
 #define WP_SIZE 20 			//number of bytes for each waypoint
-#define S1 1560
-#define S2 1625
-#define S3 1700
-#define S4 1850
-#define S5 2000
+#define S1 1500
+#define S2 1540
+#define S3 1540
+#define S4 1560
+#define S5 2560
 
 #endif
 

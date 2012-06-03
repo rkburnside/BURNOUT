@@ -1,15 +1,5 @@
 /* Minuteman / Roadrunner competition code
 
-attempting to add multi-waypoint functionality
-
-This is the final release of version 0.1. At this point the car
-will steer to a pre-defined waypoint under manual throttle.
-
-The goal of this release is to test the functionality of the
-Encoder and gyro pair. I will have the car drive forward under
-manual control, and the system will update the x,y position as
-it goes.
-
 Pin Assignments:
 
 A0 - Analog input from gyro
@@ -93,28 +83,26 @@ void encoder_interrupt() {
     clicks++;
 }
 
-void calculate_parameters() {
+void navigate() {
+	update_position();
+	print_coordinates();
+	update_steering();
+	update_waypoint();
+	get_mode();
+	if (automatic) steering.writeMicroseconds(steer_us);
+	if (automatic) speed();
+}
 
+void update_position() {
 	//calculate position
 	x += sin((angle + angle_last) * 3.14159/GYRO_CAL);
 	y += cos((angle + angle_last) * 3.14159/GYRO_CAL);
 	angle_last = angle;
 	angle_target = atan2((x_wp[wpr_count] - x),(y_wp[wpr_count] - y)) * GYRO_CAL/2.0/3.14159;
 	proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
-	
-	//print stuff to LCD
-	if((millis()-time)>1000) {
-		lcd.clear();
-		lcd.print(x_wp[wpr_count]);
-		lcd.print(" , ");
-		lcd.print(y_wp[wpr_count]);
-		lcd.setCursor(0, 1);
-		lcd.print(x);
-		lcd.print(" , ");
-		lcd.print(y);
-		time = millis();
-	}
+}
 
+void update_steering() {
 	//calculate and write angles for steering
 	angle_diff = angle_target - angle;
 	if (angle_diff < -GYRO_CAL/2) angle_diff += GYRO_CAL;
@@ -123,7 +111,9 @@ void calculate_parameters() {
 	//steer_us = (angle_diff + GYRO_CAL/2.0) * (SERVO_LIM + SERVO_LIM) / (GYRO_CAL/2.0 + GYRO_CAL/2.0) + SERVO_LIM;    
 	steer_us = (float)angle_diff/GYRO_CAL*SERVO_LIM*4.0;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
+}
 
+void update_waypoint() {
 	//waypoint acceptance and move to next waypoint
 	if (proximity < WAYPOINT_ACCEPT) {
 		wpr_count++;
@@ -137,10 +127,21 @@ void calculate_parameters() {
 		proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
 		previous_proximity = proximity;
 	}
-	
-	get_mode();
-	if (automatic) steering.writeMicroseconds(steer_us);
-	if (automatic) speed();
+}
+
+void print_coordinates() {
+	//print stuff to LCD
+	if((millis()-time)>1000) {
+		lcd.clear();
+		lcd.print(x_wp[wpr_count]);
+		lcd.print(" , ");
+		lcd.print(y_wp[wpr_count]);
+		lcd.setCursor(0, 1);
+		lcd.print(x);
+		lcd.print(" , ");
+		lcd.print(y);
+		time = millis();
+	}
 }
 
 void speed() {
@@ -342,8 +343,7 @@ void read_waypoint() {
 	lcd.print(micros() - temp);
 }    
 
-//EEPROM Clear
-void eeprom_clear() {
+void eeprom_clear() {  //EEPROM Clear
 	// write a 0 to all 512 bytes of the EEPROM
 	for (int i = 0; i < 512; i++) EEPROM.write(i, 0);
 
@@ -514,7 +514,7 @@ void loop() {
 	get_mode();
 	if (clicks >= CLICK_MAX) {
 		clicks = 0;
-		calculate_parameters();
+		navigate();
 	}
 
 	if (aux && DEBUG == 1) calibrate_gyro();
