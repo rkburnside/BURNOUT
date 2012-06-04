@@ -102,8 +102,8 @@ void calculate_speed() {
 }
 
 void cal_steer_lim() {
-	steer_limm = (int)map(speed_cur, 5400, 20000, 150, 350);
-	if (steer_limm > 300) steer_limm = 300;
+	steer_limm = (int)map(speed_cur, 5400, 20000, 200, 350);
+	if (steer_limm > 350) steer_limm = 350;
 	// lcd.clear();
 	// lcd.print(gyro_limm);
 	}

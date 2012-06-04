@@ -3,7 +3,7 @@
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-double excel_waypoints[19][2] = {{0, 0}, {0, 15000}, {0, 1500}, {0, 2000}, {0, 2500}, {0, 3000}, {0, 3500}, {0, 4000}, {0, 4500}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+double excel_waypoints[19][2] = {{0, 0}, {-70.68, 203.29}, {-194.87, 464}, {-207, 842}, {-70, 897}, {-25, 669}, {-5, 148}, {0, 4000}, {0, 4500}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
 
 #ifdef MM
 #define GYRO_CAL 8650000	//this has to be measured by rotating the gyro 360 deg. and reading the output
@@ -18,10 +18,10 @@ double excel_waypoints[19][2] = {{0, 0}, {0, 15000}, {0, 1500}, {0, 2000}, {0, 2
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 4000		// proportional gain, default it 4.0
+#define STEER_GAIN 3500		// proportional gain, default it 4.0
 #define WP_SIZE 20 			//number of bytes for each waypoint
 #define S1 1500
-#define S2 1540
+#define S2 1580
 #define S3 1560
 #define S4 1600
 #define S5 1650
