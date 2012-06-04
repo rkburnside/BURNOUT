@@ -44,7 +44,7 @@ volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, angle=0, clicks = 0;
 long angle_last, angle_target, proximity, steer_us, angle_diff, previous_proximity;
 double x_wp[WAYPOINT_COUNT], y_wp[WAYPOINT_COUNT];
 double x=0, y=0;
-int wpr_count=1, wpw_count=1;
+int wpr_count=1, wpw_count=1, speed_cur=0, speed_new=0, speed_old=0, steer_limm = 300;
 const int InterruptPin = 2 ;		//intterupt on digital pin 2
 Servo steering, esc;
 long time=0;
@@ -84,6 +84,8 @@ void encoder_interrupt() {
 }
 
 void navigate() {
+	calculate_speed();
+	cal_steer_lim();
 	update_position();
 	print_coordinates();
 	update_steering();
@@ -92,6 +94,19 @@ void navigate() {
 	if (automatic) steering.writeMicroseconds(steer_us);
 //	if (automatic) speed();
 }
+
+void calculate_speed() {
+    speed_new = micros();
+    speed_cur = speed_new - speed_old;
+    speed_old = speed_new;
+}
+
+void cal_steer_lim() {
+	steer_limm = (int)map(speed_cur, 5400, 20000, 150, 350);
+	if (steer_limm > 300) steer_limm = 300;
+	// lcd.clear();
+	// lcd.print(gyro_limm);
+	}
 
 void update_position() {
 	//calculate position
@@ -109,8 +124,8 @@ void update_steering() {
 	if (angle_diff > GYRO_CAL/2) angle_diff -= GYRO_CAL;	//if angle is greater than 180 deg, then subtract 360
 	//now, we have an angle as -180 < angle_diff < 180. 
 	steer_us = (float)angle_diff/GYRO_CAL*STEER_GAIN;
-	if (steer_us < -SERVO_LIM) steer_us = -SERVO_LIM;
-	if (steer_us > SERVO_LIM) steer_us = SERVO_LIM;
+	if (steer_us < 0-steer_limm) steer_us = 0-steer_limm;
+	if (steer_us > steer_limm) steer_us = steer_limm;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
 }
 

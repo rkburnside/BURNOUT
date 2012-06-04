@@ -3,7 +3,7 @@
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-double excel_waypoints[19][2] = {{0, 0}, {0, 1000}, {0, 1500}, {0, 2000}, {0, 2500}, {0, 3000}, {0, 3500}, {0, 4000}, {0, 4500}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+double excel_waypoints[19][2] = {{0, 0}, {0, 15000}, {0, 1500}, {0, 2000}, {0, 2500}, {0, 3000}, {0, 3500}, {0, 4000}, {0, 4500}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
 
 #ifdef MM
 #define GYRO_CAL 8650000	//this has to be measured by rotating the gyro 360 deg. and reading the output
