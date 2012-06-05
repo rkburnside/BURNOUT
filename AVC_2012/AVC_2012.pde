@@ -41,7 +41,7 @@ LiquidCrystal lcd(A3, A4, A5, 8, 7, 6);
 volatile boolean gyro_flag = false, cal_flag;
 boolean manual, automatic, aux=false, running=false;
 volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, angle=0, clicks = 0;
-long angle_last, angle_target, proximity, steer_us, angle_diff, previous_proximity;
+long angle_last, angle_target, proximity, steer_us, angle_diff, previous_proximity=10000;
 double x_wp[WAYPOINT_COUNT], y_wp[WAYPOINT_COUNT];
 double x=0, y=0;
 int wpr_count=1, wpw_count=1, speed_cur=0, speed_new=0, speed_old=0, steer_limm = 300;
@@ -92,7 +92,7 @@ void navigate() {
 	update_waypoint();
 	get_mode();
 	if (automatic) steering.writeMicroseconds(steer_us);
-//	if (automatic) speed();
+	if (automatic) speed();
 }
 
 void calculate_speed() {
@@ -162,10 +162,19 @@ void print_coordinates() {
 
 void speed() {
 // test to see how close we are to the previous waypoint
-if((previous_proximity - proximity) <= 100) esc.writeMicroseconds(S2); //allow car to line up with the next point
-else if(proximity < 200) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
-else if(proximity >= 200 && proximity < 500) esc.writeMicroseconds(S3); //slow way down
-else if(proximity >= 500) esc.writeMicroseconds(S4); //go wide open
+	running = true;
+	if((previous_proximity - proximity) <= 25) esc.writeMicroseconds(S2); //allow car to line up with the next point
+	else if(proximity < 50) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
+#ifdef RR
+	else if(proximity >= 200 && proximity < 500) esc.writeMicroseconds(S3); //slow way down
+#endif
+#ifdef MM
+	else if(proximity >= 50 && proximity < 200) { //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
+		if (speed_cur < 6000)  esc.writeMicroseconds(SB);  // less than 8000 means high speed, apply brakes
+		else esc.writeMicroseconds(S3);  //once speed is low enough, resume normal slow-down
+	}
+#endif
+	else if(proximity >= 200) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
 
 }
 

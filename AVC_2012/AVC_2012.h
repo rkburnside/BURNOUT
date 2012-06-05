@@ -20,12 +20,12 @@ double excel_waypoints[19][2] = {{0, 0}, {-70.68, 203.29}, {-194.87, 464}, {-207
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 3500		// proportional gain, default it 4.0
 #define WP_SIZE 20 			//number of bytes for each waypoint
-#define S1 1500
-#define S2 1580
-#define S3 1560
-#define S4 1600
+#define S1 1500				// some default values:
+#define S2 1560				// S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
+#define S3 1580				// This is the speed for negotiating wp's 
+#define S4 1650				// 1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650
 #define S5 1650
-
+#define SB 1300
 #endif
 
 #ifdef RR
