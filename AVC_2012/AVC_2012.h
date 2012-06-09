@@ -1,52 +1,68 @@
 //Header file variable
-#define MM
+#define RR
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-double excel_waypoints[19][2] = {{0, 0}, {-70.68, 203.29}, {-194.87, 464}, {-207, 842}, {-70, 897}, {-25, 669}, {-5, 148}, {0, 4000}, {0, 4500}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+double excel_waypoints[19][2] = {{0, 0}, {0, 14000}, {0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0}};
 
 #ifdef MM
+//WAYPOINT AND SPEED PARAMETERS
+#define WAYPOINT_ACCEPT 25	//waypoint acceptance radius
+#define WP_SIZE 20 			//number of bytes for each waypoint
+#define S1 1500				// some default values:
+#define S2 1560				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
+#define S3 1580				//This is the speed for negotiating wp's 
+#define S4 1650				//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650
+#define SB 1300				//breaking speed
+#define P1 25				//proximity to allow car to align with next waypoint 
+#define P2 50				//close proximity to waypoint
+#define P3 200				//far proximity to waypoint
+#define BREAKING_SPEED 6000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
+
+//SENSOR PARAMETERS
 #define GYRO_CAL 8650000	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define TIRE_CAL 1.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define STEER_ADJUST 1425	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
-#define CAR_NAME "***MINUTEMAN***" //car name
-#define WAYPOINT_ACCEPT 25	//waypoint acceptance radius
+#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
+#define STEER_GAIN 3500		// proportional gain, default it 4.0
 
+//FIXED PARAMETERS
+#define CAR_NAME "***MINUTEMAN***" //car name
 #define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
 #define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations default 1000
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 3500		// proportional gain, default it 4.0
-#define WP_SIZE 20 			//number of bytes for each waypoint
-#define S1 1500				// some default values:
-#define S2 1560				// S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
-#define S3 1580				// This is the speed for negotiating wp's 
-#define S4 1650				// 1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650
-#define S5 1650
-#define SB 1300
 #endif
 
 #ifdef RR
+//WAYPOINT AND SPEED PARAMETERS
+#define WAYPOINT_ACCEPT 100	//waypoint acceptance radius
+#define WP_SIZE 20 			//number of bytes for each waypoint
+#define S1 1500				//stationary speed
+#define S2 1650				//1650 is a creeping speed
+#define S3 1700				//This is the speed for negotiating wp's 
+#define S4 1800				//1800 is pretty ridiculously fast. Don't use for general use.
+#define SB 1300				//breaking. adjust this parameter to allow creeping up on waypoints
+#define P1 25				//proximity to allow car to align with next waypoint 
+#define P2 50				//close proximity to waypoint
+#define P3 200				//far proximity to waypoint
+#define BREAKING_SPEED 6000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
+
+//SENSOR PARAMETERS
 #define GYRO_CAL 8700000	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define TIRE_CAL 0.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define STEER_ADJUST 1475	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
-#define CAR_NAME "***ROADRUNNER***" //car name
-#define WAYPOINT_ACCEPT 100	//waypoint acceptance radius
+#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
+#define STEER_GAIN 4000		// proportional gain, if navigation gets unstable, reduce.
 
+//FIXED PARAMETERS
+#define CAR_NAME "***ROADRUNNER***" //car name
 #define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
 #define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations default 1000
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 4000		// proportional gain, if navigation gets unstable, reduce.
-#define WP_SIZE 20 			//number of bytes for each waypoint
-#define S1 1500
-#define S2 1625
-#define S3 1650
-#define S4 1750
 
 #endif
 

@@ -163,22 +163,13 @@ void print_coordinates() {
 void speed() {
 	running = true;			// make sure running is updated.
 
-#ifdef RR
-	if((previous_proximity - proximity) <= 100) esc.writeMicroseconds(S2); //allow car to line up with the next point
-	else if(proximity < 200) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
-	else if(proximity >= 200 && proximity < 500) esc.writeMicroseconds(S3); //slow way down
-	else if(proximity >= 500) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
-#endif
-
-#ifdef MM
-	if((previous_proximity - proximity) <= 25) esc.writeMicroseconds(S2); //allow car to line up with the next point
-	else if(proximity < 50) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
-	else if(proximity >= 50 && proximity < 200) { //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
-		if (speed_cur < 6000)  esc.writeMicroseconds(SB);  // less than 8000 means high speed, apply brakes
+	if((previous_proximity - proximity) <= P1) esc.writeMicroseconds(S2); //allow car to line up with the next point
+	else if(proximity < P2) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
+	else if(proximity >= P2 && proximity < P3) { //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
+		if (speed_cur < BREAKING_SPEED)  esc.writeMicroseconds(SB);  // less than 8000 means high speed, apply brakes
 		else esc.writeMicroseconds(S3);  //once speed is low enough, resume normal slow-down
 	}
-	else if(proximity >= 200) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
-#endif
+	else if(proximity >= P3) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
 }
 
 ISR(ADC_vect) {			//ADC interrupt
@@ -572,4 +563,3 @@ void loop() {
 		read_waypoint();
 	}
 }
-
