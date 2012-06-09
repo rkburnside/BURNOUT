@@ -87,7 +87,7 @@ void navigate() {
 	calculate_speed();
 	cal_steer_lim();
 	update_position();
-	print_coordinates();
+//	print_coordinates();
 	update_steering();
 	update_waypoint();
 	get_mode();
@@ -102,8 +102,8 @@ void calculate_speed() {
 }
 
 void cal_steer_lim() {
-	steer_limm = (int)map(speed_cur, 5400, 20000, 200, 350);
-	if (steer_limm > 350) steer_limm = 350;
+	steer_limm = (int)map(speed_cur, L1, L2, L3, L4);
+	if (steer_limm > L4) steer_limm = L4;
 	// lcd.clear();
 	// lcd.print(gyro_limm);
 	}

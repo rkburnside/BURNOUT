@@ -3,12 +3,11 @@
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-double excel_waypoints[19][2] = {{0, 0}, {0, 14000}, {0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0},{0, 0}};
+double excel_waypoints[19][2] = {{-323.19,1280.74},{-310.84,2865.01},{1509.74,3132.36},{2374.48,2803.54},{2353.1,2040.64},{2238.77,-384.86},{1883.37,-551.9},{-322.23,-480.61},{-545.43,-175.17},{-110.37,-20.42},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
 #define WAYPOINT_ACCEPT 25	//waypoint acceptance radius
-#define WP_SIZE 20 			//number of bytes for each waypoint
 #define S1 1500				// some default values:
 #define S2 1560				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
 #define S3 1580				//This is the speed for negotiating wp's 
@@ -18,6 +17,11 @@ double excel_waypoints[19][2] = {{0, 0}, {0, 14000}, {0, 0},{0, 0},{0, 0},{0, 0}
 #define P2 50				//close proximity to waypoint
 #define P3 200				//far proximity to waypoint
 #define BREAKING_SPEED 6000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
+#define L1 5400
+#define L2 20000
+#define L3 200
+#define L4 350
+
 
 //SENSOR PARAMETERS
 #define GYRO_CAL 8650000	//this has to be measured by rotating the gyro 360 deg. and reading the output
@@ -33,21 +37,27 @@ double excel_waypoints[19][2] = {{0, 0}, {0, 14000}, {0, 0},{0, 0},{0, 0},{0, 0}
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
+#define WP_SIZE 20 			//number of bytes for each waypoint
 #endif
 
 #ifdef RR
 //WAYPOINT AND SPEED PARAMETERS
 #define WAYPOINT_ACCEPT 100	//waypoint acceptance radius
-#define WP_SIZE 20 			//number of bytes for each waypoint
-#define S1 1500				//stationary speed
-#define S2 1650				//1650 is a creeping speed
-#define S3 1700				//This is the speed for negotiating wp's 
-#define S4 1800				//1800 is pretty ridiculously fast. Don't use for general use.
-#define SB 1300				//breaking. adjust this parameter to allow creeping up on waypoints
-#define P1 25				//proximity to allow car to align with next waypoint 
+#define S1 1550				//stationary speed
+#define S2 1625				//1650 is a creeping speed
+#define S3 1675				//This is the speed for negotiating wp's 
+#define S4 1850				//1800 is pretty ridiculously fast. Don't use for general use.
+#define SB 1050				//breaking. adjust this parameter to allow creeping up on waypoints
+#define P1 100				//proximity to allow car to align with next waypoint 
 #define P2 50				//close proximity to waypoint
-#define P3 200				//far proximity to waypoint
-#define BREAKING_SPEED 6000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
+#define P3 400				//far proximity to waypoint
+#define BREAKING_SPEED 3000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
+#define L1 2200
+#define L2 5500
+#define L3 200
+#define L4 350
+
+//MY BEST SPEEDS: S1=1550, S2=1625, S3=1675, S4=1750
 
 //SENSOR PARAMETERS
 #define GYRO_CAL 8700000	//this has to be measured by rotating the gyro 360 deg. and reading the output
@@ -63,7 +73,7 @@ double excel_waypoints[19][2] = {{0, 0}, {0, 14000}, {0, 0},{0, 0},{0, 0},{0, 0}
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
-
+#define WP_SIZE 20 			//number of bytes for each waypoint
 #endif
 
 /*
