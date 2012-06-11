@@ -39,7 +39,7 @@ D13 - LED status
 
 LiquidCrystal lcd(A3, A4, A5, 8, 7, 6);
 volatile boolean gyro_flag = false, cal_flag;
-boolean manual, automatic, aux=false, running=false;
+boolean manual, automatic, aux=false, running=false, first=true;
 volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, angle=0, clicks = 0;
 long angle_last, angle_target, proximity, steer_us, angle_diff, previous_proximity=10000;
 double x_wp[WAYPOINT_COUNT], y_wp[WAYPOINT_COUNT];
@@ -520,11 +520,12 @@ void setup() {
 	y=0;
 	angle=0;
 	clicks = 0;
+	first = true;
 }
 
 void loop() {
 	long temp;
-
+	
 	/* in the main loop here, we should wait for thing to happen, then act on them. Watch clicks and wait for it to reach CLICK_MAX, then calculate position and such.*/
 	get_mode();
 	if (clicks >= CLICK_MAX) {
@@ -540,6 +541,10 @@ void loop() {
 			esc.write(S2);	//i changed this to S1 so the car is stationary?
 			running = true;
 		}
+		if (first) {
+			angle = 0;
+			first = false;
+		}
 	}
 	
 	if (manual) {	//this function makes the car be stationary when in manual waypoint setting mode
@@ -547,6 +552,11 @@ void loop() {
 			esc.write(S1);	//i changed this to S1 so the car is stationary?
 			running = false;
 		}
+	}
+
+	if (wpr_count = 19) {
+		esc.writeMicroseconds(S1);
+		while (true);
 	}
 	
 	if (aux && DEBUG == 0) {
