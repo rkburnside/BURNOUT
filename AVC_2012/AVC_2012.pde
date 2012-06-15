@@ -554,7 +554,7 @@ void loop() {
 		}
 	}
 
-	if (wpr_count = 19) {
+	if (wpr_count >= WAYPOINT_COUNT) {
 		esc.writeMicroseconds(S1);
 		while (true);
 	}

@@ -3,7 +3,8 @@
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-double excel_waypoints[19][2] = {{-323.19,1280.74},{-310.84,2865.01},{1509.74,3132.36},{2374.48,2803.54},{2353.1,2040.64},{2238.77,-384.86},{1883.37,-551.9},{-322.23,-480.61},{-545.43,-175.17},{-110.37,-20.42},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}};
+double excel_waypoints[19][2] = {{0, 0}, {-150, 500}, {-150, 1200}, {-50, 1300}, {1500, 1300}, {3100, 1300}, {3200, 1100}, {3200, -1300}, {3000, -1350}, {-120, -1300}, {-175, -1100}, {-150, 300}, {-150, 300}, {-150, 300}, {-150, 300}, {-150, 300}, {-150, 300}, {-150, 300}, {-150, 300}};
+//double excel_waypoints[19][2] = {{0, 0}, {0, 500}, {0, 1000}, {0, 1500}, {0, 2000}, {0, 2500}, {0, 3000}, {0, 3500}, {0, 4000}, {0, 4500}, {0, 5000}, {0, 5500}, {0, 6000}, {0, 6500}, {0, 7000}, {0, 7500}, {0, 8000}, {0, 8500}, {0, 8500}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
@@ -42,15 +43,15 @@ double excel_waypoints[19][2] = {{-323.19,1280.74},{-310.84,2865.01},{1509.74,31
 
 #ifdef RR
 //WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 100	//waypoint acceptance radius
+#define WAYPOINT_ACCEPT 50	//waypoint acceptance radius
 #define S1 1550				//stationary speed
-#define S2 1625				//1650 is a creeping speed
+#define S2 1635				//1650 is a creeping speed
 #define S3 1675				//This is the speed for negotiating wp's 
-#define S4 1850				//1800 is pretty ridiculously fast. Don't use for general use.
+#define S4 1750				//1800 is pretty ridiculously fast. Don't use for general use.
 #define SB 1050				//breaking. adjust this parameter to allow creeping up on waypoints
-#define P1 100				//proximity to allow car to align with next waypoint 
-#define P2 50				//close proximity to waypoint
-#define P3 400				//far proximity to waypoint
+#define P1 150				//proximity to allow car to align with next waypoint 
+#define P2 75				//close proximity to waypoint
+#define P3 300				//far proximity to waypoint
 #define BREAKING_SPEED 3000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
 #define L1 2200
 #define L2 5500
@@ -58,7 +59,7 @@ double excel_waypoints[19][2] = {{-323.19,1280.74},{-310.84,2865.01},{1509.74,31
 #define L4 350
 
 //MY BEST SPEEDS: S1=1550, S2=1625, S3=1675, S4=1750
-
+//1625=~5000, 1650=~4300, 1700=~3000, 1750=~2200, 1800=~2200 
 //SENSOR PARAMETERS
 #define GYRO_CAL 8700000	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define TIRE_CAL 0.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
