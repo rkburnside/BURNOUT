@@ -1,10 +1,9 @@
 //Header file variable
-#define RR
+#define MM
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-double excel_waypoints[19][2] = {{0, 0}, {-150, 500}, {-150, 1200}, {-50, 1300}, {1500, 1300}, {3100, 1300}, {3200, 1100}, {3200, -1300}, {3000, -1350}, {-120, -1300}, {-175, -1100}, {-150, 300}, {-150, 300}, {-150, 300}, {-150, 300}, {-150, 300}, {-150, 300}, {-150, 300}, {-150, 300}};
-//double excel_waypoints[19][2] = {{0, 0}, {0, 500}, {0, 1000}, {0, 1500}, {0, 2000}, {0, 2500}, {0, 3000}, {0, 3500}, {0, 4000}, {0, 4500}, {0, 5000}, {0, 5500}, {0, 6000}, {0, 6500}, {0, 7000}, {0, 7500}, {0, 8000}, {0, 8500}, {0, 8500}};
+double excel_waypoints[19][2] = {{0, 1000}, {546.09, 1360}, {2200.11, 1300}, {3832, 1190}, {3760, -1276}, {1246, -1430}, {160.34, -1250}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
@@ -12,12 +11,12 @@ double excel_waypoints[19][2] = {{0, 0}, {-150, 500}, {-150, 1200}, {-50, 1300},
 #define S1 1500				// some default values:
 #define S2 1560				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
 #define S3 1580				//This is the speed for negotiating wp's 
-#define S4 1650				//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650
-#define SB 1300				//breaking speed
+#define S4 2000 				//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
+#define SB 1250				//breaking speed default 1300
 #define P1 25				//proximity to allow car to align with next waypoint 
 #define P2 50				//close proximity to waypoint
-#define P3 200				//far proximity to waypoint
-#define BREAKING_SPEED 6000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
+#define P3 300				//far proximity to waypoint default 250
+#define BREAKING_SPEED 4000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed default 6000
 #define L1 5400
 #define L2 20000
 #define L3 200
