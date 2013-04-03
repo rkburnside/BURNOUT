@@ -273,6 +273,8 @@ void stab_temp() {
 void watch_angle() {
 	lcd.clear();
 	lcd.print("angle watch");
+	set_gyro_adc();		//sets up free running ADC for gyro
+	calculate_null();
 	do {
 		get_mode();
 		lcd.clear();
