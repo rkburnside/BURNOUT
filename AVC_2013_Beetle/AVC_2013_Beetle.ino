@@ -11,7 +11,7 @@ Vehicle: Turnigy Beetle RC car with 7.2V battery and 2.4-GHz TX/RX
 
 /* TO DO LIST
 - compare GPS points at stake center between bing maps and my own gps. drive the car, with the data logger attached, along hard, physical routes to compare its accuracy.
-- determine GPS output rate. print milis(), get and print gps reading, print milis(), do the math
+- determine GPS output rate. print millis(), get and print gps reading, print millis(), do the math
 - clean up gps code so that i only get the information that i need
 - output the gps info i need to serial and then bluetooth
 - create serial driven menu system using serial UI
@@ -83,8 +83,8 @@ Servo steering;
 Servo speed;
 
 //Steering and Throttle
-#define SERVO 6					// pin # for steering servo
-#define THROTTLE 7				// pin # for throttle
+#define SERVO 6					// pin # for steering servo - green	
+#define THROTTLE 10				// pin # for throttle - yellow wire
 
 //GPS Variables
 float flat, flon;
@@ -93,9 +93,9 @@ unsigned short sentences, failed;
 double waypoint_distance, waypoint_heading = 0;
 
 //Compass
-#define compass_x_cal -20.5
-#define compass_y_cal 139.0
-#define declinationAngle -0.15126187
+#define compass_x_cal -92
+#define compass_y_cal 157
+#define declinationAngle 0.15126187
 int XAxis = 0, YAxis = 0;
 double compass_heading = 0;
 double angle_diff;				// for the compass
@@ -103,32 +103,22 @@ double angle_diff;				// for the compass
 
 //GPS Waypoints
 int waypoint_num = 0;
-const int waypoint_total = 15;	// <- should always be the same number of GPS waypoints
+const int waypoint_total = 5;	// <- should always be the same number of GPS waypoints
 // 0 = lat use, 1 = south lat use, 2 = north lat use
-double gps_array[15][3] = {{40.0651517950864528, -105.2097273131420, 0}, // 1st corner
-	{40.0650036900410714, -105.2097272812302, 1}, // 1st line up point
-	{40.0649066081190785, -105.2097109401257, 1}, // 2nd line up point or start of straight line
-	{40.06485, -105.20975, 1}, // just added today
-	{40.064528, -105.2097763511701, 1}, // lat point for start of turn
-	{40.06448686920148, -105.20985212357533, 0}, // 2nd corner, just inside of south parking lot
-	{40.06445080617122, -105.21016393037269, 0}, // bottom middle of south parking lot
-	{40.06449104008855, -105.21041203470733, 0}, // inbetween sidewalks for 3rd corner
-	{40.06450670940305, -105.2104463610966, 0}, // 3rd corner
-	{40.06465758628262, -105.21046433778312, 2}, // line up for inbetween next bottleneck
-	{40.06475817068338, -105.21046970220115, 2}, // past the bottleneck
-	{40.06493060073908, -105.21048043103721, 2}, // middle of the 3rd side
-	{40.06514305860027, -105.21048311324623, 2}, // end of 3rd side
-	{40.06519745591719, -105.21041069360282, 0}, // 4th corner
-	{40.06518985782108, -105.21001238556421, 0}}; // way past the finish line
+double gps_array[5][3] = {{39.538696506815334, -105.01680727005721, 0},
+{39.53873270565525, -105.01672948599578, 0},
+{39.53847827912335, -105.01641834975005, 0},
+{39.53861066377666, -105.01659805775405, 0},
+{39.53863031460211, -105.01675362587692, 0}};
 
-int header_line = 0;				// counter that reprints the serial header line
+int print_delay = 0;
 
 void setup(){
-	serial_bluetooth.begin(115200);
+	serial_bluetooth.begin(9600);
 	serial_bluetooth.println("bluetooth initialized");
 	serial_gps.begin(9600);
 	serial_bluetooth.println("gps initialized");
-
+	Serial.begin(9600);
 	steering.attach(SERVO);		//Servo Initialization
 	speed.attach(THROTTLE);		//Speed control initialization
 
@@ -150,31 +140,26 @@ void loop(){
 	set_turn();
 	set_speed();
 
-	serial_data_log();
-
-	if(header_line > 31){
-		serial_bluetooth.println("");
-		serial_bluetooth.println("XAxis\tYAxis\tHeading\t\tLat\t\t\tLon\t\t\t\tFailed");
-		serial_bluetooth.println("------------------------------------------------------------------");
-		header_line = 0;
-	}
-	header_line++;
+	if((millis() - print_delay) > 250){
+		serial_data_log();
+		print_delay = millis();
+	}	
 }
 
 /* these functions need work. consider incorporating XXX code ideas.*/
 
 void set_speed(void){		// test this and delete the delays after it works
-	if(waypoint_distance <= 20)		speed.write(112);
-	if(waypoint_distance > 20)		speed.write(150);
+	if(waypoint_distance <= 20)		speed.write(13);
+	if(waypoint_distance > 20)		speed.write(13);
 
-	while(waypoint_num >= waypoint_total) speed.write(90);		// shuts off the vehicle by setting speed to 0
+	while(waypoint_num >= waypoint_total) speed.write(0);		// shuts off the vehicle by setting speed to 0
 
 	return;
 }
 
 void set_turn(void){				// Set servo to steer in the direction of the next waypoint
 	double servo_angle;
-
+//	right is 0, left is 180.
 	angle_diff = compass_heading - waypoint_heading;
 
 	if(angle_diff < -180)	angle_diff += 360.0;
@@ -184,9 +169,26 @@ void set_turn(void){				// Set servo to steer in the direction of the next waypo
 	servo_angle = 180.0 - servo_angle;
 	
 	// this section sets the servo/turning limits
-	if(servo_angle > 130.0)		steering.write(130);
-	else if(servo_angle < 50.0)	steering.write(50);
-	else						steering.write(servo_angle);
+	// if(servo_angle > 130.0)		steering.write(130);
+	// else if(servo_angle < 50.0)	steering.write(50);
+	// else						steering.write(servo_angle);
+	// steering.write(servo_angle);
+	steering.write(120);
+
+
+	Serial.print(compass_heading);
+	Serial.print("\t\t");
+	Serial.print(waypoint_heading);
+	Serial.print("\t\t");
+	Serial.print(servo_angle);
+	Serial.print("\t\t");
+	Serial.print(angle_diff);
+	Serial.print("\t\t");
+	Serial.print(flat,8);
+	Serial.print("\t\t");
+	Serial.print(flon,8);
+	Serial.println("\t\t");
+
 	return;
 }
 
@@ -238,26 +240,27 @@ void gpsdump(TinyGPS &gps){		// GPS Calculation
 
 void compass_measurement(){
 	MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
-	YAxis = raw.YAxis + compass_y_cal;	//adjust YAxis with calibration factor
 	XAxis = raw.XAxis + compass_x_cal;	//adjust XAxis with calibration factor
+	YAxis = raw.YAxis + compass_y_cal;	//adjust YAxis with calibration factor
+
 	compass_heading = atan2(YAxis, XAxis);	//calculate compass_heading
 
-	compass_heading += declinationAngle;
+	compass_heading = PI - compass_heading;
+	compass_heading = compass_heading + declinationAngle;
+	if(compass_heading < 0.0) compass_heading += 2.0*PI;
+	if(compass_heading > (2.0*PI)) compass_heading -= 2.0*PI;
 
-	if(compass_heading < 0) compass_heading += 2*PI;	// Correct for when signs are reversed.
-	if(compass_heading > 2*PI) compass_heading -= 2*PI;	// Check for wrap due to addition of declination.
-
-	compass_heading = compass_heading * 180.0/PI;	// Convert radians to degrees for readability.
+	compass_heading = compass_heading * 180.0/PI;
 
 	return;
 }
 
 void serial_data_log(){			// Serial Data Logging
-	serial_bluetooth.print(XAxis);	serial_bluetooth.print("\t\t");   
-	serial_bluetooth.print(YAxis);	serial_bluetooth.print("\t\t");
-	serial_bluetooth.print(compass_heading,2);	serial_bluetooth.print("\t\t");
-	serial_bluetooth.print(flat,8);	serial_bluetooth.print("\t");
-	serial_bluetooth.print(flon,8); serial_bluetooth.print("\t");
+	serial_bluetooth.print(waypoint_heading);	serial_bluetooth.print("\t\t");   
+	serial_bluetooth.print(compass_heading);	serial_bluetooth.print("\t\t");
+	// serial_bluetooth.print(compass_heading,2);	serial_bluetooth.print("\t\t");
+	serial_bluetooth.print(flat,8);	serial_bluetooth.print("\t\t");
+	serial_bluetooth.print(flon,8); serial_bluetooth.print("\t\t");
 	serial_bluetooth.println(failed);
 
 	// i should include waypoint heading, distance, angle diff, etc
