@@ -66,25 +66,33 @@ LOW		NEUTRAL		HIGH
 
 */
 
+/*
+http://letsmakerobots.com/node/28278
+http://arduino.cc/forum/index.php?topic=54036.0;wap2
+PWM and timer
+There is fixed relation between the timers and the PWM capable outputs. When you look in the data sheet or the pinout of the processor these PWM capable pins have names like OCRxA, OCRxB or OCRxC (where x means the timer number 0..5). The PWM functionality is often shared with other pin functionality. 
+The Arduino has 3Timers and 6 PWM output pins. The relation between timers and PWM outputs is:
+Pins 5 and 6: controlled by timer0
+Pins 9 and 10: controlled by timer1
+Pins 11 and 3: controlled by timer2
+*/
+
 //Included Libraries
 #include <Wire.h>
-#include <SoftwareSerial.h>
 #include <HMC5883L.h>
 #include <Servo.h> 
 #include <TinyGPS.h>
 #include <math.h>
 
 //Function and Object Declarations
-SoftwareSerial serial_bluetooth(3,2);	// RX, TX
-SoftwareSerial serial_gps(4,5);			// RX, TX
 HMC5883L compass;
 TinyGPS gps;
 Servo steering;
 Servo speed;
 
 //Steering and Throttle
-#define SERVO 6					// pin # for steering servo - green	
-#define THROTTLE 10				// pin # for throttle - yellow wire
+#define SERVO 2				// pin # for steering servo - green	
+#define THROTTLE 3			// pin # for throttle - yellow wire
 
 //GPS Variables
 float flat, flon;
@@ -111,14 +119,11 @@ double gps_array[5][3] = {{39.538696506815334, -105.01680727005721, 0},
 {39.53861066377666, -105.01659805775405, 0},
 {39.53863031460211, -105.01675362587692, 0}};
 
-int print_delay = 0;
+double print_delay = 0;
 
 void setup(){
-	serial_bluetooth.begin(9600);
-	serial_bluetooth.println("bluetooth initialized");
-	serial_gps.begin(9600);
-	serial_bluetooth.println("gps initialized");
-	Serial.begin(9600);
+	Serial1.begin(115200);		// bluetooth serial
+	Serial2.begin(9600);		// gps serial
 	steering.attach(SERVO);		//Servo Initialization
 	speed.attach(THROTTLE);		//Speed control initialization
 
@@ -126,7 +131,6 @@ void setup(){
 	Wire.begin(); // Start the I2C interface.
 	compass = HMC5883L(); // Construct a new HMC5883 compass.
 	compass.SetScale(0.88); // Set the scale of the compass.
-	Serial.println("Setting measurement mode to continous.");
 	compass.SetMeasurementMode(Measurement_Continuous); // Set the measurement mode to Continuous
 
 	delay(1000);
@@ -135,7 +139,6 @@ void setup(){
 void loop(){
 	compass_measurement();
 	gps_data();
-
 	waypoint();
 	set_turn();
 	set_speed();
@@ -148,18 +151,26 @@ void loop(){
 
 /* these functions need work. consider incorporating XXX code ideas.*/
 
+
 void set_speed(void){		// test this and delete the delays after it works
-	if(waypoint_distance <= 20)		speed.write(13);
-	if(waypoint_distance > 20)		speed.write(13);
+	// if(waypoint_distance <= 20)		speed.write(13);
+	// if(waypoint_distance > 20)		speed.write(13);
 
-	while(waypoint_num >= waypoint_total) speed.write(0);		// shuts off the vehicle by setting speed to 0
-
+	// while(waypoint_num >= waypoint_total) speed.write(0);		// shuts off the vehicle by setting speed to 0
+	speed.write(97);
 	return;
 }
+
+
 
 void set_turn(void){				// Set servo to steer in the direction of the next waypoint
 	double servo_angle;
 //	right is 0, left is 180.
+	compass_heading = -(compass_heading - 90.0);	// switches heading to normal x,y coordinates
+
+	if(compass_heading < 0.0)	compass_heading += 360;
+	if(compass_heading > 360.0)	compass_heading -= 360;
+
 	angle_diff = compass_heading - waypoint_heading;
 
 	if(angle_diff < -180)	angle_diff += 360.0;
@@ -168,26 +179,11 @@ void set_turn(void){				// Set servo to steer in the direction of the next waypo
 	servo_angle = angle_diff/2.0 + 90.0;		//changes domain from -180...180 to 0...180
 	servo_angle = 180.0 - servo_angle;
 	
-	// this section sets the servo/turning limits
-	// if(servo_angle > 130.0)		steering.write(130);
-	// else if(servo_angle < 50.0)	steering.write(50);
-	// else						steering.write(servo_angle);
-	// steering.write(servo_angle);
-	steering.write(120);
+//	this section sets the servo/turning limits
+	if(servo_angle > 130.0)		steering.write(130);
+	else if(servo_angle < 50.0)	steering.write(50);
+	else						steering.write(servo_angle);
 
-
-	Serial.print(compass_heading);
-	Serial.print("\t\t");
-	Serial.print(waypoint_heading);
-	Serial.print("\t\t");
-	Serial.print(servo_angle);
-	Serial.print("\t\t");
-	Serial.print(angle_diff);
-	Serial.print("\t\t");
-	Serial.print(flat,8);
-	Serial.print("\t\t");
-	Serial.print(flon,8);
-	Serial.println("\t\t");
 
 	return;
 }
@@ -215,9 +211,9 @@ void waypoint(void){				// Distance and angle to next waypoint
 
 /*Working Functions That Are Working Well*/
 
+
 //GPS data update
 void gps_data(){
-	serial_gps.listen();
 	bool newdata = false;
 	if(feedgps()) newdata = true;
 	if(newdata) gpsdump(gps);
@@ -225,8 +221,8 @@ void gps_data(){
 }
 
 bool feedgps(){
-	while (serial_gps.available()){
-		if (gps.encode(serial_gps.read()))
+	while(Serial2.available()){
+		if(gps.encode(Serial2.read()))
 		return true;
 	}
 	return false;
@@ -237,6 +233,8 @@ void gpsdump(TinyGPS &gps){		// GPS Calculation
 	gps.stats(&chars, &sentences, &failed);	//should be removed later...just a waste of time
 	return;
 }
+
+
 
 void compass_measurement(){
 	MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
@@ -255,26 +253,20 @@ void compass_measurement(){
 	return;
 }
 
+
+
 void serial_data_log(){			// Serial Data Logging
-	serial_bluetooth.print(waypoint_heading);	serial_bluetooth.print("\t\t");   
-	serial_bluetooth.print(compass_heading);	serial_bluetooth.print("\t\t");
-	// serial_bluetooth.print(compass_heading,2);	serial_bluetooth.print("\t\t");
-	serial_bluetooth.print(flat,8);	serial_bluetooth.print("\t\t");
-	serial_bluetooth.print(flon,8); serial_bluetooth.print("\t\t");
-	serial_bluetooth.println(failed);
-
-	// i should include waypoint heading, distance, angle diff, etc
-	// latitude_array = gps_array[waypoint_num][0]*1000000;
-	// longitude_array = gps_array[waypoint_num][1]*1000000;
-	// wp_distance = waypoint_distance;
-	// wp_heading = waypoint_heading;
-	// long angle_string;
-	// angle_string = angle * 360.0 / GYRO_CAL;
-
-	
+	Serial1.print(waypoint_heading);	Serial1.print("\t\t");   
+	Serial1.print(compass_heading);		Serial1.print("\t\t");
+	Serial1.print(flat,8);				Serial1.print("\t\t");
+	Serial1.print(flon,8); 				Serial1.print("\t\t");
+	Serial1.println(failed);
 	
 	return;
 }
+
+
+
 
 /* GPS Routes
 
