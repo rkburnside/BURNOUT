@@ -157,7 +157,7 @@ void set_speed(void){		// test this and delete the delays after it works
 	// if(waypoint_distance > 20)		speed.write(13);
 
 	// while(waypoint_num >= waypoint_total) speed.write(0);		// shuts off the vehicle by setting speed to 0
-	speed.write(97);
+	speed.write(105);
 	return;
 }
 
