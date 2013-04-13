@@ -2,79 +2,47 @@
 Vehicle: Wile E. Coyote
 Author: Richard Burnside
 Verion: 1.0
-Date: 4/4/2013
+Date: 4/12/2013
 
-Microcontroller: Arduino nano
-Sensors to add: steering servo, speed control servo, GPS unit, bluetooth, magnetometer
+Microcontroller: Arduino mega.
+***USE THE MEGA. SERVO AND SOFTWARE SERIAL DO NOT!!! PLAY WELL TOGETHER***
+Components: steering servo, speed control servo, GPS unit, bluetooth, magnetometer
 Vehicle: Turnigy Beetle RC car with 7.2V battery and 2.4-GHz TX/RX
 */
 
 /* TO DO LIST
+- create header file with all tweaks i need
+- build a roll cage
+- output the gps info i need to bluetooth
+- use GPS speed and get top speed report
+- use GPS heading to calibrate compass heading
+- calibrate the CAR speed to servo angle (little changes seem to make HUGE differences)
 - compare GPS points at stake center between bing maps and my own gps. drive the car, with the data logger attached, along hard, physical routes to compare its accuracy.
-- determine GPS output rate. print millis(), get and print gps reading, print millis(), do the math
-- clean up gps code so that i only get the information that i need
-- output the gps info i need to serial and then bluetooth
 - create serial driven menu system using serial UI
 - add manual over ride switch (i.e. competition mode)
-- add ~.5 second delay after flipping switch
-- have the location for all the waypoints i need
+- add ~1.0 second delay after flipping switch
+- use bt-serial to get gps wayponits. write them using EEPROM
+- incorporate breaking into the throttle routine
 - incorporate cross track error handling
 - write routine that calculates the distance and direction to next waypoint
 - write routine to determine when i have reached a way point
-- write a routine to proceed to the next waypoint
 - use latitude/longitude for waypoint acceptance
+- recalibrate compass
+- create on the fly calibration routine for the compass
 - verify copmass heading is actually working correctly
-- write a routine to turn right or whatever direction i need
 - incorporate steering limits so i don't roll the car again
 - set gain for steering (i.e. more vs. less agressive steering)
 - set gain for throttle (i.e. more vs. less acceleration)
 - mail in AVC video
 - create shut down function for when the car passes the finish line
 - create shut down or reverse function if the car hasn't moved for ~15 seconds from its current spot
-- build a roll cage
 - hot glue everything
-- zipties everything
-- delete all of the unneeded GPS items that I have listed (alt, speed, course, time, date, etc)
 - use an array to determine GPS points, distances and angles using arrays and get averages of them
-- path forward: ignore gps heading correct between corners of building or when it is > 20-ft of waypoint
 - develop a correct method/procedure for programming waypoints and driving them consistently
-*/
-
-/* Servo Positions
-LOW		NEUTRAL		HIGH
-1250	1500		1750
-0-deg	90-deg		180-deg
-*/
-
-/*Autonomous Vehicle Order of Operation - speed
-- am i within the range of the next waypoint?
-	if the distance difference is... (use the SWITCH CASE function)
-		am i starting at waypoint[0] (home)...set speed to 10% to start to ramp up
-		0-5-ft			- yes - proceed to next waypoint, add 1 to the waypoint array counter to become next waypoint, and set speed for turning
-		5-15-ft			- set speed to 25%
-		>15-ft			- set speed to 50%
-- is there an object too close?
-	if the distance difference is... (use the SWITCH CASE function)
-		0-10-in			- use an array to determine the avearage difference, if it stays that way for ~5 seconds, then reverse or change course
-		10-30-in		- RAM INTO THE SUCKER!
-		>30-in			- proceed on
-- have i been stationary (not moved more than 5 feet) for more than 7 seconds (use an array to get the average)?
-	use the SWITCH CASE function
-		reverse for 3 seconds
-		reverse for 3 seconds while turning to the right
-		reverse for 3 seconds while turning to the left
-
-*/
-
-/*
-http://letsmakerobots.com/node/28278
-http://arduino.cc/forum/index.php?topic=54036.0;wap2
-PWM and timer
-There is fixed relation between the timers and the PWM capable outputs. When you look in the data sheet or the pinout of the processor these PWM capable pins have names like OCRxA, OCRxB or OCRxC (where x means the timer number 0..5). The PWM functionality is often shared with other pin functionality. 
-The Arduino has 3Timers and 6 PWM output pins. The relation between timers and PWM outputs is:
-Pins 5 and 6: controlled by timer0
-Pins 9 and 10: controlled by timer1
-Pins 11 and 3: controlled by timer2
+x - clean up gps code so that i only get the information that i need
+x - delete all of the unneeded GPS items that I have listed (alt, speed, course, time, date, etc)
+x - (no longer needed now that i am using the mega.) determine GPS output rate. print millis(), get and print gps reading, print millis(), do the math
+x - zipties everything
 */
 
 //Included Libraries
@@ -83,6 +51,8 @@ Pins 11 and 3: controlled by timer2
 #include <Servo.h> 
 #include <TinyGPS.h>
 #include <math.h>
+#include "AVC_2013_Beetle.h"
+#include "EEPROMAnything.h"
 
 //Function and Object Declarations
 HMC5883L compass;
@@ -132,8 +102,6 @@ void setup(){
 	compass = HMC5883L(); // Construct a new HMC5883 compass.
 	compass.SetScale(0.88); // Set the scale of the compass.
 	compass.SetMeasurementMode(Measurement_Continuous); // Set the measurement mode to Continuous
-
-	delay(1000);
 }
 
 void loop(){
@@ -153,15 +121,12 @@ void loop(){
 
 
 void set_speed(void){		// test this and delete the delays after it works
-	// if(waypoint_distance <= 20)		speed.write(13);
-	// if(waypoint_distance > 20)		speed.write(13);
+	if(waypoint_distance <= 20)		speed.write(105);
+	if(waypoint_distance > 20)		speed.write(115);
+	while(waypoint_num >= waypoint_total) speed.write(0);		// shuts off the vehicle by setting speed to 0
 
-	// while(waypoint_num >= waypoint_total) speed.write(0);		// shuts off the vehicle by setting speed to 0
-	speed.write(105);
 	return;
 }
-
-
 
 void set_turn(void){				// Set servo to steer in the direction of the next waypoint
 	double servo_angle;
@@ -183,7 +148,6 @@ void set_turn(void){				// Set servo to steer in the direction of the next waypo
 	if(servo_angle > 130.0)		steering.write(130);
 	else if(servo_angle < 50.0)	steering.write(50);
 	else						steering.write(servo_angle);
-
 
 	return;
 }
@@ -207,16 +171,14 @@ void waypoint(void){				// Distance and angle to next waypoint
 	return;
 }
 
-
-
 /*Working Functions That Are Working Well*/
-
 
 //GPS data update
 void gps_data(){
 	bool newdata = false;
 	if(feedgps()) newdata = true;
 	if(newdata) gpsdump(gps);
+
 	return;
 }
 
@@ -231,10 +193,9 @@ bool feedgps(){
 void gpsdump(TinyGPS &gps){		// GPS Calculation
 	gps.f_get_position(&flat, &flon, &age);
 	gps.stats(&chars, &sentences, &failed);	//should be removed later...just a waste of time
+
 	return;
 }
-
-
 
 void compass_measurement(){
 	MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
@@ -253,8 +214,6 @@ void compass_measurement(){
 	return;
 }
 
-
-
 void serial_data_log(){			// Serial Data Logging
 	Serial1.print(waypoint_heading);	Serial1.print("\t\t");   
 	Serial1.print(compass_heading);		Serial1.print("\t\t");
@@ -264,9 +223,6 @@ void serial_data_log(){			// Serial Data Logging
 	
 	return;
 }
-
-
-
 
 /* GPS Routes
 
