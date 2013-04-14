@@ -1,46 +1,53 @@
 //Header file variable
-#define MM
+#define SERVO 2						// pin # for steering servo - green	
+#define THROTTLE 3					// pin # for throttle - yellow wire
+#define WAYPOINT_ACCEPT_RANGE 10 	// radius in # of feet in which to accept the waypoint
+#define COMPASS_X_CAL -92			// compass calibration number
+#define COMPASS_Y_CAL 157			// compass calibration number
+#define DECLINATION 0.15126187		// compass declination number
+
+//GPS Variables
+float flat, flon;
+unsigned long age, date, time, chars;
+unsigned short sentences, failed;
+double waypoint_distance, waypoint_heading = 0;
+
+//Compass
+int XAxis = 0, YAxis = 0;
+double compass_heading = 0;
+double angle_diff;				// for the compass
+
+
+//GPS Waypoints
+int waypoint_num = 0;
+const int waypoint_total = 5;	// <- should always be the same number of GPS waypoints
+// 0 = lat use, 1 = south lat use, 2 = north lat use
+double gps_array[5][3] = {{39.538696506815334, -105.01680727005721, 0},
+{39.53873270565525, -105.01672948599578, 0},
+{39.53847827912335, -105.01641834975005, 0},
+{39.53861066377666, -105.01659805775405, 0},
+{39.53863031460211, -105.01675362587692, 0}};
+
+double print_delay = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
 double excel_waypoints[19][2] = {{0, 1000}, {546.09, 1360}, {2200.11, 1300}, {3832, 1190}, {3760, -1276}, {1246, -1430}, {160.34, -1250}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}};
 
-#ifdef MM
-//WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 25	//waypoint acceptance radius
-#define S1 1500				// some default values:
-#define S2 1560				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
-#define S3 1580				//This is the speed for negotiating wp's 
-#define S4 2000 				//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
-#define SB 1250				//breaking speed default 1300
-#define P1 25				//proximity to allow car to align with next waypoint 
-#define P2 50				//close proximity to waypoint
-#define P3 300				//far proximity to waypoint default 250
-#define BREAKING_SPEED 4000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed default 6000
-#define L1 5400
-#define L2 20000
-#define L3 200
-#define L4 350
-
-
-//SENSOR PARAMETERS
-#define GYRO_CAL 8650000	//this has to be measured by rotating the gyro 360 deg. and reading the output
-#define TIRE_CAL 1.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
-#define STEER_ADJUST 1425	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 3500		// proportional gain, default it 4.0
-
-//FIXED PARAMETERS
-#define CAR_NAME "***MINUTEMAN***" //car name
-#define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
-#define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations default 1000
-#define MODE 5				//digital pin for mode select, default 5
-#define TMISO 4				//digital pin for autopilot enable/disable, default 4
-#define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
-#define WP_SIZE 20 			//number of bytes for each waypoint
-#endif
-
-#ifdef RR
 //WAYPOINT AND SPEED PARAMETERS
 #define WAYPOINT_ACCEPT 50	//waypoint acceptance radius
 #define S1 1550				//stationary speed
@@ -57,8 +64,6 @@ double excel_waypoints[19][2] = {{0, 1000}, {546.09, 1360}, {2200.11, 1300}, {38
 #define L3 200
 #define L4 350
 
-//MY BEST SPEEDS: S1=1550, S2=1625, S3=1675, S4=1750
-//1625=~5000, 1650=~4300, 1700=~3000, 1750=~2200, 1800=~2200 
 //SENSOR PARAMETERS
 #define GYRO_CAL 8700000	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define TIRE_CAL 0.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
@@ -74,13 +79,5 @@ double excel_waypoints[19][2] = {{0, 1000}, {546.09, 1360}, {2200.11, 1300}, {38
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 #define WP_SIZE 20 			//number of bytes for each waypoint
-#endif
 
-/*
-0%	1500	20%	1600	40%	1700	60%	1800	80%	1900	100% 2000
-5%	1525	25%	1625	45%	1725	65%	1825	85%	1925
-10%	1550	30%	1650	50%	1750	70%	1850	90%	1950
-15%	1575	35%	1675	55%	1775	75%	1875	95%	1975
 */
-
-

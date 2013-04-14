@@ -52,44 +52,13 @@ x - zipties everything
 #include <TinyGPS.h>
 #include <math.h>
 #include "AVC_2013_Beetle.h"
-#include "EEPROMAnything.h"
+//#include "EEPROMAnything.h"
 
 //Function and Object Declarations
 HMC5883L compass;
 TinyGPS gps;
 Servo steering;
 Servo speed;
-
-//Steering and Throttle
-#define SERVO 2				// pin # for steering servo - green	
-#define THROTTLE 3			// pin # for throttle - yellow wire
-
-//GPS Variables
-float flat, flon;
-unsigned long age, date, time, chars;
-unsigned short sentences, failed;
-double waypoint_distance, waypoint_heading = 0;
-
-//Compass
-#define compass_x_cal -92
-#define compass_y_cal 157
-#define declinationAngle 0.15126187
-int XAxis = 0, YAxis = 0;
-double compass_heading = 0;
-double angle_diff;				// for the compass
-
-
-//GPS Waypoints
-int waypoint_num = 0;
-const int waypoint_total = 5;	// <- should always be the same number of GPS waypoints
-// 0 = lat use, 1 = south lat use, 2 = north lat use
-double gps_array[5][3] = {{39.538696506815334, -105.01680727005721, 0},
-{39.53873270565525, -105.01672948599578, 0},
-{39.53847827912335, -105.01641834975005, 0},
-{39.53861066377666, -105.01659805775405, 0},
-{39.53863031460211, -105.01675362587692, 0}};
-
-double print_delay = 0;
 
 void setup(){
 	Serial1.begin(115200);		// bluetooth serial
@@ -100,7 +69,6 @@ void setup(){
 	//compass initialization
 	Wire.begin(); // Start the I2C interface.
 	compass = HMC5883L(); // Construct a new HMC5883 compass.
-	compass.SetScale(0.88); // Set the scale of the compass.
 	compass.SetMeasurementMode(Measurement_Continuous); // Set the measurement mode to Continuous
 }
 
@@ -118,7 +86,6 @@ void loop(){
 }
 
 /* these functions need work. consider incorporating XXX code ideas.*/
-
 
 void set_speed(void){		// test this and delete the delays after it works
 	if(waypoint_distance <= 20)		speed.write(105);
@@ -161,12 +128,12 @@ void waypoint(void){				// Distance and angle to next waypoint
 	waypoint_distance = sqrt(pow(x,2) + pow(y,2))*5280.0;	// converts distance to feet
 	waypoint_heading = atan2(y,x)*180.0/M_PI;				// 180/pi converts from rads to degrees
 
-	if(waypoint_heading < 0)	waypoint_heading += 360.0;	// ensures heading is ALWAYS positive
+	if(waypoint_heading < 0) waypoint_heading += 360.0;	// ensures heading is ALWAYS positive
 
 // this is the waypoint acceptance section. consider breaking it out into another function
 	if((gps_array[waypoint_num][2] == 1) && (gps_array[waypoint_num][0] > flat)) waypoint_num++; // going south
 	else if((gps_array[waypoint_num][2] == 2) && (gps_array[waypoint_num][0] < flat)) waypoint_num++; // going north
-	else if(waypoint_distance < 10) waypoint_num++;
+	else if(waypoint_distance < WAYPOINT_ACCEPT_RANGE) waypoint_num++;
 
 	return;
 }
@@ -198,14 +165,24 @@ void gpsdump(TinyGPS &gps){		// GPS Calculation
 }
 
 void compass_measurement(){
+	
 	MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
-	XAxis = raw.XAxis + compass_x_cal;	//adjust XAxis with calibration factor
-	YAxis = raw.YAxis + compass_y_cal;	//adjust YAxis with calibration factor
 
+	// Compass Reading Filtering (sometimes bogus values are read)
+	if(raw.XAxis < 1000){		// test to see if max axis reading is acceptable
+		if(raw.XAxis > -1000)	// test to see if min axis reading is acceptable
+			XAxis = raw.XAxis + COMPASS_X_CAL;	//adjust axis with calibration factor
+	}
+	
+	if(raw.YAxis < 1000){		// test to see if max axis reading is acceptable
+		if(raw.YAxis > -1000)	// test to see if min axis reading is acceptable
+			YAxis = raw.YAxis + COMPASS_Y_CAL;	//adjust axis with calibration factor
+	}
+	
 	compass_heading = atan2(YAxis, XAxis);	//calculate compass_heading
 
 	compass_heading = PI - compass_heading;
-	compass_heading = compass_heading + declinationAngle;
+	compass_heading = compass_heading + DECLINATION;
 	if(compass_heading < 0.0) compass_heading += 2.0*PI;
 	if(compass_heading > (2.0*PI)) compass_heading -= 2.0*PI;
 
@@ -215,12 +192,14 @@ void compass_measurement(){
 }
 
 void serial_data_log(){			// Serial Data Logging
+	Serial1.print(XAxis);				Serial1.print("\t\t");   
+	Serial1.print(YAxis);				Serial1.print("\t\t");
 	Serial1.print(waypoint_heading);	Serial1.print("\t\t");   
 	Serial1.print(compass_heading);		Serial1.print("\t\t");
 	Serial1.print(flat,8);				Serial1.print("\t\t");
 	Serial1.print(flon,8); 				Serial1.print("\t\t");
 	Serial1.println(failed);
-	
+
 	return;
 }
 
