@@ -11,11 +11,8 @@ Vehicle: Turnigy Beetle RC car with 7.2V battery and 2.4-GHz TX/RX
 */
 
 /* TO DO LIST
-- create header file with all tweaks i need
+- verify cross track error handling works
 - build a roll cage
-- output the gps info i need to bluetooth
-- use GPS speed and get top speed report
-- use GPS heading to calibrate compass heading
 - calibrate the CAR speed to servo angle (little changes seem to make HUGE differences)
 - compare GPS points at stake center between bing maps and my own gps. drive the car, with the data logger attached, along hard, physical routes to compare its accuracy.
 - create serial driven menu system using serial UI
@@ -23,10 +20,8 @@ Vehicle: Turnigy Beetle RC car with 7.2V battery and 2.4-GHz TX/RX
 - add ~1.0 second delay after flipping switch
 - use bt-serial to get gps wayponits. write them using EEPROM
 - incorporate breaking into the throttle routine
-- incorporate cross track error handling
 - write routine that calculates the distance and direction to next waypoint
 - write routine to determine when i have reached a way point
-- use latitude/longitude for waypoint acceptance
 - recalibrate compass
 - create on the fly calibration routine for the compass
 - verify copmass heading is actually working correctly
@@ -43,6 +38,11 @@ x - clean up gps code so that i only get the information that i need
 x - delete all of the unneeded GPS items that I have listed (alt, speed, course, time, date, etc)
 x - (no longer needed now that i am using the mega.) determine GPS output rate. print millis(), get and print gps reading, print millis(), do the math
 x - zipties everything
+x - create header file with all tweaks i need
+x - output the gps info i need to bluetooth
+x - use GPS speed and get top speed report
+x - use GPS heading to calibrate compass heading
+x - (i'm not going to use this now, it shouldn't be an issue.) use latitude/longitude for waypoint acceptance
 */
 
 //Included Libraries
@@ -61,21 +61,22 @@ Servo steering;
 Servo speed;
 
 void setup(){
-	Serial1.begin(115200);		// bluetooth serial
-	Serial2.begin(9600);		// gps serial
+	Serial1.begin(115200);		//bluetooth serial
+	Serial2.begin(9600);		//gps serial
 	steering.attach(SERVO);		//Servo Initialization
 	speed.attach(THROTTLE);		//Speed control initialization
 
 	//compass initialization
-	Wire.begin(); // Start the I2C interface.
-	compass = HMC5883L(); // Construct a new HMC5883 compass.
-	compass.SetMeasurementMode(Measurement_Continuous); // Set the measurement mode to Continuous
+	Wire.begin(); //Start the I2C interface.
+	compass = HMC5883L(); //Construct a new HMC5883 compass.
+	compass.SetMeasurementMode(Measurement_Continuous); //Set the measurement mode to Continuous
 }
 
 void loop(){
 	compass_measurement();
 	gps_data();
 	waypoint();
+	cross_track_calculation();
 	set_turn();
 	set_speed();
 
@@ -87,56 +88,71 @@ void loop(){
 
 /* these functions need work. consider incorporating XXX code ideas.*/
 
-void set_speed(void){		// test this and delete the delays after it works
-	if(waypoint_distance <= 20)		speed.write(105);
-	if(waypoint_distance > 20)		speed.write(115);
-	while(waypoint_num >= waypoint_total) speed.write(0);		// shuts off the vehicle by setting speed to 0
+void set_speed(void){		//test this and delete the delays after it works
+	if(waypoint_distance <= 20)									speed.write(SPEED_SLOW);
+	if((waypoint_distance > 20) && (waypoint_distance <=40))	speed.write(SPEED_MED);
+	if(waypoint_distance > 20)									speed.write(SPEED_MED);
+	while(waypoint_num >= waypoint_total) speed.write(SPEED_STOP);		//shuts off the vehicle by setting speed to 0
 
 	return;
 }
 
-void set_turn(void){				// Set servo to steer in the direction of the next waypoint
+void set_turn(void){				//Set servo to steer in the direction of the next waypoint
 	double servo_angle;
 //	right is 0, left is 180.
-	compass_heading = -(compass_heading - 90.0);	// switches heading to normal x,y coordinates
+	compass_heading = -(compass_heading - 90.0);	//switches heading to normal x,y coordinates
 
-	if(compass_heading < 0.0)	compass_heading += 360;
-	if(compass_heading > 360.0)	compass_heading -= 360;
+	if(compass_heading < 0.0)	compass_heading += 360.0;
+	if(compass_heading > 360.0)	compass_heading -= 360.0;
 
-	angle_diff = compass_heading - waypoint_heading;
-
-	if(angle_diff < -180)	angle_diff += 360.0;
-	if(angle_diff >= 180)	angle_diff -= 360.0;
+	angle_diff = compass_heading - waypoint_heading - cross_track_error * ERROR_GAIN;
+	
+	if(angle_diff < -180.0)	angle_diff += 360.0;
+	if(angle_diff >= 180.0)	angle_diff -= 360.0;
 
 	servo_angle = angle_diff/2.0 + 90.0;		//changes domain from -180...180 to 0...180
 	servo_angle = 180.0 - servo_angle;
 	
 //	this section sets the servo/turning limits
-	if(servo_angle > 130.0)		steering.write(130);
-	else if(servo_angle < 50.0)	steering.write(50);
-	else						steering.write(servo_angle);
+	if(servo_angle > SERVO_STEERING_LIMIT_LEFT)			steering.write(SERVO_STEERING_LIMIT_LEFT);
+	else if(servo_angle < SERVO_STEERING_LIMIT_RIGHT)	steering.write(SERVO_STEERING_LIMIT_RIGHT);
+	else												steering.write(servo_angle);
 
 	return;
 }
 
-void waypoint(void){				// Distance and angle to next waypoint
+void waypoint(void){				//Distance and angle to next waypoint
 	double x, y;
 
 	x = 69.1*(gps_array[waypoint_num][1] - flon) * cos(flat/57.3);
 	y = 69.1*(gps_array[waypoint_num][0] - flat);
 	
-	waypoint_distance = sqrt(pow(x,2) + pow(y,2))*5280.0;	// converts distance to feet
-	waypoint_heading = atan2(y,x)*180.0/M_PI;				// 180/pi converts from rads to degrees
+	waypoint_distance = sqrt(pow(x,2) + pow(y,2))*5280.0;	//converts distance to feet
+	waypoint_heading = atan2(y,x)*180.0/M_PI;				//180/pi converts from rads to degrees
 
-	if(waypoint_heading < 0) waypoint_heading += 360.0;	// ensures heading is ALWAYS positive
-
-// this is the waypoint acceptance section. consider breaking it out into another function
-	if((gps_array[waypoint_num][2] == 1) && (gps_array[waypoint_num][0] > flat)) waypoint_num++; // going south
-	else if((gps_array[waypoint_num][2] == 2) && (gps_array[waypoint_num][0] < flat)) waypoint_num++; // going north
-	else if(waypoint_distance < WAYPOINT_ACCEPT_RANGE) waypoint_num++;
+	if(waypoint_heading < 0) waypoint_heading += 360.0;	//ensures heading is ALWAYS positive
+	
+	if(waypoint_distance < WAYPOINT_ACCEPT_RANGE) waypoint_num++;	//waypoint acceptance
 
 	return;
 }
+
+void cross_track_calculation(void){
+	double x1, x2, y1, y2, dot_product;
+	
+	// calculate the dot product
+	if(waypoint_num == 0) cross_track_error = 0;
+	else {
+		x1 = gps_array[waypoint_num-1][1];
+		x2 = gps_array[waypoint_num][1];
+		y1 = gps_array[waypoint_num-1][0];
+		y2 = gps_array[waypoint_num][0];
+		dot_product = (y1*y2 + x1*x2) / (sqrt(pow(x1,2)+pow(y1,2))*sqrt(pow(x2,2)+pow(y2,2)));	//normalization of the dot_product
+		cross_track_error = acos(dot_product)*180.0/PI;
+	}
+	return;
+}
+
 
 /*Working Functions That Are Working Well*/
 
@@ -157,9 +173,11 @@ bool feedgps(){
 	return false;
 }
 
-void gpsdump(TinyGPS &gps){		// GPS Calculation
+void gpsdump(TinyGPS &gps){		//GPS Calculation
 	gps.f_get_position(&flat, &flon, &age);
 	gps.stats(&chars, &sentences, &failed);	//should be removed later...just a waste of time
+
+	if(max_speed < gps.f_speed_mph()) max_speed = gps.f_speed_mph();	//stores maximum speed
 
 	return;
 }
@@ -168,14 +186,14 @@ void compass_measurement(){
 	
 	MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
 
-	// Compass Reading Filtering (sometimes bogus values are read)
-	if(raw.XAxis < 1000){		// test to see if max axis reading is acceptable
-		if(raw.XAxis > -1000)	// test to see if min axis reading is acceptable
+	//Compass Reading Filtering (sometimes bogus values are read)
+	if(raw.XAxis < 1000){		//test to see if max axis reading is acceptable
+		if(raw.XAxis > -1000)	//test to see if min axis reading is acceptable
 			XAxis = raw.XAxis + COMPASS_X_CAL;	//adjust axis with calibration factor
 	}
 	
-	if(raw.YAxis < 1000){		// test to see if max axis reading is acceptable
-		if(raw.YAxis > -1000)	// test to see if min axis reading is acceptable
+	if(raw.YAxis < 1000){		//test to see if max axis reading is acceptable
+		if(raw.YAxis > -1000)	//test to see if min axis reading is acceptable
 			YAxis = raw.YAxis + COMPASS_Y_CAL;	//adjust axis with calibration factor
 	}
 	
@@ -191,13 +209,16 @@ void compass_measurement(){
 	return;
 }
 
-void serial_data_log(){			// Serial Data Logging
-	Serial1.print(XAxis);				Serial1.print("\t\t");   
-	Serial1.print(YAxis);				Serial1.print("\t\t");
-	Serial1.print(waypoint_heading);	Serial1.print("\t\t");   
-	Serial1.print(compass_heading);		Serial1.print("\t\t");
-	Serial1.print(flat,8);				Serial1.print("\t\t");
-	Serial1.print(flon,8); 				Serial1.print("\t\t");
+void serial_data_log(){			//Serial Data Logging
+	// Serial1.print(XAxis);				Serial1.print("\t\t");   
+	// Serial1.print(YAxis);				Serial1.print("\t\t");
+	Serial1.print(cross_track_error,1);		Serial1.print("\t\t");
+	Serial1.print(waypoint_heading,1);		Serial1.print("\t\t");   
+	Serial1.print(compass_heading,1);		Serial1.print("\t\t");
+	Serial1.print(waypoint_distance,1);		Serial1.print("\t\t");
+	Serial1.print(flat,8);					Serial1.print("\t\t");
+	Serial1.print(flon,8); 					Serial1.print("\t\t");
+	Serial1.print(max_speed,1); 			Serial1.print("\t\t");
 	Serial1.println(failed);
 
 	return;

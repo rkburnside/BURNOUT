@@ -1,53 +1,48 @@
 //Header file variable
-#define SERVO 2						// pin # for steering servo - green	
-#define THROTTLE 3					// pin # for throttle - yellow wire
-#define WAYPOINT_ACCEPT_RANGE 10 	// radius in # of feet in which to accept the waypoint
-#define COMPASS_X_CAL -92			// compass calibration number
-#define COMPASS_Y_CAL 157			// compass calibration number
-#define DECLINATION 0.15126187		// compass declination number
+#define COMPASS_X_CAL -92			//compass calibration number
+#define COMPASS_Y_CAL 157			//compass calibration number
+#define DECLINATION 0.15126187		//compass declination number
+
+#define WAYPOINT_ACCEPT_RANGE 10 	//radius in # of feet in which to accept the waypoint
+
+#define SERVO 2						//pin # for steering servo - green	
+#define SERVO_STEERING_LIMIT_LEFT 150
+#define SERVO_STEERING_LIMIT_RIGHT 30
+
+#define THROTTLE 3					//pin # for throttle - yellow wire
+#define SPEED_STOP 90
+#define SPEED_SLOW 100
+#define SPEED_MED 105
+#define SPEED_FAST 120
+#define SPEED_BREAKING 50
+#define ERROR_GAIN 1.0				//1.0 full gain, .5 half as aggressive, .25 quarter aggressive
+
+//Global Variables
+double print_delay = 0;
+double cross_track_error = 0;
 
 //GPS Variables
-float flat, flon;
+float flat, flon, max_speed=0.0;
 unsigned long age, date, time, chars;
 unsigned short sentences, failed;
-double waypoint_distance, waypoint_heading = 0;
+double waypoint_distance, waypoint_heading = 0.0;
 
 //Compass
 int XAxis = 0, YAxis = 0;
 double compass_heading = 0;
-double angle_diff;				// for the compass
-
+double angle_diff;				//for the compass
 
 //GPS Waypoints
 int waypoint_num = 0;
-const int waypoint_total = 5;	// <- should always be the same number of GPS waypoints
-// 0 = lat use, 1 = south lat use, 2 = north lat use
-double gps_array[5][3] = {{39.538696506815334, -105.01680727005721, 0},
-{39.53873270565525, -105.01672948599578, 0},
-{39.53847827912335, -105.01641834975005, 0},
-{39.53861066377666, -105.01659805775405, 0},
-{39.53863031460211, -105.01675362587692, 0}};
-
-double print_delay = 0;
-
-
-
-
-
-
-
-
-
-
-
+const int waypoint_total = 5;	//<- should always be the same number of GPS waypoints
+double gps_array[5][2] = {{39.538696506815334, -105.01680727005721},
+{39.53873270565525, -105.01672948599578},
+{39.53847827912335, -105.01641834975005},
+{39.53861066377666, -105.01659805775405},
+{39.53863031460211, -105.01675362587692}};
 
 
 /*
-
-#define WAYPOINT_COUNT 19
-#define WAYPOINTS_STRING \
-double excel_waypoints[19][2] = {{0, 1000}, {546.09, 1360}, {2200.11, 1300}, {3832, 1190}, {3760, -1276}, {1246, -1430}, {160.34, -1250}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}, {214.93, 274.15}};
-
 //WAYPOINT AND SPEED PARAMETERS
 #define WAYPOINT_ACCEPT 50	//waypoint acceptance radius
 #define S1 1550				//stationary speed
@@ -63,21 +58,4 @@ double excel_waypoints[19][2] = {{0, 1000}, {546.09, 1360}, {2200.11, 1300}, {38
 #define L2 5500
 #define L3 200
 #define L4 350
-
-//SENSOR PARAMETERS
-#define GYRO_CAL 8700000	//this has to be measured by rotating the gyro 360 deg. and reading the output
-#define TIRE_CAL 0.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
-#define STEER_ADJUST 1475	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 4000		// proportional gain, if navigation gets unstable, reduce.
-
-//FIXED PARAMETERS
-#define CAR_NAME "***ROADRUNNER***" //car name
-#define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
-#define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations default 1000
-#define MODE 5				//digital pin for mode select, default 5
-#define TMISO 4				//digital pin for autopilot enable/disable, default 4
-#define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
-#define WP_SIZE 20 			//number of bytes for each waypoint
-
 */
