@@ -1,6 +1,6 @@
 //Header file variable
-#define COMPASS_X_CAL -92			//compass calibration number
-#define COMPASS_Y_CAL 157			//compass calibration number
+int compass_x_cal = -92;			//compass calibration number
+int compass_y_cal = 157;			//compass calibration number
 #define DECLINATION 0.15126187		//compass declination number
 
 #define WAYPOINT_ACCEPT_RANGE 10 	//radius in # of feet in which to accept the waypoint

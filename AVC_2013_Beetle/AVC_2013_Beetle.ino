@@ -70,6 +70,10 @@ void setup(){
 	Wire.begin(); //Start the I2C interface.
 	compass = HMC5883L(); //Construct a new HMC5883 compass.
 	compass.SetMeasurementMode(Measurement_Continuous); //Set the measurement mode to Continuous
+	delay(10000);
+	compass_calibration_routine();
+	delay(5000);
+	
 }
 
 void loop(){
@@ -141,7 +145,7 @@ void cross_track_calculation(void){
 	double x1, x2, y1, y2, dot_product;
 	
 	// calculate the dot product
-	if(waypoint_num == 0) cross_track_error = 0;
+	if(waypoint_num == 0) cross_track_error = 0.0;
 	else {
 		x1 = gps_array[waypoint_num-1][1];
 		x2 = gps_array[waypoint_num][1];
@@ -150,6 +154,48 @@ void cross_track_calculation(void){
 		dot_product = (y1*y2 + x1*x2) / (sqrt(pow(x1,2)+pow(y1,2))*sqrt(pow(x2,2)+pow(y2,2)));	//normalization of the dot_product
 		cross_track_error = acos(dot_product)*180.0/PI;
 	}
+	return;
+}
+
+
+//compass calibration routine
+ 
+void compass_calibration_routine(void){
+	int max_x = 0, max_y = 0, min_x = 0, min_y = 0;
+	double x_average = 0, y_average = 0;
+
+	Serial1.println("compass calibration will start in 5 seconds");
+	delay(5000);
+	Serial1.println("begin compass calibration. drive in circles");
+
+	for(int i=0; i<1000; i++){
+		MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
+
+		if(raw.XAxis < 1000){		//test to see if max axis reading is acceptable
+			if(raw.XAxis > -1000)	//test to see if min axis reading is acceptable
+				XAxis = raw.XAxis;	//adjust axis with calibration factor
+		}
+		
+		if(raw.YAxis < 1000){		//test to see if max axis reading is acceptable
+			if(raw.YAxis > -1000)	//test to see if min axis reading is acceptable
+				YAxis = raw.YAxis + compass_y_cal;	//adjust axis with calibration factor
+		}
+		if(XAxis > max_x) max_x = XAxis;
+		if(XAxis < min_x) min_x = XAxis;
+		if(YAxis > max_y) max_y = YAxis;
+		if(YAxis < max_y) min_y = YAxis;
+		
+		delay(10);
+	}
+	               
+	compass_x_cal = (max_x + min_x)/2;
+	compass_y_cal = (max_y + min_y)/2;
+	
+	Serial1.println("compass calibration complete\t");
+	Serial1.print(compass_x_cal);		Serial1.print("\t");
+	Serial1.println(compass_y_cal);
+	delay(5000);
+	
 	return;
 }
 
@@ -189,12 +235,12 @@ void compass_measurement(){
 	//Compass Reading Filtering (sometimes bogus values are read)
 	if(raw.XAxis < 1000){		//test to see if max axis reading is acceptable
 		if(raw.XAxis > -1000)	//test to see if min axis reading is acceptable
-			XAxis = raw.XAxis + COMPASS_X_CAL;	//adjust axis with calibration factor
+			XAxis = raw.XAxis + compass_x_cal;	//adjust axis with calibration factor
 	}
 	
 	if(raw.YAxis < 1000){		//test to see if max axis reading is acceptable
 		if(raw.YAxis > -1000)	//test to see if min axis reading is acceptable
-			YAxis = raw.YAxis + COMPASS_Y_CAL;	//adjust axis with calibration factor
+			YAxis = raw.YAxis + compass_y_cal;	//adjust axis with calibration factor
 	}
 	
 	compass_heading = atan2(YAxis, XAxis);	//calculate compass_heading
