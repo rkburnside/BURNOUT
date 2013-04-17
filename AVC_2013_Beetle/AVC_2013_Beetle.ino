@@ -70,8 +70,9 @@ void setup(){
 	Wire.begin(); //Start the I2C interface.
 	compass = HMC5883L(); //Construct a new HMC5883 compass.
 	compass.SetMeasurementMode(Measurement_Continuous); //Set the measurement mode to Continuous
-	delay(10000);
+
 	compass_calibration_routine();
+
 	delay(5000);
 	
 }
@@ -161,41 +162,54 @@ void cross_track_calculation(void){
 //compass calibration routine
  
 void compass_calibration_routine(void){
-	int max_x = 0, max_y = 0, min_x = 0, min_y = 0;
-	double x_average = 0, y_average = 0;
+	Serial1.println("perform calibration? (y=1 / n=0): ");
 
-	Serial1.println("compass calibration will start in 5 seconds");
-	delay(5000);
-	Serial1.println("begin compass calibration. drive in circles");
+	while(1){
+		if(Serial1.available()) {
+			if(Serial1.parseInt() == 1){
+				int max_x = 0, max_y = 0, min_x = 0, min_y = 0;
+				double x_average = 0, y_average = 0;
+	
+				Serial1.println("compass calibration will start in 5 seconds");
+				delay(5000);
+				Serial1.println("begin compass calibration. drive in circles");
+				delay(1000);
 
-	for(int i=0; i<1000; i++){
-		MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
+				for(int i=0; i<1000; i++){
+					MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
 
-		if(raw.XAxis < 1000){		//test to see if max axis reading is acceptable
-			if(raw.XAxis > -1000)	//test to see if min axis reading is acceptable
-				XAxis = raw.XAxis;	//adjust axis with calibration factor
+					if(raw.XAxis < 1000){		//test to see if max axis reading is acceptable
+						if(raw.XAxis > -1000)	//test to see if min axis reading is acceptable
+							XAxis = raw.XAxis;	//adjust axis with calibration factor
+					}
+					
+					if(raw.YAxis < 1000){		//test to see if max axis reading is acceptable
+						if(raw.YAxis > -1000)	//test to see if min axis reading is acceptable
+							YAxis = raw.YAxis + compass_y_cal;	//adjust axis with calibration factor
+					}
+					if(XAxis > max_x) max_x = XAxis;
+					if(XAxis < min_x) min_x = XAxis;
+					if(YAxis > max_y) max_y = YAxis;
+					if(YAxis < max_y) min_y = YAxis;
+					
+					delay(10);
+				}
+				               
+				compass_x_cal = (max_x + min_x)/2;
+				compass_y_cal = (max_y + min_y)/2;
+				
+				Serial1.println("compass calibration complete\t");
+				Serial1.print(compass_x_cal);		Serial1.print("\t");
+				Serial1.println(compass_y_cal);
+				Serial1.println("accept calibration results? y=0 / n=1): ");
+			}
+
+			else{
+				Serial1.println("exiting function");			
+				return;
+			}
 		}
-		
-		if(raw.YAxis < 1000){		//test to see if max axis reading is acceptable
-			if(raw.YAxis > -1000)	//test to see if min axis reading is acceptable
-				YAxis = raw.YAxis + compass_y_cal;	//adjust axis with calibration factor
-		}
-		if(XAxis > max_x) max_x = XAxis;
-		if(XAxis < min_x) min_x = XAxis;
-		if(YAxis > max_y) max_y = YAxis;
-		if(YAxis < max_y) min_y = YAxis;
-		
-		delay(10);
 	}
-	               
-	compass_x_cal = (max_x + min_x)/2;
-	compass_y_cal = (max_y + min_y)/2;
-	
-	Serial1.println("compass calibration complete\t");
-	Serial1.print(compass_x_cal);		Serial1.print("\t");
-	Serial1.println(compass_y_cal);
-	delay(5000);
-	
 	return;
 }
 
