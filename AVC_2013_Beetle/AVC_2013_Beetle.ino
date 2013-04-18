@@ -70,18 +70,18 @@ void setup(){
 	Wire.begin(); //Start the I2C interface.
 	compass = HMC5883L(); //Construct a new HMC5883 compass.
 	compass.SetMeasurementMode(Measurement_Continuous); //Set the measurement mode to Continuous
-
-	compass_calibration_routine();
-
-	delay(5000);
 	
+	Serial1.setTimeout(100000);
+	Serial1.println("perform calibration? (y=1 / n=0): ");
+	while(Serial1.parseInt() == 1) compass_calibration_routine();
+	Serial1.setTimeout(1000);
 }
 
 void loop(){
 	compass_measurement();
 	gps_data();
 	waypoint();
-	cross_track_calculation();
+//	cross_track_calculation();
 	set_turn();
 	set_speed();
 
@@ -142,74 +142,83 @@ void waypoint(void){				//Distance and angle to next waypoint
 	return;
 }
 
+/*
 void cross_track_calculation(void){
-	double x1, x2, y1, y2, dot_product;
-	
-	// calculate the dot product
+	double x1, x2, y1, y2, cross_product;
+
 	if(waypoint_num == 0) cross_track_error = 0.0;
 	else {
 		x1 = gps_array[waypoint_num-1][1];
 		x2 = gps_array[waypoint_num][1];
 		y1 = gps_array[waypoint_num-1][0];
 		y2 = gps_array[waypoint_num][0];
-		dot_product = (y1*y2 + x1*x2) / (sqrt(pow(x1,2)+pow(y1,2))*sqrt(pow(x2,2)+pow(y2,2)));	//normalization of the dot_product
-		cross_track_error = acos(dot_product)*180.0/PI;
-	}
-	return;
-}
+ 
+		//create unit vectors
+		unit_factor = sqrt(x1*x1 + y1*y1);
+		x1 = x1/unit_factor;
+		y1 = y1/unit_factor;
+		 
+		unit_factor = sqrt(x2*x2 + y2*y2);
+		x2 = x2/unit_factor;
+		y2 = y2/unit_factor;
 
+		cross_product = (x1*y2 - x2*y1);              //normalization of the dot_product
+		cross_track_error = asin(cross_product)*180.0/PI;
+	}
+return;
+}
+*/
 
 //compass calibration routine
  
 void compass_calibration_routine(void){
-	Serial1.println("perform calibration? (y=1 / n=0): ");
+	int max_x = 0, max_y = 0, min_x = 0, min_y = 0;
+	double x_average = 0, y_average = 0;
 
-	while(1){
-		if(Serial1.available()) {
-			if(Serial1.parseInt() == 1){
-				int max_x = 0, max_y = 0, min_x = 0, min_y = 0;
-				double x_average = 0, y_average = 0;
-	
-				Serial1.println("compass calibration will start in 5 seconds");
-				delay(5000);
-				Serial1.println("begin compass calibration. drive in circles");
-				delay(1000);
+	Serial1.println("compass calibration will start in 1 seconds");
+	delay(1000);
+	Serial1.println("begin compass calibration. drive in circles");
+	delay(1000);
 
-				for(int i=0; i<1000; i++){
-					MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
+	for(int i=0; i<1000; i++){
+		MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
 
-					if(raw.XAxis < 1000){		//test to see if max axis reading is acceptable
-						if(raw.XAxis > -1000)	//test to see if min axis reading is acceptable
-							XAxis = raw.XAxis;	//adjust axis with calibration factor
-					}
-					
-					if(raw.YAxis < 1000){		//test to see if max axis reading is acceptable
-						if(raw.YAxis > -1000)	//test to see if min axis reading is acceptable
-							YAxis = raw.YAxis + compass_y_cal;	//adjust axis with calibration factor
-					}
-					if(XAxis > max_x) max_x = XAxis;
-					if(XAxis < min_x) min_x = XAxis;
-					if(YAxis > max_y) max_y = YAxis;
-					if(YAxis < max_y) min_y = YAxis;
-					
-					delay(10);
-				}
-				               
-				compass_x_cal = (max_x + min_x)/2;
-				compass_y_cal = (max_y + min_y)/2;
-				
-				Serial1.println("compass calibration complete\t");
-				Serial1.print(compass_x_cal);		Serial1.print("\t");
-				Serial1.println(compass_y_cal);
-				Serial1.println("accept calibration results? y=0 / n=1): ");
-			}
-
-			else{
-				Serial1.println("exiting function");			
-				return;
-			}
+		if(raw.XAxis < 1000){		//test to see if max axis reading is acceptable
+			if(raw.XAxis > -1000)	//test to see if min axis reading is acceptable
+				XAxis = raw.XAxis;	//adjust axis with calibration factor
 		}
+		
+		if(raw.YAxis < 1000){		//test to see if max axis reading is acceptable
+			if(raw.YAxis > -1000)	//test to see if min axis reading is acceptable
+				YAxis = raw.YAxis + compass_y_cal;	//adjust axis with calibration factor
+		}
+		if(XAxis > max_x) max_x = XAxis;
+		if(XAxis < min_x) min_x = XAxis;
+		if(YAxis > max_y) max_y = YAxis;
+		if(YAxis < max_y) min_y = YAxis;
+		
+		Serial1.print(XAxis);	Serial1.print("\t");
+		Serial1.print(YAxis);	Serial1.print("\t");
+		Serial1.print(min_x);	Serial1.print("\t");
+		Serial1.print(max_x);	Serial1.print("\t");
+		Serial1.print(min_y);	Serial1.print("\t");
+		Serial1.println(max_y);
+		
+		delay(8);
 	}
+	               
+	compass_x_cal = -(max_x + min_x)/2;
+	compass_y_cal = (max_y + min_y)/2;
+	
+	Serial1.println("compass calibration complete\t");
+	Serial1.print(min_x);	Serial1.print("\t");
+	Serial1.print(max_x);	Serial1.print("\t");
+	Serial1.print(min_y);	Serial1.print("\t");
+	Serial1.print(max_y);	Serial1.print("\t");
+	Serial1.print(compass_x_cal);		Serial1.print("\t");
+	Serial1.println(compass_y_cal);
+	Serial1.println("rerun calibration routine? y=1 / n=0): ");
+
 	return;
 }
 
@@ -272,13 +281,13 @@ void compass_measurement(){
 void serial_data_log(){			//Serial Data Logging
 	// Serial1.print(XAxis);				Serial1.print("\t\t");   
 	// Serial1.print(YAxis);				Serial1.print("\t\t");
-	Serial1.print(cross_track_error,1);		Serial1.print("\t\t");
-	Serial1.print(waypoint_heading,1);		Serial1.print("\t\t");   
-	Serial1.print(compass_heading,1);		Serial1.print("\t\t");
-	Serial1.print(waypoint_distance,1);		Serial1.print("\t\t");
-	Serial1.print(flat,8);					Serial1.print("\t\t");
-	Serial1.print(flon,8); 					Serial1.print("\t\t");
-	Serial1.print(max_speed,1); 			Serial1.print("\t\t");
+	Serial1.print(waypoint_heading,1);		Serial1.print("\t");   
+	Serial1.print(cross_track_error,1);		Serial1.print("\t");
+	Serial1.print(compass_heading,1);		Serial1.print("\t");
+	Serial1.print(waypoint_distance,1);		Serial1.print("\t");
+	Serial1.print(flat,8);					Serial1.print("\t");
+	Serial1.print(flon,8); 					Serial1.print("\t");
+	Serial1.print(max_speed,1); 			Serial1.print("\t");
 	Serial1.println(failed);
 
 	return;
