@@ -172,14 +172,13 @@ return;
 //compass calibration routine
  
 void compass_calibration_routine(void){
-	int max_x = 0, max_y = 0, min_x = 0, min_y = 0;
-	double x_average = 0, y_average = 0;
+	int max_x[10], max_y[10], min_x[10], min_y[10];
 
 	Serial1.println("compass calibration will start in 1 seconds");
 	delay(1000);
 	Serial1.println("begin compass calibration. drive in circles");
 	delay(1000);
-
+	
 	for(int i=0; i<1000; i++){
 		MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
 
@@ -192,29 +191,85 @@ void compass_calibration_routine(void){
 			if(raw.YAxis > -1000)	//test to see if min axis reading is acceptable
 				YAxis = raw.YAxis + compass_y_cal;	//adjust axis with calibration factor
 		}
-		if(XAxis > max_x) max_x = XAxis;
-		if(XAxis < min_x) min_x = XAxis;
-		if(YAxis > max_y) max_y = YAxis;
-		if(YAxis < max_y) min_y = YAxis;
 		
-		Serial1.print(XAxis);	Serial1.print("\t");
-		Serial1.print(YAxis);	Serial1.print("\t");
-		Serial1.print(min_x);	Serial1.print("\t");
-		Serial1.print(max_x);	Serial1.print("\t");
-		Serial1.print(min_y);	Serial1.print("\t");
-		Serial1.println(max_y);
-		
+		for(int j=0; j<10 && i==0; j++)	max_x[j] = XAxis; //initialization of the array with the current compass values
+		for(int j=0; j<10 && i==0; j++) max_y[j] = YAxis; //initialization of the array with the current compass values
+		for(int j=0; j<10 && i==0; j++) min_x[j] = XAxis; //initialization of the array with the current compass values
+		for(int j=0; j<10 && i==0; j++) min_y[j] = YAxis; //initialization of the array with the current compass values
+
+		if(XAxis > max_x[9]){
+			max_x[0] = max_x[1];
+			max_x[1] = max_x[2];
+			max_x[2] = max_x[3];
+			max_x[3] = max_x[4];
+			max_x[4] = max_x[5];
+			max_x[5] = max_x[6];
+			max_x[6] = max_x[7];
+			max_x[7] = max_x[8];
+			max_x[8] = max_x[9];
+			max_x[9] = XAxis;
+			}
+
+		if(YAxis > max_y[9]){
+			max_y[0] = max_y[1];
+			max_y[1] = max_y[2];
+			max_y[2] = max_y[3];
+			max_y[3] = max_y[4];
+			max_y[4] = max_y[5];
+			max_y[5] = max_y[6];
+			max_y[6] = max_y[7];
+			max_y[7] = max_y[8];
+			max_y[8] = max_y[9];
+			max_y[9] = YAxis;
+			}
+
+		if(XAxis < min_x[9]){
+			min_x[0] = min_x[1];
+			min_x[1] = min_x[2];
+			min_x[2] = min_x[3];
+			min_x[3] = min_x[4];
+			min_x[4] = min_x[5];
+			min_x[5] = min_x[6];
+			min_x[6] = min_x[7];
+			min_x[7] = min_x[8];
+			min_x[8] = min_x[9];
+			min_x[9] = XAxis;
+			}
+
+		if(YAxis < min_y[9]){
+			min_y[0] = min_y[1];
+			min_y[1] = min_y[2];
+			min_y[2] = min_y[3];
+			min_y[3] = min_y[4];
+			min_y[4] = min_y[5];
+			min_y[5] = min_y[6];
+			min_y[6] = min_y[7];
+			min_y[7] = min_y[8];
+			min_y[8] = min_y[9];
+			min_y[9] = YAxis;
+			}
+
+		Serial1.print(XAxis);		Serial1.print("\t");
+		Serial1.print(YAxis);		Serial1.print("\t");
+		Serial1.print(min_x[9]);	Serial1.print("\t");
+		Serial1.print(max_x[9]);	Serial1.print("\t");
+		Serial1.print(min_y[9]);	Serial1.print("\t");
+		Serial1.println(max_y[9]);
+
 		delay(8);
 	}
-	               
-	compass_x_cal = -(max_x + min_x)/2;
-	compass_y_cal = (max_y + min_y)/2;
+	
+	compass_x_cal = (max_x[0] + min_x[0])/2;
+	compass_y_cal = (max_y[0] + min_y[0])/2;
 	
 	Serial1.println("compass calibration complete\t");
-	Serial1.print(min_x);	Serial1.print("\t");
-	Serial1.print(max_x);	Serial1.print("\t");
-	Serial1.print(min_y);	Serial1.print("\t");
-	Serial1.print(max_y);	Serial1.print("\t");
+	for(int j=0; j<10; j++){
+		Serial1.print(min_x[j]);	Serial1.print("\t");
+		Serial1.print(max_x[j]);	Serial1.print("\t");
+		Serial1.print(min_y[j]);	Serial1.print("\t");
+		Serial1.println(max_y[j]);
+	}
+
 	Serial1.print(compass_x_cal);		Serial1.print("\t");
 	Serial1.println(compass_y_cal);
 	Serial1.println("rerun calibration routine? y=1 / n=0): ");
