@@ -1,14 +1,8 @@
 //Header file variable
-int compass_x_cal = -300;			//compass calibration number
-int compass_y_cal = -125;			//compass calibration number
-#define HEADING_ADJUSTMENT 3.490658504		//compass declination number
-
 #define WAYPOINT_ACCEPT_RANGE 10 	//radius in # of feet in which to accept the waypoint
-
 #define SERVO 2						//pin # for steering servo - green	
 #define SERVO_STEERING_LIMIT_LEFT 150
 #define SERVO_STEERING_LIMIT_RIGHT 30
-
 #define THROTTLE 3					//pin # for throttle - yellow wire
 #define SPEED_STOP 90
 #define SPEED_SLOW 100
@@ -21,16 +15,19 @@ int compass_y_cal = -125;			//compass calibration number
 double print_delay = 0;
 double cross_track_error = 0;
 
+//Gyro calibration
+#define GYRO_SAMPLING_RATE 10 //sampling at 10ms
+#define GYRO_CALIBRATION_NUMBER 3890318.0 //THIS NUMBER IS BASED ON SAMPLING TIME!!!
+double gyro_sum=0, gyro_null=0, gyro_angle=0, angle_diff=0;		//for the gyro
+double sample_time = 0;
+
+
+
 //GPS Variables
 float flat, flon, max_speed=0.0;
 unsigned long age, date, time, chars;
 unsigned short sentences, failed;
 double waypoint_distance, waypoint_heading = 0.0;
-
-//Compass
-int XAxis = 0, YAxis = 0;
-double compass_heading = 0;
-double angle_diff;				//for the compass
 
 //GPS Waypoints
 int waypoint_num = 0;

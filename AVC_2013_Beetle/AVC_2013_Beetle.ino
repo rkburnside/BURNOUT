@@ -46,19 +46,19 @@ x - (i'm not going to use this now, it shouldn't be an issue.) use latitude/long
 */
 
 //Included Libraries
+#include "AVC_2013_Beetle.h"
 #include <Wire.h>
-#include <HMC5883L.h>
+#include <L3G.h>
 #include <Servo.h> 
 #include <TinyGPS.h>
 #include <math.h>
-#include "AVC_2013_Beetle.h"
 //#include "EEPROMAnything.h"
 
 //Function and Object Declarations
-HMC5883L compass;
 TinyGPS gps;
 Servo steering;
 Servo speed;
+L3G gyro;
 
 void setup(){
 	Serial1.begin(115200);		//bluetooth serial
@@ -66,26 +66,36 @@ void setup(){
 	steering.attach(SERVO);		//Servo Initialization
 	speed.attach(THROTTLE);		//Speed control initialization
 
-	//compass initialization
-	Wire.begin(); //Start the I2C interface.
-	compass = HMC5883L(); //Construct a new HMC5883 compass.
-	compass.SetMeasurementMode(Measurement_Continuous); //Set the measurement mode to Continuous
+	//gyro setup
+	Wire.begin();
+	if (!gyro.init()) {
+		Serial1.println("Failed to autodetect gyro type!");
+		while (1);
+	}
+	gyro.enableDefault();
+	Serial1.println("gyro null being calculated");
+	gyro_null_cal();
 	
 	Serial1.setTimeout(100000);
-	Serial1.println("perform calibration? (y=1 / n=0): ");
-	while(Serial1.parseInt() == 1) compass_calibration_routine();
+	Serial1.println("perform gyro calibration? (y=1 / n=0): ");
+	while(Serial1.parseInt() == 1) gyro_calibration();
 	Serial1.setTimeout(1000);
 }
 
 void loop(){
-	compass_measurement();
+	//sample gyro
+	if((millis() - sample_time) > GYRO_SAMPLING_RATE){
+		sample_time = millis();
+		angle_update();
+	}
+
 	gps_data();
 	waypoint();
 //	cross_track_calculation();
 //	set_turn();
 	set_speed();
 
-	if((millis() - print_delay) > 10){
+	if((millis() - print_delay) > 100){
 		serial_data_log();
 		print_delay = millis();
 	}	
@@ -102,6 +112,7 @@ void set_speed(void){		//test this and delete the delays after it works
 	return;
 }
 
+/*
 void set_turn(void){				//Set servo to steer in the direction of the next waypoint
 	double servo_angle;
 //	right is 0, left is 180.
@@ -125,6 +136,7 @@ void set_turn(void){				//Set servo to steer in the direction of the next waypoi
 
 	return;
 }
+*/
 
 void waypoint(void){				//Distance and angle to next waypoint
 	double x, y;
@@ -142,7 +154,7 @@ void waypoint(void){				//Distance and angle to next waypoint
 	return;
 }
 
-/*
+/* Cross Track Error
 void unit_vector_calculation(void){
 	double x1, x2, y1, y2;
 
@@ -166,11 +178,64 @@ return;
 }
 */
 
-
-
 /*Working Functions That Are Working Well*/
 
+//Gyro routines
+void angle_update(void){
+	gyro.read();
+
+	gyro_sum = gyro_sum - (gyro.g.z - gyro_null);
+
+	if(gyro_sum > GYRO_CALIBRATION_NUMBER) gyro_sum = gyro_sum - GYRO_CALIBRATION_NUMBER;
+	if(gyro_sum < 0.0) gyro_sum = gyro_sum + GYRO_CALIBRATION_NUMBER;
+
+	gyro_angle = gyro_sum / GYRO_CALIBRATION_NUMBER * 360.0;
+}
+
+void gyro_calibration(void){
+	while(1){
+		if((millis() - sample_time) > GYRO_SAMPLING_RATE){
+			sample_time = millis();
+			gyro.read();
+			gyro_sum = gyro_sum - (gyro.g.z - gyro_null);
+			gyro_angle = gyro_sum / GYRO_CALIBRATION_NUMBER * 360.0;
+		}
+		
+		if((millis() - print_delay) > 100){
+			print_delay = millis();
+			Serial1.print((int)gyro.g.z);
+			Serial1.print("\t\t");
+			Serial1.print(gyro_sum);
+			Serial1.print("\t\t");
+			Serial1.println(gyro_angle);
+		}
+	}
+}
+
+
 //GPS data update
+void gyro_null_cal() {
+	for(int i = 0; i<30; i++) {
+		gyro.read();
+		delay(GYRO_SAMPLING_RATE);
+	}
+		
+	for(int i = 0; i<500; i++) {
+		gyro.read();
+		gyro_null = gyro_null + gyro.g.z;
+		Serial1.print((int)gyro.g.z);
+		Serial1.print("\t\t");
+		Serial1.println(gyro_null);
+		delay(GYRO_SAMPLING_RATE);
+	}
+	
+	gyro_null = gyro_null / 500.0;
+	Serial1.print("\n\ngyro_null is: ");
+	Serial1.println(gyro_null);
+	Serial1.println();
+	delay(1000);
+}
+
 void gps_data(){
 	bool newdata = false;
 	if(feedgps()) newdata = true;
@@ -196,125 +261,19 @@ void gpsdump(TinyGPS &gps){		//GPS Calculation
 	return;
 }
 
-//compass calibration routine
-void compass_calibration_routine(void){
-	int max_x[10], max_y[10], min_x[10], min_y[10];
-	double calibration_average = 0;
-	Serial1.println("compass calibration will start in 1 seconds");
-	delay(1000);
-	Serial1.println("begin compass calibration. drive in circles");
-	delay(1000);
-	
-	for(int i=0; i<1000; i++){
-		MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
-
-		if(raw.XAxis < 1000){		//test to see if max axis reading is acceptable
-			if(raw.XAxis > -1000)	//test to see if min axis reading is acceptable
-				XAxis = raw.XAxis;	//adjust axis with calibration factor
-		}
-		
-		if(raw.YAxis < 1000){		//test to see if max axis reading is acceptable
-			if(raw.YAxis > -1000)	//test to see if min axis reading is acceptable
-				YAxis = raw.YAxis + compass_y_cal;	//adjust axis with calibration factor
-		}
-		
-		for(int j=0; j<10 && i==0; j++)	max_x[j] = XAxis; //initialization of the array with the current compass values
-		for(int j=0; j<10 && i==0; j++) max_y[j] = YAxis; //initialization of the array with the current compass values
-		for(int j=0; j<10 && i==0; j++) min_x[j] = XAxis; //initialization of the array with the current compass values
-		for(int j=0; j<10 && i==0; j++) min_y[j] = YAxis; //initialization of the array with the current compass values
-
-		if(XAxis > max_x[9]){
-			for(int j=0; j<9; j++) max_x[j] = max_x[j+1];
-			max_x[9] = XAxis;
-		}
-		
-		if(XAxis < min_x[9]){
-			for(int j=0; j<9; j++) min_x[j] = min_x[j+1];
-			min_x[9] = XAxis;
-		}
-
-		if(YAxis > max_y[9]){
-			for(int j=0; j<9; j++) max_y[j] = max_y[j+1];
-			max_y[9] = YAxis;
-		}
-
-		if(YAxis < min_y[9]){
-			for(int j=0; j<9; j++) min_y[j] = min_y[j+1];
-			min_y[9] = YAxis;
-		}
-
-		Serial1.print(XAxis);		Serial1.print("\t");
-		Serial1.print(YAxis);		Serial1.print("\t");
-		Serial1.print(min_x[9]);	Serial1.print("\t");
-		Serial1.print(max_x[9]);	Serial1.print("\t");
-		Serial1.print(min_y[9]);	Serial1.print("\t");
-		Serial1.println(max_y[9]);
-
-		delay(8);
-	}
-	
-	for(int j=0; j<10; j++) calibration_average = calibration_average + min_x[j] + max_x[j];
-	compass_x_cal = calibration_average / 20.0;
-	
-	calibration_average = 0;
-	for(int j=0; j<10; j++) calibration_average = calibration_average + min_y[j] + max_y[j];
-	compass_y_cal = calibration_average / 20.0;
-	
-	Serial1.println("compass calibration complete\t");
-	for(int j=0; j<10; j++){
-		Serial1.print(min_x[j]);	Serial1.print("\t");
-		Serial1.print(max_x[j]);	Serial1.print("\t");
-		Serial1.print(min_y[j]);	Serial1.print("\t");
-		Serial1.println(max_y[j]);
-	}
-	
-	Serial1.println("Calibration Results: X, Y");
-	Serial1.print(compass_x_cal);		Serial1.print("\t");
-	Serial1.println(compass_y_cal);
-	Serial1.println();
-	Serial1.println("rerun calibration routine? y=1 / n=0): ");
-
-	return;
-}
-
-void compass_measurement(){
-	
-	MagnetometerRaw raw = compass.ReadRawAxis();	//get raw 
-
-	//Compass Reading Filtering (sometimes bogus values are read)
-	if(raw.XAxis < 1000){		//test to see if max axis reading is acceptable
-		if(raw.XAxis > -1000)	//test to see if min axis reading is acceptable
-			XAxis = raw.XAxis - (float)compass_x_cal;	//adjust axis with calibration factor
-	}
-	
-	if(raw.YAxis < 1000){		//test to see if max axis reading is acceptable
-		if(raw.YAxis > -1000)	//test to see if min axis reading is acceptable
-			YAxis = raw.YAxis - (float)compass_y_cal;	//adjust axis with calibration factor
-	}
-	
-	compass_heading = atan2((float)YAxis, (float)XAxis);	//calculate compass_heading
-
-//	compass_heading = PI - compass_heading; //flips reading from CW to CCW
-	compass_heading = compass_heading + HEADING_ADJUSTMENT;
-
-	// convert the compass_heading to make is always between 0 and 2*PI (i.e. 360)
-	if(compass_heading < 0.0) compass_heading += 2.0*PI;
-	if(compass_heading > (2.0*PI)) compass_heading -= 2.0*PI;
-
-	compass_heading = compass_heading * 180.0/PI;
-
-	return;
-}
-
 void serial_data_log(){			//Serial Data Logging
-	Serial1.print(waypoint_heading,1);		Serial1.print("\t");   
-	Serial1.print(cross_track_error,1);		Serial1.print("\t");
-	Serial1.print(compass_heading,1);		Serial1.print("\t");
-	Serial1.print(waypoint_distance,1);		Serial1.print("\t");
-	Serial1.print(flat,8);					Serial1.print("\t");
-	Serial1.print(flon,8); 					Serial1.print("\t");
-	Serial1.print(max_speed,1); 			Serial1.print("\t");
-	Serial1.println(failed);
+	Serial1.print(gyro_angle,1);	Serial1.print("\t");
+	// Serial1.print(gyro_sum,1);		Serial1.print("\t");
+	// Serial1.print(waypoint_heading,1);		Serial1.print("\t");   
+	// Serial1.print(cross_track_error,1);		Serial1.print("\t");
+	// Serial1.print(gyro_sum,1);		Serial1.print("\t\t\t\t");
+	// Serial1.print(gyro_angle,1);		Serial1.print("\t");
+	// Serial1.print(waypoint_distance,1);		Serial1.print("\t");
+	// Serial1.print(flat,8);					Serial1.print("\t");
+	// Serial1.print(flon,8); 					Serial1.print("\t");
+	// Serial1.print(max_speed,1); 			Serial1.print("\t");
+	// Serial1.print(failed);
+	Serial1.println();
 
 	return;
 }
