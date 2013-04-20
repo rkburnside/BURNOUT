@@ -1,7 +1,7 @@
 //Header file variable
-int compass_x_cal = -92;			//compass calibration number
-int compass_y_cal = 157;			//compass calibration number
-#define DECLINATION 0.15126187		//compass declination number
+int compass_x_cal = -300;			//compass calibration number
+int compass_y_cal = -125;			//compass calibration number
+#define HEADING_ADJUSTMENT 3.490658504		//compass declination number
 
 #define WAYPOINT_ACCEPT_RANGE 10 	//radius in # of feet in which to accept the waypoint
 
@@ -35,11 +35,13 @@ double angle_diff;				//for the compass
 //GPS Waypoints
 int waypoint_num = 0;
 const int waypoint_total = 5;	//<- should always be the same number of GPS waypoints
-double gps_array[5][2] = {{39.538696506815334, -105.01680727005721},
+double gps_array[waypoint_total][2] = {{39.538696506815334, -105.01680727005721},
 {39.53873270565525, -105.01672948599578},
 {39.53847827912335, -105.01641834975005},
 {39.53861066377666, -105.01659805775405},
 {39.53863031460211, -105.01675362587692}};
+
+double unit_vectors[waypoint_total][2];
 
 
 /*
