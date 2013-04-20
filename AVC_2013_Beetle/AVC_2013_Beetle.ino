@@ -62,7 +62,7 @@ L3G gyro;
 
 void setup(){
 	Serial1.begin(115200);		//bluetooth serial
-	Serial2.begin(9600);		//gps serial
+	Serial2.begin(115200);		//gps serial
 	steering.attach(SERVO);		//Servo Initialization
 	speed.attach(THROTTLE);		//Speed control initialization
 
@@ -72,14 +72,22 @@ void setup(){
 		Serial1.println("Failed to autodetect gyro type!");
 		while (1);
 	}
+
+	Serial1.setTimeout(100000);
+	Serial1.println("is car aligned with true north for calibration? (y=1 / n=0): ");
+	while(Serial1.parseInt() != 1) Serial1.println("align car with true north");
+
 	gyro.enableDefault();
 	Serial1.println("gyro null being calculated");
 	gyro_null_cal();
+	delay(1000);
 	
-	Serial1.setTimeout(100000);
-	Serial1.println("perform gyro calibration? (y=1 / n=0): ");
-	while(Serial1.parseInt() == 1) gyro_calibration();
-	Serial1.setTimeout(1000);
+	// Serial1.println("perform gyro calibration? (y=1 / n=0): ");
+	// while(Serial1.parseInt() == 1) gyro_calibration();
+	// Serial1.setTimeout(1000);
+
+//	heading_calibration();
+	gyro_sum = (90.0/360.0)*GYRO_CALIBRATION_NUMBER;
 }
 
 void loop(){
@@ -92,7 +100,7 @@ void loop(){
 	gps_data();
 	waypoint();
 //	cross_track_calculation();
-//	set_turn();
+	set_turn();
 	set_speed();
 
 	if((millis() - print_delay) > 100){
@@ -100,6 +108,35 @@ void loop(){
 		print_delay = millis();
 	}	
 }
+
+
+/*
+void heading_calibration(void){
+/* i need this function to do the following:
+1. have the car drive at heading 0
+2. adjust the steering servo to make it drive at heading 0
+3. record the starting gps location
+4. drive for 5 seconds and record the next gps location
+5. make sure that the gps location has changed
+6. find the heading using those 2 gps locations
+7. change the gyro heading to be a the angle calculated
+
+	while(1){
+		
+
+		//sample gyro
+		if((millis() - sample_time) > GYRO_SAMPLING_RATE){
+			sample_time = millis();
+			angle_update();
+		}
+
+		gps_data();
+	}
+}
+*/
+
+
+
 
 /* these functions need work. consider incorporating XXX code ideas.*/
 
@@ -112,44 +149,22 @@ void set_speed(void){		//test this and delete the delays after it works
 	return;
 }
 
-/*
 void set_turn(void){				//Set servo to steer in the direction of the next waypoint
 	double servo_angle;
 //	right is 0, left is 180.
-	compass_heading = -(compass_heading - 90.0);	//switches heading to normal x,y coordinates
 
-	if(compass_heading < 0.0)	compass_heading += 360.0;
-	if(compass_heading > 360.0)	compass_heading -= 360.0;
+	angle_diff = gyro_angle - waypoint_heading;
+	//incorporate eventually - cross_track_error * ERROR_GAIN;
 
-	angle_diff = compass_heading - waypoint_heading - cross_track_error * ERROR_GAIN;
-	
 	if(angle_diff < -180.0)	angle_diff += 360.0;
 	if(angle_diff >= 180.0)	angle_diff -= 360.0;
 
-	servo_angle = angle_diff/2.0 + 90.0;		//changes domain from -180...180 to 0...180
-	servo_angle = 180.0 - servo_angle;
+	servo_angle = 180.0 - (angle_diff/2.0 + 90.0);	//changes domain from -180...180 to 0...180
 	
 //	this section sets the servo/turning limits
 	if(servo_angle > SERVO_STEERING_LIMIT_LEFT)			steering.write(SERVO_STEERING_LIMIT_LEFT);
 	else if(servo_angle < SERVO_STEERING_LIMIT_RIGHT)	steering.write(SERVO_STEERING_LIMIT_RIGHT);
 	else												steering.write(servo_angle);
-
-	return;
-}
-*/
-
-void waypoint(void){				//Distance and angle to next waypoint
-	double x, y;
-
-	x = 69.1*(gps_array[waypoint_num][1] - flon) * cos(flat/57.3);
-	y = 69.1*(gps_array[waypoint_num][0] - flat);
-	
-	waypoint_distance = sqrt(pow(x,2) + pow(y,2))*5280.0;	//converts distance to feet
-	waypoint_heading = atan2(y,x)*180.0/M_PI;				//180/pi converts from rads to degrees
-
-	if(waypoint_heading < 0) waypoint_heading += 360.0;	//ensures heading is ALWAYS positive
-	
-	if(waypoint_distance < WAYPOINT_ACCEPT_RANGE) waypoint_num++;	//waypoint acceptance
 
 	return;
 }
@@ -184,7 +199,7 @@ return;
 void angle_update(void){
 	gyro.read();
 
-	gyro_sum = gyro_sum - (gyro.g.z - gyro_null);
+	gyro_sum = gyro_sum - (gyro.g.z - gyro_null);// - (3890318.0/4.0*360); //changes orientation from true north to (X,Y)
 
 	if(gyro_sum > GYRO_CALIBRATION_NUMBER) gyro_sum = gyro_sum - GYRO_CALIBRATION_NUMBER;
 	if(gyro_sum < 0.0) gyro_sum = gyro_sum + GYRO_CALIBRATION_NUMBER;
@@ -211,7 +226,6 @@ void gyro_calibration(void){
 		}
 	}
 }
-
 
 //GPS data update
 void gyro_null_cal() {
@@ -261,40 +275,31 @@ void gpsdump(TinyGPS &gps){		//GPS Calculation
 	return;
 }
 
-void serial_data_log(){			//Serial Data Logging
-	Serial1.print(gyro_angle,1);	Serial1.print("\t");
-	// Serial1.print(gyro_sum,1);		Serial1.print("\t");
-	// Serial1.print(waypoint_heading,1);		Serial1.print("\t");   
-	// Serial1.print(cross_track_error,1);		Serial1.print("\t");
-	// Serial1.print(gyro_sum,1);		Serial1.print("\t\t\t\t");
-	// Serial1.print(gyro_angle,1);		Serial1.print("\t");
-	// Serial1.print(waypoint_distance,1);		Serial1.print("\t");
-	// Serial1.print(flat,8);					Serial1.print("\t");
-	// Serial1.print(flon,8); 					Serial1.print("\t");
-	// Serial1.print(max_speed,1); 			Serial1.print("\t");
-	// Serial1.print(failed);
-	Serial1.println();
+void waypoint(void){				//Distance and angle to next waypoint
+	double x, y;
+
+	x = 69.1*(gps_array[waypoint_num][1] - flon) * cos(flat/57.3);
+	y = 69.1*(gps_array[waypoint_num][0] - flat);
+	
+	waypoint_distance = sqrt(pow(x,2) + pow(y,2))*5280.0;	//converts distance to feet
+	waypoint_heading = atan2(y,x)*180.0/M_PI;				//180/pi converts from rads to degrees
+
+	if(waypoint_heading < 0) waypoint_heading += 360.0;	//ensures heading is ALWAYS positive
+	
+	if(waypoint_distance < WAYPOINT_ACCEPT_RANGE) waypoint_num++;	//waypoint acceptance
 
 	return;
 }
 
-/* GPS Routes
+void serial_data_log(){			//Serial Data Logging
+	Serial1.print(gyro_angle,1);			Serial1.print("\t");
+	Serial1.print(waypoint_heading,1);		Serial1.print("\t");   
+	// Serial1.print(cross_track_error,1);	Serial1.print("\t");
+	Serial1.print(waypoint_distance,1);		Serial1.print("\t");
+	Serial1.print(flat,8);					Serial1.print("\t");
+	Serial1.print(flon,8); 					Serial1.print("\t");
+	Serial1.print(max_speed,1); 			Serial1.print("\t");
+	Serial1.println();
 
-SC - Parking Lot - old
-{{39.538298770540344,-105.01172583175334},
-{39.53849527942753,-105.01150857282313},
-{39.538635938078826,-105.01140396667155},
-{39.538669034190654,-105.01133154702815},
-{39.53855319773023,-105.01111160588893},
-{39.53844356661642,-105.01092921567592},
-{39.53837323713148,-105.0108541138235},
-{39.538269811288885,-105.01089702916774},
-{39.53810019257341,-105.0110874660078},
-{39.537924367857656,-105.01124303413066},
-{39.53787058609094,-105.01135568690928},
-{39.5379740125284,-105.01154344154033},
-{39.53809398700279,-105.0117365605894},
-{39.53815914891089,-105.01183747870347},
-{39.53820179479863,-105.01186061275624},
-{39.53826074760557,-105.01180830968045}};
-*/
+	return;
+}

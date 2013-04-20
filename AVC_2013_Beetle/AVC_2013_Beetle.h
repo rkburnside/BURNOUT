@@ -1,13 +1,13 @@
 //Header file variable
 #define WAYPOINT_ACCEPT_RANGE 10 	//radius in # of feet in which to accept the waypoint
 #define SERVO 2						//pin # for steering servo - green	
-#define SERVO_STEERING_LIMIT_LEFT 150
-#define SERVO_STEERING_LIMIT_RIGHT 30
+#define SERVO_STEERING_LIMIT_LEFT 130
+#define SERVO_STEERING_LIMIT_RIGHT 50
 #define THROTTLE 3					//pin # for throttle - yellow wire
 #define SPEED_STOP 90
 #define SPEED_SLOW 100
-#define SPEED_MED 105
-#define SPEED_FAST 120
+#define SPEED_MED 100
+#define SPEED_FAST 110
 #define SPEED_BREAKING 50
 #define ERROR_GAIN 1.0				//1.0 full gain, .5 half as aggressive, .25 quarter aggressive
 
@@ -31,12 +31,17 @@ double waypoint_distance, waypoint_heading = 0.0;
 
 //GPS Waypoints
 int waypoint_num = 0;
-const int waypoint_total = 5;	//<- should always be the same number of GPS waypoints
-double gps_array[waypoint_total][2] = {{39.538696506815334, -105.01680727005721},
-{39.53873270565525, -105.01672948599578},
-{39.53847827912335, -105.01641834975005},
-{39.53861066377666, -105.01659805775405},
-{39.53863031460211, -105.01675362587692}};
+const int waypoint_total = 8;	//<- should always be the same number of GPS waypoints
+double gps_array[waypoint_total][2] = {
+{39.53872443285608, -105.01673417986156},
+{39.53864479537386, -105.01663091481448},
+{39.53847310906244, -105.01641365588428},
+{39.53839450554921, -105.01641365588428},
+{39.53816386577954, -105.01665773690463},
+{39.53840898515045, -105.0163989037347},
+{39.53846690352515, -105.01639756263019},
+{39.53872856986564, -105.0167408853841}
+};
 
 double unit_vectors[waypoint_total][2];
 
