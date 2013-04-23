@@ -648,7 +648,8 @@ void setup()
   int error;
   uint8_t c;
 
-
+  pinMode(2, INPUT);
+  
   Serial.begin(115200);
   Serial.println(F("InvenSense MPU-6050"));
   Serial.println(F("June 2012"));
@@ -684,12 +685,16 @@ void setup()
   // Clear the 'sleep' bit to start the sensor.
   MPU6050_write_reg (MPU6050_PWR_MGMT_1, 0);
   
-  MPU6050_write_reg (MPU6050_SIGNAL_PATH_RESET, MPU6050_GYRO_RESET);
-  MPU6050_write_reg (MPU6050_GYRO_CONFIG, MPU6050_FS_SEL_500);    // set sensitivity to 500 deg/s
-  MPU6050_write_reg (MPU6050_FIFO_EN, MPU6050_ZG_FIFO_EN);    // enable write for z axis gyro to fifo
+  //MPU6050_write_reg (MPU6050_SIGNAL_PATH_RESET, MPU6050_GYRO_RESET);
+  MPU6050_write_reg (MPU6050_GYRO_CONFIG, bit(MPU6050_FS_SEL_500));    // set sensitivity to 500 deg/s
+  //MPU6050_write_reg (MPU6050_FIFO_EN, MPU6050_ZG_FIFO_EN);    // enable write for z axis gyro to fifo
+  MPU6050_write_reg (MPU6050_SMPLRT_DIV, 0);    // Use a 255 divider
+  MPU6050_write_reg (MPU6050_INT_PIN_CFG, bit(MPU6050_LATCH_INT_EN) | bit(MPU6050_INT_RD_CLEAR));    // 
+  //MPU6050_write_reg (MPU6050_INT_PIN_CFG, MPU6050_LATCH_INT_EN);    // 
+  //MPU6050_write_reg (MPU6050_INT_PIN_CFG, MPU6050_INT_RD_CLEAR);    // 
+  MPU6050_write_reg (MPU6050_INT_ENABLE, bit(MPU6050_DATA_RDY_EN));    // 
   MPU6050_write_reg (MPU6050_CONFIG, MPU6050_DLPF_21HZ);    // enable digital low pass filter at 21 HZ
-  MPU6050_write_reg (MPU6050_USER_CTRL, MPU6050_FIFO_EN);
-    
+  //MPU6050_write_reg (MPU6050_USER_CTRL, MPU6050_FIFO_EN);
 }
 
 
@@ -698,8 +703,9 @@ void loop()
   int error;
   double dT;
   accel_t_gyro_union accel_t_gyro;
-  uint8_t c;
+  //uint8_t c;
 
+  while (digitalRead(2) == LOW) ;
 
 //  Serial.println(F(""));
 //  Serial.println(F("MPU-6050"));
@@ -711,7 +717,7 @@ void loop()
   // there is no filter enabled, and the values
   // are not very stable.
   //error = MPU6050_read (MPU6050_GYRO_ZOUT_H, (uint8_t *) &accel_t_gyro, sizeof(accel_t_gyro));
-  error = MPU6050_read (MPU6050_FIFO_R_W, (uint8_t *) &accel_t_gyro, sizeof(accel_t_gyro));
+  error = MPU6050_read (MPU6050_GYRO_ZOUT_H, (uint8_t *) &accel_t_gyro, sizeof(accel_t_gyro));
 //  Serial.print(F("Read accel, temp and gyro, error = "));
 //  Serial.println(error,DEC);
 
@@ -732,11 +738,11 @@ void loop()
 //  Serial.print(F(", "));
 //  Serial.println(F(""));
 
-  error = MPU6050_read (MPU6050_FIFO_COUNTH, (uint8_t *) &c, 1);
-  error = MPU6050_read (MPU6050_FIFO_COUNTL, (uint8_t *) &c, 1);
-  Serial.println(c, DEC);
+  //error = MPU6050_read (MPU6050_FIFO_COUNTH, (uint8_t *) &c, 1);
+  //error = MPU6050_read (MPU6050_FIFO_COUNTL, (uint8_t *) &c, 1);
+  //Serial.println(c, DEC);
 
-  delay(20);
+  //delay(20);
 }
 
 
