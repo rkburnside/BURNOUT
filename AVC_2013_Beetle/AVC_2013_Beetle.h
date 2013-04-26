@@ -44,22 +44,3 @@ double gps_array[waypoint_total][2] = {
 };
 
 double unit_vectors[waypoint_total][2];
-
-
-/*
-//WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 50	//waypoint acceptance radius
-#define S1 1550				//stationary speed
-#define S2 1635				//1650 is a creeping speed
-#define S3 1675				//This is the speed for negotiating wp's 
-#define S4 1750				//1800 is pretty ridiculously fast. Don't use for general use.
-#define SB 1050				//breaking. adjust this parameter to allow creeping up on waypoints
-#define P1 150				//proximity to allow car to align with next waypoint 
-#define P2 75				//close proximity to waypoint
-#define P3 300				//far proximity to waypoint
-#define BREAKING_SPEED 3000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
-#define L1 2200
-#define L2 5500
-#define L3 200
-#define L4 350
-*/

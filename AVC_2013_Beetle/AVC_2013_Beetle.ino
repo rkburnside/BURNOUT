@@ -2,7 +2,7 @@
 Vehicle: Wile E. Coyote
 Author: Richard Burnside
 Verion: 1.0
-Date: 4/12/2013
+Date: 4/21/2013
 
 Microcontroller: Arduino mega.
 ***USE THE MEGA. SERVO AND SOFTWARE SERIAL DO NOT!!! PLAY WELL TOGETHER***
@@ -11,29 +11,31 @@ Vehicle: Turnigy Beetle RC car with 7.2V battery and 2.4-GHz TX/RX
 */
 
 /* TO DO LIST
-- verify cross track error handling works
-- build a roll cage
-- calibrate the CAR speed to servo angle (little changes seem to make HUGE differences)
-- compare GPS points at stake center between bing maps and my own gps. drive the car, with the data logger attached, along hard, physical routes to compare its accuracy.
-- create serial driven menu system using serial UI
-- add manual over ride switch (i.e. competition mode)
-- add ~1.0 second delay after flipping switch
-- use bt-serial to get gps wayponits. write them using EEPROM
-- incorporate breaking into the throttle routine
-- write routine that calculates the distance and direction to next waypoint
-- write routine to determine when i have reached a way point
-- recalibrate compass
-- create on the fly calibration routine for the compass
-- verify copmass heading is actually working correctly
-- incorporate steering limits so i don't roll the car again
-- set gain for steering (i.e. more vs. less agressive steering)
-- set gain for throttle (i.e. more vs. less acceleration)
-- mail in AVC video
-- create shut down function for when the car passes the finish line
-- create shut down or reverse function if the car hasn't moved for ~15 seconds from its current spot
-- hot glue everything
-- use an array to determine GPS points, distances and angles using arrays and get averages of them
-- develop a correct method/procedure for programming waypoints and driving them consistently
+- (H) create reset switch for arduino
+- (H) hot glue everything
+- (H) build a roll cage
+- (H) add manual over ride switch (i.e. competition mode)
+- (H) use bt-serial to get gps wayponits. write them using EEPROM
+- (H) create and implement cross track error handling
+- (H) create function to calculate unit vectors and use that in cross_track_error
+- (M) calibrate the CAR speed to servo angle (little changes seem to make HUGE differences)
+- (M) create serial driven menu system
+- (M) add ~1.0 second delay after flipping switch
+- (M) incorporate breaking into the throttle routine
+- (M) set gain for steering (i.e. more vs. less agressive steering)
+- (M) set gain for throttle (i.e. more vs. less acceleration)
+- (M) mail in AVC video
+- (L) reincorporate the compass. read bot thoughts tutorial on compass calibration.
+- (L) develop a correct method/procedure for programming waypoints and driving them consistently
+- (L) compare GPS points at stake center between bing maps and my own gps. drive the car, with the data logger attached, along hard, physical routes to compare its accuracy.
+- (L) verify copmass heading is actually working correctly
+- (L) recalibrate compass
+x - write routine to determine when i have reached a way point
+x - write routine that calculates the distance and direction to next waypoint
+x - (not going to implement) create shut down or reverse function if the car hasn't moved for ~15 seconds from its current spot
+x - create shut down function for when the car passes the finish line
+x - incorporate steering limits so i don't roll the car again
+x - create on the fly calibration routine for the compass
 x - clean up gps code so that i only get the information that i need
 x - delete all of the unneeded GPS items that I have listed (alt, speed, course, time, date, etc)
 x - (no longer needed now that i am using the mega.) determine GPS output rate. print millis(), get and print gps reading, print millis(), do the math
