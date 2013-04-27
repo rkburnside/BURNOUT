@@ -29,22 +29,31 @@ D13 - LED status
 #include <EEPROM.h>
 #include "AVC_2013.h"
 #include "EEPROMAnything.h"
+#include "Wire.h"
+
+// I2Cdev and MPU6050 must be installed as libraries, or else the .cpp/.h files
+// for both classes must be in the include path of your project
+#include <I2Cdev.h>
+//#include "MPU6050_6Axis_MotionApps20.h"
+#include <MPU6050.h>
+//#include "new_gyro.h"
+
 
 //these are used for setting and clearing bits in special control registers on ATmega
-#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
-#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 
-LiquidCrystal lcd(A3, A4, A5, 8, 7, 6);
-volatile boolean gyro_flag = false, cal_flag;
+//LiquidCrystal lcd(A3, A4, A5, 8, 7, 6);
+volatile boolean gyro_flag = false, cal_flag = false;
 boolean manual, automatic, aux=false, running=false, first=true;
 volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, angle=0, clicks = 0;
-long angle_last, angle_target, proximity, steer_us, angle_diff, previous_proximity=10000;
+long count, angle_last, angle_target, proximity, steer_us, angle_diff, previous_proximity=10000;
 double x_wp[WAYPOINT_COUNT], y_wp[WAYPOINT_COUNT];
 double x=0, y=0;
 int wpr_count=1, wpw_count=1, speed_cur=0, speed_new=0, speed_old=0, steer_limm = 300;
 const int InterruptPin = 2 ;		//intterupt on digital pin 2
 Servo steering, esc;
 long time=0;
+
+MPU6050 accelgyro;
 
 struct position_structure {
 
@@ -85,8 +94,7 @@ void calculate_speed() {
 void cal_steer_lim() {
 	steer_limm = (int)map(speed_cur, L1, L2, L3, L4);
 	if (steer_limm > L4) steer_limm = L4;
-	// lcd.clear();
-	// lcd.print(gyro_limm);
+	// Serial.println(gyro_limm);
 	}
 
 void update_position() {
@@ -114,13 +122,11 @@ void update_waypoint() {
 	//waypoint acceptance and move to next waypoint
 	if (proximity < WAYPOINT_ACCEPT) {
 		wpr_count++;
-		lcd.clear();
-		lcd.print("read WP # ");
-		lcd.print(wpr_count);
-		lcd.setCursor(0, 1);
-		lcd.print(x_wp[wpr_count]);
-		lcd.print(" , ");
-		lcd.print(y_wp[wpr_count]);
+		Serial.println("read WP # ");
+		Serial.println(wpr_count);
+		Serial.println(x_wp[wpr_count]);
+		Serial.println(" , ");
+		Serial.println(y_wp[wpr_count]);
 		proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
 		previous_proximity = proximity;
 	}
@@ -129,14 +135,12 @@ void update_waypoint() {
 void print_coordinates() {
 	//print stuff to LCD
 	if((millis()-time)>1000) {
-		lcd.clear();
-		lcd.print(x_wp[wpr_count]);
-		lcd.print(" , ");
-		lcd.print(y_wp[wpr_count]);
-		lcd.setCursor(0, 1);
-		lcd.print(x);
-		lcd.print(" , ");
-		lcd.print(y);
+		Serial.println(x_wp[wpr_count]);
+		Serial.println(" , ");
+		Serial.println(y_wp[wpr_count]);
+		Serial.println(x);
+		Serial.println(" , ");
+		Serial.println(y);
 		time = millis();
 	}
 }
@@ -153,133 +157,44 @@ void speed() {
 	else if(proximity >= P3) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
 }
 
-ISR(ADC_vect) {			//ADC interrupt
-	
-	uint8_t high,low;	//I think uint8_t is the same as byte.
-	gyro_sum += ADCL | (ADCH << 8);  //read and accumulate high and low bytes of adc
-	gyro_count++;    			//iterate the counter
-
-	if (gyro_count == GYRO_LIMIT) {
-		angle += (gyro_sum - gyro_null);
-		if ((angle > GYRO_CAL) && (!cal_flag)) angle -= GYRO_CAL; //if we are calculating null, don't roll-over
-		if ((angle < 0) && (!cal_flag)) angle += GYRO_CAL;
-		gyro_sum = 0;
-		gyro_count =0;
-		gyro_flag = true;
-	}
-}  
-
-void set_gyro_adc() {
-    //ADMUX should default to 000, which selects internal reference.
-    ADMUX = B0;   //completely reset the MUX. should be sampling only on A0, now
-    sbi(ADMUX, REFS0);  //use internal ref, AVcc
-    //this section sets the prescalar for the ADC. 111 = 128 = 9.6kSps, 011 = 64 = 19.2kSps, 101=38.4ksps
-    //tests show sss = 19ksps, css = 38.4ksps, scs = 76.8ksps
-    sbi(ADCSRA, ADPS0);
-    sbi(ADCSRA, ADPS1);
-    sbi(ADCSRA, ADPS2);
-
-    sbi(ADCSRA, ADEN);              //Enable ADC
-    sbi(ADCSRA, ADATE);             //Enable auto-triggering
-    sbi(ADCSRA, ADIE);              //Enable ADC Interrupt
-    sei();                                  //Enable Global Interrupts
-    sbi(ADCSRA, ADSC);              //Start A2D Conversions
-
-    // lcd.clear();
-    // lcd.print(ADCSRA, BIN);
-    // lcd.setCursor(0, 1);
-    // lcd.print(ADMUX, BIN);
-    // while (true) ;
-        
-    delay(100);                                     //small delay to let ADC "warm up" (don't know if it's necessary)
-}
 
 void calculate_null() {
-	lcd.clear();
-	lcd.print("CALCULATING NULL");
+	Serial.println("CALCULATING NULL");
 
 	cal_flag = true;		//tell ADC ISR that we are calibrating,
-	gyro_flag = false;		//this will be set, already, but need to begin on new cycle
-	while (!gyro_flag) ;	//wait for start of new cycle
 	angle = 0;				//reset the angle. angle will act as accumulator for null calculation
 	gyro_null = 0;			//make sure to not subract any nulls here
+	gyro_count = 0;
 
-	for (int i=0; i <= 50; i++){
-		while (!gyro_flag);
-		gyro_flag = false;	//start another round
+	while (gyro_count < 20000){
+		read_FIFO();
+		//delay(10);
+		//Serial.println(gyro_count);
 	}
 	
-	gyro_null = angle/50;	//calculate the null
+	gyro_null = angle/gyro_count;	//calculate the null
 	cal_flag = false;		//stop calibration
 	angle = 0;
+	
 
 	//should print null here
-	lcd.clear();
-	lcd.print("Null: ");
-	lcd.print(gyro_null);
-	//while (true);
-}
-
-void calibrate_gyro() {
-	lcd.clear();
-	lcd.print("calibrating gyro");
-	lcd.setCursor(0, 1);
-	set_gyro_adc();
-	delay(5000);
-	cal_flag = true;		//tell ADC ISR that we are calibrating,
-	gyro_flag = false;		//this will be set, already, but need to begin on new cycle
-	while (!gyro_flag) ;	//wait for start of new cycle
-	angle = 0;				//reset the angle
-
-	do {
-		get_mode();
-		lcd.clear();
-		lcd.print(angle);
-		delay(20);
-	} while (aux);			//keep summing unitil we turn the mode switch off. angle will  not roll-over
-	cal_flag = false;		//stop calibration
-
-	//should print angle here
-	lcd.clear();
-	lcd.print("total angle is:");
-	lcd.setCursor(0, 1);
-	lcd.print(angle);
-	angle = 0;
-	gyro_count = 0;
-	while (true);
+	Serial.print("Null: ");
+	Serial.println(gyro_null);
 }
 
 long get_temp() {
-	double temp = 0;
-    for (int i=0; i <= 500; i++){
-   	 temp += analogRead(1);
-    }
-    return temp;
 }
 
 void stab_temp() {
-	lcd.clear();
-	lcd.print("Temperature");
-	lcd.setCursor(0, 1);
-	lcd.print("Stabilizing...");
-	delay(1000);
-	while (true) {
-		lcd.clear();
-		lcd.print(get_temp());
-		delay(200);
-	}
 }
 
 void watch_angle() {
-	lcd.clear();
-	lcd.print("angle watch");
-	set_gyro_adc();		//sets up free running ADC for gyro
-	calculate_null();
+	Serial.println("angle watch");
 	do {
 		get_mode();
-		lcd.clear();
-		lcd.print(angle*360.0/GYRO_CAL);
-		delay(100);
+		read_FIFO();
+		Serial.println(angle*360.0/GYRO_CAL);
+		delay(30);
 	} while (manual);		//keep summing unitil we turn the mode switch off.
 }
 
@@ -306,21 +221,18 @@ void set_waypoint() {
 	waypoint.y = y;
 	//waypoint.last = false
 	EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
-	lcd.clear();
-	lcd.print("set WP # ");
-	lcd.print(wpw_count);
-	lcd.setCursor(0, 1);
-	lcd.print(waypoint.x);
-	lcd.print(" , ");
-	lcd.print(waypoint.y);
+	Serial.println("set WP # ");
+	Serial.println(wpw_count);
+	Serial.println(waypoint.x);
+	Serial.println(" , ");
+	Serial.println(waypoint.y);
 	wpw_count++;
 	while(aux) get_mode();
 }    
 
 void load_waypoints() {
 	int temp = 1;
-	lcd.clear();
-	lcd.print("LOADING POINTS");
+	Serial.println("LOADING POINTS");
 	delay(1500);
 
 	while (temp <= WAYPOINT_COUNT) {
@@ -330,10 +242,8 @@ void load_waypoints() {
 		temp++;
 	}
 
-	lcd.clear();
-	lcd.print("ALL POINTS");
-	lcd.setCursor(0, 1);
-	lcd.print("LOADED");
+	Serial.println("ALL POINTS");
+	Serial.println("LOADED");
 	delay(1500);
 }
 
@@ -344,16 +254,13 @@ void read_waypoint() {
 	//y_wp = waypoint.y;
 	//waypoint.last = false
 	//EEPROM_writeAnything(wp_count*WP_SIZE, waypoint);
-	lcd.clear();
-	lcd.print("read WP # ");
-	lcd.print(wpr_count);
-	lcd.setCursor(0, 1);
-	lcd.print(waypoint.x);
-	lcd.print(" , ");
-	lcd.print(waypoint.y);
+	Serial.println("read WP # ");
+	Serial.println(wpr_count);
+	Serial.println(waypoint.x);
+	Serial.println(" , ");
+	Serial.println(waypoint.y);
 	wpr_count++;
-	lcd.clear();
-	lcd.print(micros() - temp);
+	Serial.println(micros() - temp);
 }    
 
 void eeprom_clear() {  //EEPROM Clear
@@ -361,8 +268,7 @@ void eeprom_clear() {  //EEPROM Clear
 	for (int i = 0; i < 512; i++) EEPROM.write(i, 0);
 
 	// turn the LED on when we're done
-	lcd.clear();
-	lcd.print("EEPROM clear");
+	Serial.println("EEPROM clear");
 	delay(1500);
 }
 
@@ -380,10 +286,8 @@ void import_waypoints() {
 		wpw_count++;
 	}
 
-	lcd.clear();
-	lcd.print("ALL POINTS");
-	lcd.setCursor(0, 1);
-	lcd.print("IMPORTED");
+	Serial.println("ALL POINTS");
+	Serial.println("IMPORTED");
 	delay(1500);
 }
 
@@ -402,10 +306,8 @@ void export_waypoints() {
 		wpr_count++;
 	}
 
-	lcd.clear();
-	lcd.print("ALL POINTS");
-	lcd.setCursor(0, 1);
-	lcd.print("EXPORTED");
+	Serial.println("ALL POINTS");
+	Serial.println("EXPORTED");
 	delay(1500);
 	Serial.end();
 }
@@ -452,42 +354,151 @@ byte menu_list(byte items, char* value_list[]) {
        }
        delay(500);
        //delay(map(abs(pulse_length-STEER_ADJUST), 0, 300, 700, 100));
-       lcd.clear();
-       lcd.print(value_list[0]);
-       lcd.setCursor(0, 1);
-       lcd.print(value_list[adjust]);
+       Serial.println(value_list[0]);
+       Serial.println(value_list[adjust]);
 
-       //lcd.print(adjust);
+       //Serial.println(adjust);
     }    
 }
 
+void setup_mpu6050() {
+    // initialize device
+    Serial.println("Initializing I2C devices...");
+    accelgyro.initialize();
+
+    // verify connection
+    Serial.println("Testing device connections...");
+    Serial.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
+	
+    // reset device
+    Serial.println(F("\n\nResetting MPU6050..."));
+    accelgyro.reset();
+    delay(30); // wait after reset
+
+
+    // disable sleep mode
+    Serial.println(F("Disabling sleep mode..."));
+    accelgyro.setSleepEnabled(false);
+
+    // get X/Y/Z gyro offsets
+    Serial.println(F("Reading gyro offset values..."));
+    int8_t xgOffset = accelgyro.getXGyroOffset();
+    int8_t ygOffset = accelgyro.getYGyroOffset();
+    int8_t zgOffset = accelgyro.getZGyroOffset();
+    Serial.print(F("X gyro offset = "));
+    Serial.println(xgOffset);
+    Serial.print(F("Y gyro offset = "));
+    Serial.println(ygOffset);
+    Serial.print(F("Z gyro offset = "));
+    Serial.println(zgOffset);
+
+            Serial.println(F("Setting clock source to Z Gyro..."));
+            accelgyro.setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
+
+            // Serial.println(F("Setting DMP and FIFO_OFLOW interrupts enabled..."));
+            // accelgyro.setIntEnabled(0x12);
+
+             Serial.println(F("Setting sample rate to 200Hz..."));
+             accelgyro.setRate(0); // 1khz / (1 + 4) = 200 Hz
+
+            // Serial.println(F("Setting external frame sync to TEMP_OUT_L[0]..."));
+            // accelgyro.setExternalFrameSync(MPU6050_EXT_SYNC_TEMP_OUT_L);
+
+            Serial.println(F("Setting DLPF bandwidth to 42Hz..."));
+            accelgyro.setDLPFMode(MPU6050_DLPF_BW_42);
+
+            Serial.println(F("Setting gyro sensitivity to +/- 250 deg/sec..."));
+            accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
+
+            // Serial.println(F("Setting X/Y/Z gyro offsets to previous values..."));
+            // accelgyro.setXGyroOffset(xgOffset);
+            // accelgyro.setYGyroOffset(ygOffset);
+            // accelgyro.setZGyroOffset(61);
+
+            // Serial.println(F("Setting X/Y/Z gyro user offsets to zero..."));
+            // accelgyro.setXGyroOffsetUser(0);
+            // accelgyro.setYGyroOffsetUser(0);
+            //accelgyro.setZGyroOffsetUser(0);
+    //Serial.print(F("Z gyro offset = "));
+    //Serial.println(accelgyro.getZGyroOffset());
+
+            // Serial.println(F("Setting motion detection threshold to 2..."));
+            // accelgyro.setMotionDetectionThreshold(2);
+
+            // Serial.println(F("Setting zero-motion detection threshold to 156..."));
+            // accelgyro.setZeroMotionDetectionThreshold(156);
+
+            // Serial.println(F("Setting motion detection duration to 80..."));
+            // accelgyro.setMotionDetectionDuration(80);
+
+            // Serial.println(F("Setting zero-motion detection duration to 0..."));
+            // accelgyro.setZeroMotionDetectionDuration(0);
+
+            Serial.println(F("Resetting FIFO..."));
+            accelgyro.resetFIFO();
+
+            Serial.println(F("Enabling FIFO..."));
+            accelgyro.setFIFOEnabled(true);
+	        accelgyro.setZGyroFIFOEnabled(true);
+	
+}
+
+void read_FIFO() {
+  uint8_t buffer[2];
+  int accumulator = 0;
+  int samplz = 0;
+
+  samplz = accelgyro.getFIFOCount() >> 1;
+  //Serial.println("FIFO_COUNTH : ");
+  //Serial.println(samplz,DEC);
+  for (int i=0; i < samplz; i++) {
+		accelgyro.getFIFOBytes(buffer, 2);
+		angle -= ((((int16_t)buffer[0]) << 8) | buffer[1]) + gyro_null;
+		gyro_count++;
+		
+		if ((angle > GYRO_CAL) && (!cal_flag)) angle -= GYRO_CAL; //if we are calculating null, don't roll-over
+		if ((angle < 0) && (!cal_flag)) angle += GYRO_CAL;
+	}
+}
+
+void watch_gyro() {
+	while(true) {
+		read_FIFO();
+		//Serial.println(angle/130797);
+//	Serial.println(angle);
+	//Serial.println((float)angle/130797.0);
+    // blinkState = !blinkState;
+    // digitalWrite(LED_PIN, blinkState);
+		delay(4);
+	}
+}
+
 void setup() {
+	Serial.begin(115200);
+	Wire.begin();
 	//Pin assignments:
 	pinMode(TMISO, INPUT);
 	pinMode(MODE, INPUT);
-	lcd.begin(16, 2);			//set up the LCD's number of columns and rows:
-	lcd.print(CAR_NAME);	//Print a message to the LCD.
-	delay(1500);
+	Serial.println(CAR_NAME);	//Print a message to the LCD.
+	delay(10);
 
 	pinMode(InterruptPin, INPUT);	 
 	attachInterrupt(0, encoder_interrupt, CHANGE);	//interrupt 0 is on digital pin 2
 
 	get_mode();
-	root_menu();
+	//root_menu();
 	load_waypoints();
 
 	//verify that car is in manual mode prior to starting null calculation
 	get_mode();
 	if(manual == false) {
-		lcd.clear();
-		lcd.print("SET CAR TO");
-		lcd.setCursor(0, 1);
-		lcd.print("MANUAL MODE!");
+		Serial.println("SET CAR TO");
+		Serial.println("MANUAL MODE!");
 	}
 	while(manual == false) get_mode();
 	delay(500);
 
-	set_gyro_adc();		//sets up free running ADC for gyro
+	setup_mpu6050();
 	calculate_null();
 
 	steering.attach(10);
@@ -496,8 +507,7 @@ void setup() {
 	esc.attach(11);
 	esc.writeMicroseconds(S1);
 
-	lcd.setCursor(0, 1);
-	lcd.print("**READY TO RUN**");
+	Serial.println("**READY TO RUN**");
 	wpr_count = 1;		//set waypoint read counter to first waypoint
 	x=0;
 	y=0;
@@ -508,7 +518,9 @@ void setup() {
 
 void loop() {
 	long temp;
-	
+	//watch_angle();
+	read_FIFO();
+	//watch_gyro();
 	/* in the main loop here, we should wait for thing to happen, then act on them. Watch clicks and wait for it to reach CLICK_MAX, then calculate position and such.*/
 	get_mode();
 	if (clicks >= CLICK_MAX) {
@@ -516,7 +528,6 @@ void loop() {
 		navigate();
 	}
 
-	if (aux && DEBUG == 1) calibrate_gyro();
 	if (aux && DEBUG == 2) watch_angle();
 	
 	if (automatic) {	//this function makes the car be stationary when in manual waypoint setting mode
@@ -546,8 +557,8 @@ void loop() {
 		temp = millis();
 		while (aux) get_mode();
 		temp = millis() - temp;
-		if (temp > 500 && temp < 5000) set_waypoint();
-		if (temp > 5000) read_waypoint();
+		if (temp > 500) set_waypoint();
+		//if (temp > 5000) read_waypoint();
 	}
 	
 	if (aux && DEBUG == 3) {
