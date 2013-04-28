@@ -181,7 +181,7 @@ void calculate_null(){
 	gyro_null = 0;			//make sure to not subract any nulls here
 	gyro_count = 0;
 
-	while (gyro_count < 20000){
+	while (gyro_count < 5000){
 		read_FIFO();
 		//delay(10);
 		//Serial.println(gyro_count);
@@ -605,6 +605,8 @@ void setup(){
 	//Pin assignments:
 	pinMode(TMISO, INPUT);
 	pinMode(MODE, INPUT);
+	pinMode(12, OUTPUT);
+	digitalWrite(12, LOW);
 
 	Wire.begin();
 
@@ -637,7 +639,7 @@ void setup(){
 
 	esc.attach(11);
 	esc.writeMicroseconds(S1);
-
+	digitalWrite(12, HIGH);
 	Serial.println("**READY TO RUN**");
 
 	while(manual == true) get_mode();	//waits until autonomous mode is enabled and then initializes EVERYTHING and starts the car
