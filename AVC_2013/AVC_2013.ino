@@ -67,12 +67,12 @@ to (*old_pos).x.*/
     //boolean last;
 } waypoint;
 
-void encoder_interrupt() {
+void encoder_interrupt(){
     clicks++;
 	return ;
 }
 
-void navigate() {
+void navigate(){
 	calculate_speed();
 	cal_steer_lim();
 	update_position();
@@ -86,7 +86,7 @@ void navigate() {
 	return ;
 }
 
-void calculate_speed() {
+void calculate_speed(){
     speed_new = micros();
     speed_cur = speed_new - speed_old;
     speed_old = speed_new;
@@ -94,7 +94,7 @@ void calculate_speed() {
 	return ;
 }
 
-void cal_steer_lim() {
+void cal_steer_lim(){
 	steer_limm = (int)map(speed_cur, L1, L2, L3, L4);
 	if (steer_limm > L4) steer_limm = L4;
 	// Serial.println(gyro_limm);
@@ -102,7 +102,7 @@ void cal_steer_lim() {
 	return ;
 }
 
-void update_position() {
+void update_position(){
 	//calculate position
 	x += sin((angle + angle_last) * 3.14159/GYRO_CAL);
 	y += cos((angle + angle_last) * 3.14159/GYRO_CAL);
@@ -113,7 +113,7 @@ void update_position() {
 	return ;
 }
 
-void update_steering() {
+void update_steering(){
 	//calculate and write angles for steering
 	angle_diff = angle_target - angle;
 	if (angle_diff < -GYRO_CAL/2) angle_diff += GYRO_CAL;   //if angle is less than 180 deg, then add 360 deg
@@ -127,9 +127,9 @@ void update_steering() {
 	return ;
 }
 
-void update_waypoint() {
+void update_waypoint(){
 	//waypoint acceptance and move to next waypoint
-	if (proximity < WAYPOINT_ACCEPT) {
+	if (proximity < WAYPOINT_ACCEPT){
 		wpr_count++;
 		Serial.print("read WP #");
 		Serial.print(wpr_count);
@@ -144,7 +144,7 @@ void update_waypoint() {
 	return ;
 }
 
-void print_coordinates() { //print target, location, and angle
+void print_coordinates(){ //print target, location, and angle
 	Serial.print("target: ");
 	Serial.print(x_wp[wpr_count]);
 	Serial.print(" , ");
@@ -159,12 +159,12 @@ void print_coordinates() { //print target, location, and angle
 	return ;
 }
 
-void speed() {
+void speed(){
 	running = true;			// make sure running is updated.
 
 	if((previous_proximity - proximity) <= P1) esc.writeMicroseconds(S2); //allow car to line up with the next point
 	else if(proximity < P2) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
-	else if(proximity >= P2 && proximity < P3) { //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
+	else if(proximity >= P2 && proximity < P3){ //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
 		if (speed_cur < BREAKING_SPEED)  esc.writeMicroseconds(SB);  // less than 8000 means high speed, apply brakes
 		else esc.writeMicroseconds(S3);  //once speed is low enough, resume normal slow-down
 	}
@@ -173,7 +173,7 @@ void speed() {
 	return ;
 }
 
-void calculate_null() {
+void calculate_null(){
 	Serial.println("CALCULATING NULL");
 
 	cal_flag = true;		//tell ADC ISR that we are calibrating,
@@ -199,28 +199,13 @@ void calculate_null() {
 	return ;
 }
 
-void watch_angle() {
-	setup_mpu6050();
-	calculate_null();
-
-	Serial.println("angle watch");
-	do {
-		get_mode();
-		read_FIFO();
-		Serial.println(angle*360.0/GYRO_CAL);
-		delay(30);
-	} while (manual);		//keep summing unitil we turn the mode switch off.
-
-	return ;
-}
-
-void get_mode() {
-    if (!digitalRead(TMISO)) {
+void get_mode(){
+    if (!digitalRead(TMISO)){
 		manual = true;
 		automatic = false;
 		aux = false;
     }
-    else if (!digitalRead(MODE)) {
+    else if (!digitalRead(MODE)){
 		manual = false;
 		automatic = false;
 		aux = true;
@@ -234,7 +219,7 @@ void get_mode() {
 	return ;	
 }
 
-void set_waypoint() {
+void set_waypoint(){
 	waypoint.x = x;
 	waypoint.y = y;
 	//waypoint.last = false
@@ -250,12 +235,27 @@ void set_waypoint() {
 	return ;
 }    
 
-void load_waypoints() {
+void watch_angle(){
+	setup_mpu6050();
+	calculate_null();
+
+	Serial.println("angle watch");
+	do {
+		get_mode();
+		read_FIFO();
+		Serial.println(angle*360.0/GYRO_CAL);
+		delay(30);
+	} while (manual);		//keep summing unitil we turn the mode switch off.
+
+	return ;
+}
+
+void load_waypoints(){
 	int temp = 1;
 	Serial.println("LOADING POINTS");
 	delay(1500);
 
-	while (temp <= WAYPOINT_COUNT) {
+	while (temp <= WAYPOINT_COUNT){
 		EEPROM_readAnything(temp*WP_SIZE, waypoint);
 		x_wp[temp] = waypoint.x;
 		y_wp[temp] = waypoint.y;
@@ -269,7 +269,7 @@ void load_waypoints() {
 	return ;
 }
 
-void read_waypoint() {
+void read_waypoint(){
 	long temp = micros();
 	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 	//x_wp = waypoint.x;
@@ -287,21 +287,7 @@ void read_waypoint() {
 	return ;
 }    
 
-void display_waypoints(){
-	for (int i=1; i <= 6; i++){
-		EEPROM_readAnything(i*WP_SIZE, waypoint);
-		Serial.print(i);
-		Serial.print(": ");
-		Serial.print(waypoint.x);
-		Serial.print(" , ");
-		Serial.println(waypoint.y);
-	}
-	Serial.println();
-
-	return ;
-}
-
-void eeprom_clear() {  //EEPROM Clear
+void eeprom_clear(){  //EEPROM Clear
 	// write a 0 to all 512 bytes of the EEPROM
 	for (int i = 0; i < 512; i++) EEPROM.write(i, 0);
 
@@ -314,13 +300,13 @@ void eeprom_clear() {  //EEPROM Clear
 	return ;
 }
 
-void import_waypoints() {
+void import_waypoints(){
 	eeprom_clear();
 
 	int i=0, j=WAYPOINT_COUNT;
 	WAYPOINTS_STRING    //edit this in header file to change waypoints
 	
-	while(i<j) {
+	while(i<j){
 		waypoint.x = excel_waypoints[i][0];
 		waypoint.y = excel_waypoints[i][1];
 		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
@@ -337,11 +323,11 @@ void import_waypoints() {
 	return ;
 }
 
-void export_waypoints() {
+void export_waypoints(){
 	Serial.begin(115200);
 	load_waypoints();
 	
-	for(int i=0; i<WAYPOINT_COUNT; i++) {
+	for(int i=0; i<WAYPOINT_COUNT; i++){
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		Serial.print("waypoint #");
 		Serial.print(wpr_count);
@@ -353,9 +339,42 @@ void export_waypoints() {
 	}
 	
 	wpr_count = 1;	//resets the waypoint counter to 1, its initial setting
+	Serial.println();
 	Serial.println("ALL POINTS EXPORTED");
 	Serial.println();
 	delay(1500);
+	
+	return ;
+}
+
+void display_waypoints(){
+	for (int i=1; i <= 6; i++){
+		EEPROM_readAnything(i*WP_SIZE, waypoint);
+		Serial.print(i);
+		Serial.print(": ");
+		Serial.print(waypoint.x);
+		Serial.print(" , ");
+		Serial.println(waypoint.y);
+	}
+	Serial.println();
+
+	return ;
+}
+
+void gyro_initialization(){
+
+	Serial.println();
+	Serial.println();
+	Serial.println("gyro (re)initialization starting");
+	Serial.println();
+	
+	setup_mpu6050();
+	calculate_null();
+
+	Serial.println();
+	Serial.println("gyro (re)initialization complete");
+	Serial.println();
+	Serial.println();
 	
 	return ;
 }
@@ -369,9 +388,9 @@ void menu_choices(){
 	Serial.println("c = clear EEPROM");
 	Serial.println("d = display waypoints");
 	Serial.println("e = edit waypoint (not working yet)");
+	Serial.println("g = (re)initialize gyro");
 	Serial.println("i = import waypoints");
 	Serial.println("l = gyro calibration (not working yet)");
-	Serial.println("n = (re)initialize gyro (not working yet)");
 	Serial.println("p = export waypoints");
 	Serial.println("x = exit. start setup routine for the race");
 	Serial.println();
@@ -403,15 +422,16 @@ void main_menu(){
 					// edit_waypoint();
 					// menu_choices();
 					// break;
+				case 'g':
+					gyro_initialization();
+					menu_choices();
+					break;
 				case 'i':
 					import_waypoints();
 					menu_choices();
 					break;
 				// case 'l':
 					// gyro_calibration();
-					// break;
-				// case 'n':
-					// initialize gyro;
 					// break;
 				case 'p':
 					export_waypoints();
@@ -432,7 +452,7 @@ void main_menu(){
 	return ;
 }
 
-void setup_mpu6050() {
+void setup_mpu6050(){
     // initialize device
     Serial.println("Initializing I2C devices...");
     accelgyro.initialize();
@@ -515,7 +535,7 @@ void setup_mpu6050() {
 	return ;
 }
 
-void read_FIFO() {
+void read_FIFO(){
   uint8_t buffer[2];
   int accumulator = 0;
   int samplz = 0;
@@ -523,7 +543,7 @@ void read_FIFO() {
   samplz = accelgyro.getFIFOCount() >> 1;
   //Serial.println("FIFO_COUNTH : ");
   //Serial.println(samplz,DEC);
-  for (int i=0; i < samplz; i++) {
+  for (int i=0; i < samplz; i++){
 		accelgyro.getFIFOBytes(buffer, 2);
 		angle -= ((((int16_t)buffer[0]) << 8) | buffer[1]) + gyro_null;
 		gyro_count++;
@@ -535,8 +555,8 @@ void read_FIFO() {
 	return ;
 }
 
-void watch_gyro() {
-	while(true) {
+void watch_gyro(){
+	while(true){
 		read_FIFO();
 		//Serial.println(angle/130797);
 //	Serial.println(angle);
@@ -549,7 +569,7 @@ void watch_gyro() {
 	return ;
 }
 
-void setup() {
+void setup(){
 	//Pin assignments:
 	pinMode(TMISO, INPUT);
 	pinMode(MODE, INPUT);
@@ -573,7 +593,7 @@ void setup() {
 
 	//verify that car is in manual mode prior to starting null calculation
 	get_mode();
-	if(manual == false) {
+	if(manual == false){
 		Serial.println("SET CAR TO");
 		Serial.println("MANUAL MODE!");
 	}
@@ -598,44 +618,44 @@ void setup() {
 	first = true;
 }
 
-void loop() {
+void loop(){
 	long temp;
 	//watch_angle();
 	read_FIFO();
 	//watch_gyro();
 	/* in the main loop here, we should wait for thing to happen, then act on them. Watch clicks and wait for it to reach CLICK_MAX, then calculate position and such.*/
 	get_mode();
-	if (clicks >= CLICK_MAX) {
+	if (clicks >= CLICK_MAX){
 		clicks = 0;
 		navigate();
 	}
 
 	if (aux && DEBUG == 2) watch_angle();
 	
-	if (automatic) {	//this function makes the car be stationary when in manual waypoint setting mode
-		if (!running) {
+	if (automatic){	//this function makes the car be stationary when in manual waypoint setting mode
+		if (!running){
 			esc.write(S2);	//i changed this to S1 so the car is stationary?
 			running = true;
 		}
-		if (first) {
+		if (first){
 			angle = 0;
 			first = false;
 		}
 	}
 	
-	if (manual) {	//this function makes the car be stationary when in manual waypoint setting mode
-		if (running) {
+	if (manual){	//this function makes the car be stationary when in manual waypoint setting mode
+		if (running){
 			esc.write(S1);	//i changed this to S1 so the car is stationary?
 			running = false;
 		}
 	}
 
-	if (wpr_count >= WAYPOINT_COUNT) {
+	if (wpr_count >= WAYPOINT_COUNT){
 		esc.writeMicroseconds(S1);
 		while (true);
 	}
 	
-	if (aux && DEBUG == 0) {
+	if (aux && DEBUG == 0){
 		temp = millis();
 		while (aux) get_mode();
 		temp = millis() - temp;
@@ -643,13 +663,13 @@ void loop() {
 		//if (temp > 5000) read_waypoint();
 	}
 	
-	if (aux && DEBUG == 3) {
+	if (aux && DEBUG == 3){
 		temp = millis();
 		while (aux) get_mode();
 		read_waypoint();
 	}
 
-	if((millis()-time)>1000) {
+	if((millis()-time)>1000){
 		print_coordinates();
 		time = millis();
 	}
