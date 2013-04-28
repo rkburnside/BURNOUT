@@ -4,27 +4,26 @@ Pin Assignments:
 
 A0 - Analog input from gyro
 A1 - analog input for temp, from gyro
-A2 - nc
-A3 - LCD  (RS?)
-A4 - LCD  (enable?)
-A5 - LCD
+A2 - NC
+A3 - NC
+A4 - SDA
+A5 - SCL
 D0 - RX
 D1 - TX
-D2 - nc (normally Ch1 in)
+D2 - NC (normally Ch1 in)
 D3 - Steering input (connected to Ch2 in on board)
 D4 - MUX enble input (input only. manual if low, auto if high)
 D5 - Mode input (switched by Ch3)
-D6 - LCD
-D7 - LCD
-D8 - LCD
-D9 - nc (internally connected to MUX 1)  **consider connecting to MUX 3
+D6 - NC
+D7 - NC
+D8 - NC
+D9 - NC (internally connected to MUX 1)  **consider connecting to MUX 3
 D10 - Steering contorl out (internally connected to MUX 2
 D11 - ESC control out (connect to MUX 3)
 D12 - LED status
 D13 - LED status
 */
 
-#include <LiquidCrystal.h>
 #include <Servo.h>
 #include <EEPROM.h>
 #include "AVC_2013.h"
@@ -41,7 +40,6 @@ D13 - LED status
 
 //these are used for setting and clearing bits in special control registers on ATmega
 
-//LiquidCrystal lcd(A3, A4, A5, 8, 7, 6);
 volatile boolean gyro_flag = false, cal_flag = false;
 boolean manual, automatic, aux=false, running=false, first=true;
 volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, angle=0, clicks = 0;
@@ -71,6 +69,7 @@ to (*old_pos).x.*/
 
 void encoder_interrupt() {
     clicks++;
+	return ;
 }
 
 void navigate() {
@@ -83,19 +82,25 @@ void navigate() {
 	get_mode();
 	if (automatic) steering.writeMicroseconds(steer_us);
 	if (automatic) speed();
+	
+	return ;
 }
 
 void calculate_speed() {
     speed_new = micros();
     speed_cur = speed_new - speed_old;
     speed_old = speed_new;
+	
+	return ;
 }
 
 void cal_steer_lim() {
 	steer_limm = (int)map(speed_cur, L1, L2, L3, L4);
 	if (steer_limm > L4) steer_limm = L4;
 	// Serial.println(gyro_limm);
-	}
+	
+	return ;
+}
 
 void update_position() {
 	//calculate position
@@ -104,6 +109,8 @@ void update_position() {
 	angle_last = angle;
 	angle_target = atan2((x_wp[wpr_count] - x),(y_wp[wpr_count] - y)) * GYRO_CAL/2.0/3.14159;
 	proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
+	
+	return ;
 }
 
 void update_steering() {
@@ -116,33 +123,40 @@ void update_steering() {
 	if (steer_us < 0-steer_limm) steer_us = 0-steer_limm;
 	if (steer_us > steer_limm) steer_us = steer_limm;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
+
+	return ;
 }
 
 void update_waypoint() {
 	//waypoint acceptance and move to next waypoint
 	if (proximity < WAYPOINT_ACCEPT) {
 		wpr_count++;
-		Serial.println("read WP # ");
-		Serial.println(wpr_count);
-		Serial.println(x_wp[wpr_count]);
-		Serial.println(" , ");
+		Serial.print("read WP #");
+		Serial.print(wpr_count);
+		Serial.print(": ");
+		Serial.print(x_wp[wpr_count]);
+		Serial.print(" , ");
 		Serial.println(y_wp[wpr_count]);
 		proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
 		previous_proximity = proximity;
 	}
+	
+	return ;
 }
 
-void print_coordinates() {
-	//print stuff to LCD
-	if((millis()-time)>1000) {
-		Serial.println(x_wp[wpr_count]);
-		Serial.println(" , ");
-		Serial.println(y_wp[wpr_count]);
-		Serial.println(x);
-		Serial.println(" , ");
-		Serial.println(y);
-		time = millis();
-	}
+void print_coordinates() { //print target, location, and angle
+	Serial.print("target: ");
+	Serial.print(x_wp[wpr_count]);
+	Serial.print(" , ");
+	Serial.print(y_wp[wpr_count]);
+	Serial.print("\tposition: ");
+	Serial.print(x);
+	Serial.print(" , ");
+	Serial.print(y);
+	Serial.print("\tangle: ");
+	Serial.println((angle/GYRO_CAL)*360);
+
+	return ;
 }
 
 void speed() {
@@ -155,8 +169,9 @@ void speed() {
 		else esc.writeMicroseconds(S3);  //once speed is low enough, resume normal slow-down
 	}
 	else if(proximity >= P3) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
-}
 
+	return ;
+}
 
 void calculate_null() {
 	Serial.println("CALCULATING NULL");
@@ -180,15 +195,14 @@ void calculate_null() {
 	//should print null here
 	Serial.print("Null: ");
 	Serial.println(gyro_null);
-}
-
-long get_temp() {
-}
-
-void stab_temp() {
+	
+	return ;
 }
 
 void watch_angle() {
+	setup_mpu6050();
+	calculate_null();
+
 	Serial.println("angle watch");
 	do {
 		get_mode();
@@ -196,6 +210,8 @@ void watch_angle() {
 		Serial.println(angle*360.0/GYRO_CAL);
 		delay(30);
 	} while (manual);		//keep summing unitil we turn the mode switch off.
+
+	return ;
 }
 
 void get_mode() {
@@ -214,6 +230,8 @@ void get_mode() {
 		automatic = true;
 		aux = false;
     }
+
+	return ;	
 }
 
 void set_waypoint() {
@@ -228,6 +246,8 @@ void set_waypoint() {
 	Serial.println(waypoint.y);
 	wpw_count++;
 	while(aux) get_mode();
+
+	return ;
 }    
 
 void load_waypoints() {
@@ -242,9 +262,11 @@ void load_waypoints() {
 		temp++;
 	}
 
-	Serial.println("ALL POINTS");
-	Serial.println("LOADED");
+	Serial.println("ALL POINTS LOADED");
+	Serial.println();
 	delay(1500);
+	
+	return ;
 }
 
 void read_waypoint() {
@@ -261,15 +283,35 @@ void read_waypoint() {
 	Serial.println(waypoint.y);
 	wpr_count++;
 	Serial.println(micros() - temp);
+	
+	return ;
 }    
+
+void display_waypoints(){
+	for (int i=1; i <= 6; i++){
+		EEPROM_readAnything(i*WP_SIZE, waypoint);
+		Serial.print(i);
+		Serial.print(": ");
+		Serial.print(waypoint.x);
+		Serial.print(" , ");
+		Serial.println(waypoint.y);
+	}
+	Serial.println();
+
+	return ;
+}
 
 void eeprom_clear() {  //EEPROM Clear
 	// write a 0 to all 512 bytes of the EEPROM
 	for (int i = 0; i < 512; i++) EEPROM.write(i, 0);
 
-	// turn the LED on when we're done
+	Serial.println();
 	Serial.println("EEPROM clear");
+	Serial.println();
+	
 	delay(1500);
+
+	return ;
 }
 
 void import_waypoints() {
@@ -286,16 +328,20 @@ void import_waypoints() {
 		wpw_count++;
 	}
 
-	Serial.println("ALL POINTS");
-	Serial.println("IMPORTED");
+	display_waypoints();
+	Serial.println("ALL POINTS IMPORTED");
+	Serial.println();
+
 	delay(1500);
+	
+	return ;
 }
 
 void export_waypoints() {
 	Serial.begin(115200);
 	load_waypoints();
 	
-	for(int i=0; i<19; i++) {
+	for(int i=0; i<WAYPOINT_COUNT; i++) {
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		Serial.print("waypoint #");
 		Serial.print(wpr_count);
@@ -305,60 +351,85 @@ void export_waypoints() {
 		Serial.println(waypoint.y);
 		wpr_count++;
 	}
-
-	Serial.println("ALL POINTS");
-	Serial.println("EXPORTED");
+	
+	wpr_count = 1;	//resets the waypoint counter to 1, its initial setting
+	Serial.println("ALL POINTS EXPORTED");
+	Serial.println();
 	delay(1500);
-	Serial.end();
+	
+	return ;
 }
 
-void root_menu(){
-    char* value_list[]={"ROOT MENU", "CONTINUE", "TEMPERATURE STAB", "IMPORT WP", "EXPORT WP", "WATCH ANGLE"};
-    byte selection;
-    selection = menu_list(5, value_list);   // try using sizeof(value_list) here
-    switch (selection) {
-	case 1:
-		break;
-    case 2:
-		stab_temp();
-       break;
-    case 3:
-		import_waypoints();
-       break;
-    case 4:
-		export_waypoints();
-       break;
-    case 5:
-		watch_angle();
-       break;
-    default:
-       return;
-    }
+void menu_choices(){
+	Serial.println();
+	Serial.println();
+	Serial.println("Main Menu");
+	Serial.println("----------");
+	Serial.println("a = watch angle");
+	Serial.println("c = clear EEPROM");
+	Serial.println("d = display waypoints");
+	Serial.println("e = edit waypoint (not working yet)");
+	Serial.println("i = import waypoints");
+	Serial.println("l = gyro calibration (not working yet)");
+	Serial.println("n = (re)initialize gyro (not working yet)");
+	Serial.println("p = export waypoints");
+	Serial.println("x = exit. start setup routine for the race");
+	Serial.println();
+	Serial.println();
+	return ;
 }
 
-byte menu_list(byte items, char* value_list[]) {
-    int pulse_length, adjust = 1, temp = 0;
-    while (true) {
-       pulse_length = pulseIn(3,HIGH);
-       if (pulse_length - STEER_ADJUST > 50) adjust++;
-       else if (pulse_length - STEER_ADJUST < -50) adjust--;
-       if (adjust > items) adjust -= items;
-       if (adjust < 1) adjust += items;
-       get_mode();
-       if (aux) {
-           temp = millis();
-           while (aux) get_mode();
-           temp -= millis();
-           if (temp < 500) return adjust;
-           else return 0;
-       }
-       delay(500);
-       //delay(map(abs(pulse_length-STEER_ADJUST), 0, 300, 700, 100));
-       Serial.println(value_list[0]);
-       Serial.println(value_list[adjust]);
-
-       //Serial.println(adjust);
-    }    
+void main_menu(){
+	int loop = 1;
+	menu_choices();
+	Serial.flush();
+	while(loop == 1){
+		if(Serial.available() > 0){
+	 		switch (Serial.read()){
+				case 'a':
+					watch_angle();
+					menu_choices();
+					break;
+				case 'c':
+					eeprom_clear();
+					menu_choices();
+					break;
+				case 'd':
+					display_waypoints();
+					menu_choices();
+					break;
+				// case 'e':
+					// Serial.println("Edit wp #?");
+					// edit_waypoint();
+					// menu_choices();
+					// break;
+				case 'i':
+					import_waypoints();
+					menu_choices();
+					break;
+				// case 'l':
+					// gyro_calibration();
+					// break;
+				// case 'n':
+					// initialize gyro;
+					// break;
+				case 'p':
+					export_waypoints();
+					menu_choices();
+					break;
+				case 'x':
+					Serial.println("Setting up for the race");
+					loop = 0;
+					break;
+				default:
+					Serial.println("invalid entry. try again.");
+					menu_choices();
+					break;
+			}
+		}
+	}
+	
+	return ;
 }
 
 void setup_mpu6050() {
@@ -441,6 +512,7 @@ void setup_mpu6050() {
             accelgyro.setFIFOEnabled(true);
 	        accelgyro.setZGyroFIFOEnabled(true);
 	
+	return ;
 }
 
 void read_FIFO() {
@@ -459,6 +531,8 @@ void read_FIFO() {
 		if ((angle > GYRO_CAL) && (!cal_flag)) angle -= GYRO_CAL; //if we are calculating null, don't roll-over
 		if ((angle < 0) && (!cal_flag)) angle += GYRO_CAL;
 	}
+	
+	return ;
 }
 
 void watch_gyro() {
@@ -471,22 +545,30 @@ void watch_gyro() {
     // digitalWrite(LED_PIN, blinkState);
 		delay(4);
 	}
+	
+	return ;
 }
 
 void setup() {
-	Serial.begin(115200);
-	Wire.begin();
 	//Pin assignments:
 	pinMode(TMISO, INPUT);
 	pinMode(MODE, INPUT);
-	Serial.println(CAR_NAME);	//Print a message to the LCD.
-	delay(10);
+
+	Wire.begin();
+
+	Serial.begin(115200);
+	Serial.println(CAR_NAME);
+	Serial.println();
+
+	main_menu();
+	delay(1500);
+
+	setup_mpu6050();
+	calculate_null();
 
 	pinMode(InterruptPin, INPUT);	 
 	attachInterrupt(0, encoder_interrupt, CHANGE);	//interrupt 0 is on digital pin 2
 
-	get_mode();
-	//root_menu();
 	load_waypoints();
 
 	//verify that car is in manual mode prior to starting null calculation
@@ -497,10 +579,7 @@ void setup() {
 	}
 	while(manual == false) get_mode();
 	delay(500);
-
-	setup_mpu6050();
-	calculate_null();
-
+	
 	steering.attach(10);
 	steering.writeMicroseconds(STEER_ADJUST);
 
@@ -508,6 +587,9 @@ void setup() {
 	esc.writeMicroseconds(S1);
 
 	Serial.println("**READY TO RUN**");
+
+	while(manual == true) get_mode();	//waits until autonomous mode is enabled and then initializes EVERYTHING and starts the car
+
 	wpr_count = 1;		//set waypoint read counter to first waypoint
 	x=0;
 	y=0;
@@ -565,5 +647,10 @@ void loop() {
 		temp = millis();
 		while (aux) get_mode();
 		read_waypoint();
+	}
+
+	if((millis()-time)>1000) {
+		print_coordinates();
+		time = millis();
 	}
 }
