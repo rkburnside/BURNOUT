@@ -614,9 +614,10 @@ void setup(){
 	Serial.println(CAR_NAME);
 	Serial.println();
 
-	main_menu();
-	delay(1500);
-
+	//main_menu();
+	delay(500);
+	get_mode();
+	if(!aux) main_menu(); 
 	setup_mpu6050();
 	calculate_null();
 
