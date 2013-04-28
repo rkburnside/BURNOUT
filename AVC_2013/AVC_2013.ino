@@ -379,74 +379,41 @@ void gyro_initialization(){
 	return ;
 }
 
-void menu_choices(){
-	Serial.println();
-	Serial.println();
-	Serial.println("Main Menu");
-	Serial.println("----------");
-	Serial.println("a = watch angle");
-	Serial.println("c = clear EEPROM");
-	Serial.println("d = display waypoints");
-	Serial.println("e = edit waypoint (not working yet)");
-	Serial.println("g = (re)initialize gyro");
-	Serial.println("i = import waypoints");
-	Serial.println("l = gyro calibration (not working yet)");
-	Serial.println("p = export waypoints");
-	Serial.println("x = exit. start setup routine for the race");
-	Serial.println();
-	Serial.println();
+void gyro_calibration(){
+	uint8_t buffer[2];
+	int accumulator = 0;
+	int samplz = 0;
+
+	setup_mpu6050();
+	calculate_null();
+	
+	samplz = accelgyro.getFIFOCount() >> 1;
+	Serial.println("FIFO_COUNTH : ");
+	Serial.println(samplz,DEC);
+
+	do{
+		get_mode();
+		for (int i=0; i < samplz; i++){
+			accelgyro.getFIFOBytes(buffer, 2);
+			angle -= ((((int16_t)buffer[0]) << 8) | buffer[1]) + gyro_null;
+			gyro_count++;
+		}
+
+		Serial.println(angle);
+	} while(manual);
+	
 	return ;
 }
 
-void main_menu(){
-	int loop = 1;
-	menu_choices();
-	Serial.flush();
-	while(loop == 1){
-		if(Serial.available() > 0){
-	 		switch (Serial.read()){
-				case 'a':
-					watch_angle();
-					menu_choices();
-					break;
-				case 'c':
-					eeprom_clear();
-					menu_choices();
-					break;
-				case 'd':
-					display_waypoints();
-					menu_choices();
-					break;
-				// case 'e':
-					// Serial.println("Edit wp #?");
-					// edit_waypoint();
-					// menu_choices();
-					// break;
-				case 'g':
-					gyro_initialization();
-					menu_choices();
-					break;
-				case 'i':
-					import_waypoints();
-					menu_choices();
-					break;
-				// case 'l':
-					// gyro_calibration();
-					// break;
-				case 'p':
-					export_waypoints();
-					menu_choices();
-					break;
-				case 'x':
-					Serial.println("Setting up for the race");
-					loop = 0;
-					break;
-				default:
-					Serial.println("invalid entry. try again.");
-					menu_choices();
-					break;
-			}
-		}
+void watch_gyro(){
+	while(true){
+		read_FIFO();
+		//Serial.println(angle/130797);
+//	Serial.println(angle);
+	//Serial.println((float)angle/130797.0);
+    // blinkState = !blinkState;
+    // digitalWrite(LED_PIN, blinkState);
+		delay(4);
 	}
 	
 	return ;
@@ -462,7 +429,7 @@ void setup_mpu6050(){
     Serial.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
 	
     // reset device
-    Serial.println(F("\n\nResetting MPU6050..."));
+    Serial.println(F("\nResetting MPU6050..."));
     accelgyro.reset();
     delay(30); // wait after reset
 
@@ -555,15 +522,80 @@ void read_FIFO(){
 	return ;
 }
 
-void watch_gyro(){
-	while(true){
-		read_FIFO();
-		//Serial.println(angle/130797);
-//	Serial.println(angle);
-	//Serial.println((float)angle/130797.0);
-    // blinkState = !blinkState;
-    // digitalWrite(LED_PIN, blinkState);
-		delay(4);
+void menu_choices(){
+	Serial.println();
+	Serial.println();
+	Serial.println("Main Menu");
+	Serial.println("----------");
+	Serial.println("a = watch angle");
+	Serial.println("c = clear EEPROM");
+	Serial.println("d = display waypoints");
+	Serial.println("e = edit waypoint (not yet implemented)");
+	Serial.println("g = (re)initialize gyro");
+	Serial.println("i = import waypoints");
+	Serial.println("l = gyro calibration");
+	Serial.println("p = export waypoints");
+	Serial.println("s = steering calibration (not yet implemented)");
+	Serial.println("x = exit. start setup routine for the race");
+	Serial.println();
+	Serial.println();
+	return ;
+}
+
+void main_menu(){
+	int loop = 1;
+	menu_choices();
+	Serial.flush();
+	while(loop == 1){
+		if(Serial.available() > 0){
+	 		switch (Serial.read()){
+				case 'a':
+					watch_angle();
+					menu_choices();
+					break;
+				case 'c':
+					eeprom_clear();
+					menu_choices();
+					break;
+				case 'd':
+					display_waypoints();
+					menu_choices();
+					break;
+				// case 'e':
+					// Serial.println("Edit wp #?");
+					// edit_waypoint();
+					// menu_choices();
+					// break;
+				case 'g':
+					gyro_initialization();
+					menu_choices();
+					break;
+				case 'i':
+					import_waypoints();
+					menu_choices();
+					break;
+				case 'l':
+					gyro_calibration();
+					menu_choices();
+					break;
+				case 'p':
+					export_waypoints();
+					menu_choices();
+					break;
+				// case 's':
+					// steering_calibration();
+					// menu_choices();
+					// break;
+				case 'x':
+					Serial.println("Setting up for the race");
+					loop = 0;
+					break;
+				default:
+					Serial.println("invalid entry. try again.");
+					menu_choices();
+					break;
+			}
+		}
 	}
 	
 	return ;
