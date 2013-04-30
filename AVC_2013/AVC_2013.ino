@@ -324,7 +324,8 @@ void import_waypoints(){
 }
 
 void export_waypoints(){
-	Serial.begin(115200);
+	Serial.println();
+	Serial.println();
 	load_waypoints();
 	
 	for(int i=0; i<WAYPOINT_COUNT; i++){
@@ -348,7 +349,9 @@ void export_waypoints(){
 }
 
 void display_waypoints(){
-	for (int i=1; i <= 6; i++){
+	Serial.println();
+	Serial.println();
+	for (int i=1; i <= WAYPOINT_COUNT; i++){
 		EEPROM_readAnything(i*WP_SIZE, waypoint);
 		Serial.print(i);
 		Serial.print(": ");
@@ -358,6 +361,52 @@ void display_waypoints(){
 	}
 	Serial.println();
 
+	return ;
+}
+
+void edit_waypoint(){
+	while(1){
+		display_waypoints();
+		Serial.println();
+
+		Serial.print("Edit wp #?  ");
+		int i = Serial.parseInt();
+		EEPROM_readAnything(i*WP_SIZE, waypoint);
+		Serial.println();
+		Serial.print("current values: "); Serial.print(waypoint.x); Serial.print(" , "); Serial.println(waypoint.y);
+		Serial.println();
+		Serial.print("enter new coordinates \"x , y\":  ");
+		int x_temp = Serial.parseInt();
+		int y_temp = Serial.parseInt();
+		Serial.println();
+		Serial.print("current values: "); Serial.print(waypoint.x); Serial.print(" , "); Serial.println(waypoint.y);
+		Serial.print("new values: "); Serial.print(x_temp); Serial.print(" , "); Serial.println(y_temp);
+		
+		while(1){
+			Serial.print("accept values (y=1, n=0)?  ");
+			int y_or_n = Serial.parseInt();
+			if(y_or_n == 1){
+				waypoint.x = x_temp;
+				waypoint.y = y_temp;
+				EEPROM_writeAnything(i*WP_SIZE, waypoint);
+				Serial.println();
+				Serial.println("waypoint changed");
+				break;
+			}
+			else if(y_or_n == 0){
+				Serial.println("no change made");
+				break;
+			}
+			else Serial.println("invalid. try again");
+		}
+
+		Serial.println();
+		Serial.print("edit another waypoint (y=1, n=0)? ");
+		int n_or_y = Serial.parseInt();
+		if(n_or_y == 1) ;
+		else break;
+	}
+	
 	return ;
 }
 
@@ -530,11 +579,10 @@ void menu_choices(){
 	Serial.println("a = watch angle");
 	Serial.println("c = clear EEPROM");
 	Serial.println("d = display waypoints");
-	Serial.println("e = edit waypoint (not yet implemented)");
+	Serial.println("e = edit waypoint");
 	Serial.println("g = (re)initialize gyro");
 	Serial.println("i = import waypoints");
 	Serial.println("l = gyro calibration");
-	Serial.println("p = export waypoints");
 	Serial.println("s = steering calibration (not yet implemented)");
 	Serial.println("x = exit. start setup routine for the race");
 	Serial.println();
@@ -561,11 +609,11 @@ void main_menu(){
 					display_waypoints();
 					menu_choices();
 					break;
-				// case 'e':
-					// Serial.println("Edit wp #?");
-					// edit_waypoint();
-					// menu_choices();
-					// break;
+				case 'e':
+					edit_waypoint();
+					Serial.flush();
+					menu_choices();
+					break;
 				case 'g':
 					gyro_initialization();
 					menu_choices();
@@ -576,10 +624,6 @@ void main_menu(){
 					break;
 				case 'l':
 					gyro_calibration();
-					menu_choices();
-					break;
-				case 'p':
-					export_waypoints();
 					menu_choices();
 					break;
 				// case 's':
@@ -611,6 +655,7 @@ void setup(){
 	Wire.begin();
 
 	Serial.begin(115200);
+	Serial.setTimeout(100000);
 	Serial.println(CAR_NAME);
 	Serial.println();
 

@@ -58,7 +58,7 @@ double excel_waypoints[19][2] = {{0, 1000}, {546.09, 1360}, {2200.11, 1300}, {38
 #define L4 350
 
 //SENSOR PARAMETERS
-#define GYRO_CAL 46808830 //46530819	//this has to be measured by rotating the gyro 360 deg. and reading the output
+#define GYRO_CAL 468088300 //46530819	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define TIRE_CAL 1.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define STEER_ADJUST 1500	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
@@ -70,7 +70,7 @@ double excel_waypoints[19][2] = {{0, 1000}, {546.09, 1360}, {2200.11, 1300}, {38
 #define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations default 1000
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
-#define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
+#define CLICK_MAX 1			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 #define WP_SIZE 20 			//number of bytes for each waypoint
 #endif
 
