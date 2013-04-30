@@ -187,7 +187,7 @@ void calculate_null(){
 		//Serial.println(gyro_count);
 	}
 	
-	gyro_null = angle/gyro_count;	//calculate the null
+	gyro_null = angle/gyro_count - 30;	//calculate the null. the -30 is a fudge factor for 5000 pts.
 	cal_flag = false;		//stop calibration
 	angle = 0;
 	
@@ -512,7 +512,7 @@ void read_FIFO(){
   //Serial.println(samplz,DEC);
   for (int i=0; i < samplz; i++){
 		accelgyro.getFIFOBytes(buffer, 2);
-		angle -= ((((int16_t)buffer[0]) << 8) | buffer[1]) + gyro_null;
+		angle -= ((((int16_t)buffer[0]) << 8) | buffer[1])*10 + gyro_null;
 		gyro_count++;
 		
 		if ((angle > GYRO_CAL) && (!cal_flag)) angle -= GYRO_CAL; //if we are calculating null, don't roll-over

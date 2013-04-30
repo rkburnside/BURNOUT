@@ -24,7 +24,7 @@ double excel_waypoints[19][2] = {{0, 1000}, {546.09, 1360}, {2200.11, 1300}, {38
 
 
 //SENSOR PARAMETERS
-#define GYRO_CAL 47086841	//this has to be measured by rotating the gyro 360 deg. and reading the output
+#define GYRO_CAL 470868410	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define TIRE_CAL 1.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define STEER_ADJUST 1425	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
