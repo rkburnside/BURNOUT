@@ -610,9 +610,13 @@ void main_menu(){
 					menu_choices();
 					break;
 				case 'e':
-					edit_waypoint();
 					Serial.flush();
+					edit_waypoint();
+					Serial.println("debug 1");
 					menu_choices();
+					Serial.println("debug 2");
+					break;
+					Serial.println("debug 3");
 					break;
 				case 'g':
 					gyro_initialization();
