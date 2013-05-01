@@ -433,13 +433,14 @@ void gyro_calibration(){
 }
 
 void watch_gyro(){
-	while(true){
+	while(manual){
 		read_FIFO();
 		//Serial.println(angle/130797);
-//	Serial.println(angle);
-	//Serial.println((float)angle/130797.0);
-    // blinkState = !blinkState;
-    // digitalWrite(LED_PIN, blinkState);
+		//Serial.println(angle);
+		//Serial.println((float)angle/130797.0);
+		//blinkState = !blinkState;
+		//digitalWrite(LED_PIN, blinkState);
+		getmode();
 		delay(4);
 	}
 	
@@ -530,14 +531,31 @@ void setup_mpu6050(){
 }
 
 void read_FIFO(){
-  uint8_t buffer[2];
-  int accumulator = 0;
-  int samplz = 0;
+	setup_mpu6050();
+	calculate_null();
 
-  samplz = accelgyro.getFIFOCount() >> 1;
-  //Serial.println("FIFO_COUNTH : ");
-  //Serial.println(samplz,DEC);
-  for (int i=0; i < samplz; i++){
+	Serial.println("angle watch");
+	do {
+		get_mode();
+		read_FIFO();
+		Serial.println(angle*360.0/GYRO_CAL);
+		delay(30);
+	} while (manual);		//keep summing unitil we turn the mode switch off.
+
+	return ;
+
+
+
+
+
+	uint8_t buffer[2];
+	int accumulator = 0;
+	int samplz = 0;
+
+	samplz = accelgyro.getFIFOCount() >> 1;
+	//Serial.println("FIFO_COUNTH : ");
+	//Serial.println(samplz,DEC);
+	for (int i=0; i < samplz; i++){
 		accelgyro.getFIFOBytes(buffer, 2);
 		angle -= ((((int16_t)buffer[0]) << 8) | buffer[1])*10 + gyro_null;
 		gyro_count++;
@@ -545,28 +563,40 @@ void read_FIFO(){
 		if ((angle > GYRO_CAL) && (!cal_flag)) angle -= GYRO_CAL; //if we are calculating null, don't roll-over
 		if ((angle < 0) && (!cal_flag)) angle += GYRO_CAL;
 	}
-	
+
 	return ;
 }
 
 void steering_calibration(){
-	// while(automatic){
-		// steering.writeMicroseconds(steer_us);
-		// if (automatic) steering.writeMicroseconds(steer_us);
+	while(manual){
+		uint8_t buffer[2];
+		int accumulator = 0;
+		int samplz = 0;
 
-	// if((millis()-time)>250){
-		// print_coordinates();
-		// time = millis();
-	// }
+		samplz = accelgyro.getFIFOCount() >> 1;
+		for (int i=0; i < samplz; i++){
+			accelgyro.getFIFOBytes(buffer, 2);
+			angle -= ((((int16_t)buffer[0]) << 8) | buffer[1])*10 + gyro_null;
+			gyro_count++;
+			
+			if ((angle > GYRO_CAL) && (!cal_flag)) angle -= GYRO_CAL; //if we are calculating null, don't roll-over
+			if ((angle < 0) && (!cal_flag)) angle += GYRO_CAL;
+		}
 
+				
+		steering.writeMicroseconds(steer_us);
+		if (automatic) steering.writeMicroseconds(steer_us);
 
-
-	// }
+		if((millis()-time)>250){
+			print_coordinates();
+			time = millis();
+		}
+		
+		get_mode();
+	}
 
 	return ;
 }
-
-
 
 void menu_choices(){
 	Serial.println();
