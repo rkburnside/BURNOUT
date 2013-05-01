@@ -302,47 +302,23 @@ void eeprom_clear(){  //EEPROM Clear
 
 void import_waypoints(){
 	eeprom_clear();
-
-	int i=0, j=WAYPOINT_COUNT;
+	
+	wpw_count = 1;	//resets the counter to import correctly
 	WAYPOINTS_STRING    //edit this in header file to change waypoints
 	
-	while(i<j){
+	for(int i=0; i < WAYPOINT_COUNT; i++){
 		waypoint.x = excel_waypoints[i][0];
 		waypoint.y = excel_waypoints[i][1];
 		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
 		i++;
 		wpw_count++;
 	}
-
+	
+	wpw_count = 1;	//resets the couter for autonomous mode
 	display_waypoints();
 	Serial.println("ALL POINTS IMPORTED");
 	Serial.println();
 
-	delay(1500);
-	
-	return ;
-}
-
-void export_waypoints(){
-	Serial.println();
-	Serial.println();
-	load_waypoints();
-	
-	for(int i=0; i<WAYPOINT_COUNT; i++){
-		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
-		Serial.print("waypoint #");
-		Serial.print(wpr_count);
-		Serial.print(":\t");
-		Serial.print(waypoint.x);
-		Serial.print("\t");
-		Serial.println(waypoint.y);
-		wpr_count++;
-	}
-	
-	wpr_count = 1;	//resets the waypoint counter to 1, its initial setting
-	Serial.println();
-	Serial.println("ALL POINTS EXPORTED");
-	Serial.println();
 	delay(1500);
 	
 	return ;
@@ -406,6 +382,8 @@ void edit_waypoint(){
 		if(n_or_y == 1) ;
 		else break;
 	}
+	
+	Serial.println();
 	
 	return ;
 }
@@ -571,6 +549,25 @@ void read_FIFO(){
 	return ;
 }
 
+void steering_calibration(){
+	// while(automatic){
+		// steering.writeMicroseconds(steer_us);
+		// if (automatic) steering.writeMicroseconds(steer_us);
+
+	// if((millis()-time)>250){
+		// print_coordinates();
+		// time = millis();
+	// }
+
+
+
+	// }
+
+	return ;
+}
+
+
+
 void menu_choices(){
 	Serial.println();
 	Serial.println();
@@ -583,7 +580,7 @@ void menu_choices(){
 	Serial.println("g = (re)initialize gyro");
 	Serial.println("i = import waypoints");
 	Serial.println("l = gyro calibration");
-	Serial.println("s = steering calibration (not yet implemented)");
+	Serial.println("s = steering calibration");
 	Serial.println("x = exit. start setup routine for the race");
 	Serial.println();
 	Serial.println();
@@ -610,13 +607,8 @@ void main_menu(){
 					menu_choices();
 					break;
 				case 'e':
-					Serial.flush();
 					edit_waypoint();
-					Serial.println("debug 1");
 					menu_choices();
-					Serial.println("debug 2");
-					break;
-					Serial.println("debug 3");
 					break;
 				case 'g':
 					gyro_initialization();
@@ -630,10 +622,10 @@ void main_menu(){
 					gyro_calibration();
 					menu_choices();
 					break;
-				// case 's':
-					// steering_calibration();
-					// menu_choices();
-					// break;
+				case 's':
+					steering_calibration();
+					menu_choices();
+					break;
 				case 'x':
 					Serial.println("Setting up for the race");
 					loop = 0;
