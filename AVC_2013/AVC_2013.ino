@@ -235,21 +235,6 @@ void set_waypoint(){
 	return ;
 }    
 
-void watch_angle(){
-	setup_mpu6050();
-	calculate_null();
-
-	Serial.println("angle watch");
-	do {
-		get_mode();
-		read_FIFO();
-		Serial.println(angle*360.0/GYRO_CAL);
-		delay(30);
-	} while (manual);		//keep summing unitil we turn the mode switch off.
-
-	return ;
-}
-
 void load_waypoints(){
 	int temp = 1;
 	Serial.println("LOADING POINTS");
@@ -407,43 +392,62 @@ void gyro_initialization(){
 }
 
 void gyro_calibration(){
-	uint8_t buffer[2];
-	int accumulator = 0;
-	int samplz = 0;
-
+	Serial.println();
 	setup_mpu6050();
 	calculate_null();
-	
-	samplz = accelgyro.getFIFOCount() >> 1;
-	Serial.println("FIFO_COUNTH : ");
-	Serial.println(samplz,DEC);
 
+	Serial.println("calibrate gyro");
 	do{
+		cal_flag = true;
+		read_FIFO();
+		
+		// if((millis()-time)> 250){
+			Serial.println(angle);
+			// time = millis();
+		// }
 		get_mode();
-		for (int i=0; i < samplz; i++){
-			accelgyro.getFIFOBytes(buffer, 2);
-			angle -= ((((int16_t)buffer[0]) << 8) | buffer[1]) + gyro_null;
-			gyro_count++;
-		}
-
-		Serial.println(angle);
 	} while(manual);
 	
+	cal_flag = false;
+	Serial.println();
+	return ;
+}
+
+void watch_angle(){
+	Serial.println();
+	setup_mpu6050();
+	calculate_null();
+
+	Serial.println("watch angle");
+	do {
+		read_FIFO();
+
+		if((millis()-time)> 250){
+			Serial.println(angle*360.0/GYRO_CAL);
+			time = millis();
+		}
+		get_mode();
+	} while (manual);		//keep summing unitil we turn the mode switch off.
+
 	return ;
 }
 
 void watch_gyro(){
-	while(manual){
+	Serial.println();
+	setup_mpu6050();
+	calculate_null();
+
+	Serial.println("watch gyro");
+	do {
 		read_FIFO();
-		//Serial.println(angle/130797);
-		//Serial.println(angle);
-		//Serial.println((float)angle/130797.0);
-		//blinkState = !blinkState;
-		//digitalWrite(LED_PIN, blinkState);
-		getmode();
-		delay(4);
-	}
-	
+
+		if((millis()-time)> 250){
+			Serial.println(angle);
+			time = millis();
+		}
+		get_mode();
+	} while (manual);		//keep summing unitil we turn the mode switch off.
+
 	return ;
 }
 
@@ -531,23 +535,6 @@ void setup_mpu6050(){
 }
 
 void read_FIFO(){
-	setup_mpu6050();
-	calculate_null();
-
-	Serial.println("angle watch");
-	do {
-		get_mode();
-		read_FIFO();
-		Serial.println(angle*360.0/GYRO_CAL);
-		delay(30);
-	} while (manual);		//keep summing unitil we turn the mode switch off.
-
-	return ;
-
-
-
-
-
 	uint8_t buffer[2];
 	int accumulator = 0;
 	int samplz = 0;
@@ -568,32 +555,32 @@ void read_FIFO(){
 }
 
 void steering_calibration(){
-	while(manual){
-		uint8_t buffer[2];
-		int accumulator = 0;
-		int samplz = 0;
+	// while(manual){
+		// uint8_t buffer[2];
+		// int accumulator = 0;
+		// int samplz = 0;
 
-		samplz = accelgyro.getFIFOCount() >> 1;
-		for (int i=0; i < samplz; i++){
-			accelgyro.getFIFOBytes(buffer, 2);
-			angle -= ((((int16_t)buffer[0]) << 8) | buffer[1])*10 + gyro_null;
-			gyro_count++;
+		// samplz = accelgyro.getFIFOCount() >> 1;
+		// for (int i=0; i < samplz; i++){
+			// accelgyro.getFIFOBytes(buffer, 2);
+			// angle -= ((((int16_t)buffer[0]) << 8) | buffer[1])*10 + gyro_null;
+			// gyro_count++;
 			
-			if ((angle > GYRO_CAL) && (!cal_flag)) angle -= GYRO_CAL; //if we are calculating null, don't roll-over
-			if ((angle < 0) && (!cal_flag)) angle += GYRO_CAL;
-		}
+			// if ((angle > GYRO_CAL) && (!cal_flag)) angle -= GYRO_CAL; //if we are calculating null, don't roll-over
+			// if ((angle < 0) && (!cal_flag)) angle += GYRO_CAL;
+		// }
 
 				
-		steering.writeMicroseconds(steer_us);
-		if (automatic) steering.writeMicroseconds(steer_us);
+		// steering.writeMicroseconds(steer_us);
+		// if (automatic) steering.writeMicroseconds(steer_us);
 
-		if((millis()-time)>250){
-			print_coordinates();
-			time = millis();
-		}
+		// if((millis()-time)>250){
+			// print_coordinates();
+			// time = millis();
+		// }
 		
-		get_mode();
-	}
+		// get_mode();
+	// }
 
 	return ;
 }
@@ -611,6 +598,7 @@ void menu_choices(){
 	Serial.println("i = import waypoints");
 	Serial.println("l = gyro calibration");
 	Serial.println("s = steering calibration");
+	Serial.println("w = watch gyro");
 	Serial.println("x = exit. start setup routine for the race");
 	Serial.println();
 	Serial.println();
@@ -654,6 +642,10 @@ void main_menu(){
 					break;
 				case 's':
 					steering_calibration();
+					menu_choices();
+					break;
+				case 'w':
+					watch_gyro();
 					menu_choices();
 					break;
 				case 'x':
