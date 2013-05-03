@@ -120,7 +120,7 @@ void update_steering(){
 	if (angle_diff > GYRO_CAL/2) angle_diff -= GYRO_CAL;	//if angle is greater than 180 deg, then subtract 360
 	//now, we have an angle as -180 < angle_diff < 180. 
 	steer_us = (float)angle_diff/GYRO_CAL*STEER_GAIN;
-	if (steer_us < 0-steer_limm) steer_us = 0-steer_limm;
+	if (steer_us < (0-steer_limm)) steer_us = 0-steer_limm;
 	if (steer_us > steer_limm) steer_us = steer_limm;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
 
@@ -152,10 +152,8 @@ void print_coordinates(){ //print target, location, and angle
 	Serial.print("\tposition: ");
 	Serial.print(x);
 	Serial.print(" , ");
-	Serial.print(y);
-	Serial.print("\tangle: ");
-	Serial.println((angle/GYRO_CAL)*360);
-
+	Serial.println(y);
+	
 	return ;
 }
 
@@ -170,32 +168,6 @@ void speed(){
 	}
 	else if(proximity >= P3) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
 
-	return ;
-}
-
-void calculate_null(){
-	Serial.println("CALCULATING NULL");
-
-	cal_flag = true;		//tell ADC ISR that we are calibrating,
-	angle = 0;				//reset the angle. angle will act as accumulator for null calculation
-	gyro_null = 0;			//make sure to not subract any nulls here
-	gyro_count = 0;
-
-	while (gyro_count < 5000){
-		read_FIFO();
-		//delay(10);
-		//Serial.println(gyro_count);
-	}
-	
-	gyro_null = angle/gyro_count - 30;	//calculate the null. the -30 is a fudge factor for 5000 pts.
-	cal_flag = false;		//stop calibration
-	angle = 0;
-	
-
-	//should print null here
-	Serial.print("Null: ");
-	Serial.println(gyro_null);
-	
 	return ;
 }
 
@@ -224,11 +196,12 @@ void set_waypoint(){
 	waypoint.y = y;
 	//waypoint.last = false
 	EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
-	Serial.println("set WP # ");
-	Serial.println(wpw_count);
-	Serial.println(waypoint.x);
-	Serial.println(" , ");
-	Serial.println(waypoint.y);
+	Serial.print("set WP #");
+	Serial.print(wpw_count);
+	Serial.print(":  ");
+	Serial.print(waypoint.x);
+	Serial.print(" , ");
+	Serial.print(waypoint.y);
 	wpw_count++;
 	while(aux) get_mode();
 
@@ -295,8 +268,12 @@ void import_waypoints(){
 		waypoint.x = excel_waypoints[i][0];
 		waypoint.y = excel_waypoints[i][1];
 		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
-		i++;
 		wpw_count++;
+		// Serial.print(i);
+		// Serial.print("\t");
+		// Serial.print(excel_waypoints[i][0]);
+		// Serial.print("\t");
+		// Serial.println(excel_waypoints[i][1]);
 	}
 	
 	wpw_count = 1;	//resets the couter for autonomous mode
@@ -395,16 +372,16 @@ void gyro_calibration(){
 	Serial.println();
 	setup_mpu6050();
 	calculate_null();
+	cal_flag = true;
 
 	Serial.println("calibrate gyro");
 	do{
-		cal_flag = true;
 		read_FIFO();
 		
-		// if((millis()-time)> 250){
+		if((millis()-time)> 250){
 			Serial.println(angle);
-			// time = millis();
-		// }
+			time = millis();
+		}
 		get_mode();
 	} while(manual);
 	
@@ -534,9 +511,33 @@ void setup_mpu6050(){
 	return ;
 }
 
+void calculate_null(){
+	Serial.println("CALCULATING NULL");
+
+	cal_flag = true;		//tell ADC ISR that we are calibrating,
+	angle = 0;				//reset the angle. angle will act as accumulator for null calculation
+	gyro_null = 0;			//make sure to not subract any nulls here
+	gyro_count = 0;
+
+	while (gyro_count < 5000){
+		read_FIFO();
+		//delay(10);
+		//Serial.println(gyro_count);
+	}
+	gyro_null = angle/gyro_count+50;	//calculate the null. the -30 is a fudge factor for 5000 pts.
+	cal_flag = false;		//stop calibration
+	angle = 0;
+	
+
+	//should print null here
+	Serial.print("Null: ");
+	Serial.println(gyro_null);
+	
+	return ;
+}
+
 void read_FIFO(){
 	uint8_t buffer[2];
-	int accumulator = 0;
 	int samplz = 0;
 
 	samplz = accelgyro.getFIFOCount() >> 1;
@@ -544,7 +545,9 @@ void read_FIFO(){
 	//Serial.println(samplz,DEC);
 	for (int i=0; i < samplz; i++){
 		accelgyro.getFIFOBytes(buffer, 2);
-		angle -= ((((int16_t)buffer[0]) << 8) | buffer[1])*10 + gyro_null;
+		// angle -= ((((int16_t)buffer[0]) << 8) | buffer[1]) + gyro_null;
+		long temp_angle = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+		angle -= temp_angle*10 + gyro_null;
 		gyro_count++;
 		
 		if ((angle > GYRO_CAL) && (!cal_flag)) angle -= GYRO_CAL; //if we are calculating null, don't roll-over
