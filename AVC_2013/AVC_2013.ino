@@ -152,7 +152,9 @@ void print_coordinates(){ //print target, location, and angle
 	Serial.print("\tposition: ");
 	Serial.print(x);
 	Serial.print(" , ");
-	Serial.println(y);
+	Serial.print(y);
+	Serial.print("\tspeed: ");
+	Serial.println(speed_cur);
 	
 	return ;
 }
@@ -201,7 +203,7 @@ void set_waypoint(){
 	Serial.print(":  ");
 	Serial.print(waypoint.x);
 	Serial.print(" , ");
-	Serial.print(waypoint.y);
+	Serial.println(waypoint.y);
 	wpw_count++;
 	while(aux) get_mode();
 
