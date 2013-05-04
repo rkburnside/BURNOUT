@@ -1,8 +1,9 @@
 //Header file variable
-#define RR
+#define MM
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
+//#define PI 3.14159
 int excel_waypoints[19][2] = {{0, 1000}, {546, 1360}, {2200, 1300}, {3832, 1190}, {3760, -1276}, {1246, -1430}, {160, -1250}, {214, 274}, {214, 274}, {214, 274}, {214, 274}, {214, 274}, {214, 274}, {214, 274}, {214, 274}, {214, 274}, {214, 274}, {214, 274}, {1, 1}};
 
 #ifdef MM
@@ -24,7 +25,8 @@ int excel_waypoints[19][2] = {{0, 1000}, {546, 1360}, {2200, 1300}, {3832, 1190}
 
 
 //SENSOR PARAMETERS
-#define GYRO_CAL 470868410	//this has to be measured by rotating the gyro 360 deg. and reading the output
+//#define GYRO_CAL 470868410	//this has to be measured by rotating the gyro 360 deg. and reading the output
+#define GYRO_CAL 235434205	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define TIRE_CAL 1.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define STEER_ADJUST 1425	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300

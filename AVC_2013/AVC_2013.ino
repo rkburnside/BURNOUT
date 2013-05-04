@@ -42,10 +42,10 @@ D13 - LED status
 
 volatile boolean gyro_flag = false, cal_flag = false;
 boolean manual, automatic, aux=false, running=false, first=true;
-volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, angle=0, clicks = 0;
-long count, angle_last, angle_target, proximity, steer_us, angle_diff, previous_proximity=10000;
+volatile long gyro_sum = 0, gyro_count = 0, gyro_null=0, accum=0, clicks = 0;
+long count, proximity, steer_us, previous_proximity=10000;
 double x_wp[WAYPOINT_COUNT], y_wp[WAYPOINT_COUNT];
-double x=0, y=0;
+double angle_diff, angle_last, angle_target, x=0, y=0, angle=0;
 int wpr_count=1, wpw_count=1, speed_cur=0, speed_new=0, speed_old=0, steer_limm = 300;
 const int InterruptPin = 2 ;		//intterupt on digital pin 2
 Servo steering, esc;
@@ -104,26 +104,23 @@ void cal_steer_lim(){
 
 void update_position(){
 	//calculate position
-	x += sin((angle + angle_last) * 3.14159/GYRO_CAL);
-	y += cos((angle + angle_last) * 3.14159/GYRO_CAL);
-	angle_last = angle;
-	angle_target = atan2((x_wp[wpr_count] - x),(y_wp[wpr_count] - y)) * GYRO_CAL/2.0/3.14159;
-	proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
-	
+	x += sin(angle);
+	y += cos(angle);
+	angle_target = atan2((x_wp[wpr_count] - x),(y_wp[wpr_count] - y));
+	proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);	
 	return ;
 }
 
 void update_steering(){
 	//calculate and write angles for steering
 	angle_diff = angle_target - angle;
-	if (angle_diff < -GYRO_CAL/2) angle_diff += GYRO_CAL;   //if angle is less than 180 deg, then add 360 deg
-	if (angle_diff > GYRO_CAL/2) angle_diff -= GYRO_CAL;	//if angle is greater than 180 deg, then subtract 360
+	if (angle_diff < -3.14159) angle_diff += 3.14159*2;   //if angle is less than 180 deg, then add 360 deg
+	if (angle_diff > 3.14159) angle_diff -= 3.14159*2;	//if angle is greater than 180 deg, then subtract 360
 	//now, we have an angle as -180 < angle_diff < 180. 
-	steer_us = (float)angle_diff/GYRO_CAL*STEER_GAIN;
+	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;
 	if (steer_us < (0-steer_limm)) steer_us = 0-steer_limm;
 	if (steer_us > steer_limm) steer_us = steer_limm;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
-
 	return ;
 }
 
@@ -402,7 +399,9 @@ void watch_angle(){
 		read_FIFO();
 
 		if((millis()-time)> 250){
-			Serial.println(angle*360.0/GYRO_CAL);
+			//Serial.println(angle);
+			Serial.println(angle*180.0/3.14159);
+			//Serial.println(accum);
 			time = millis();
 		}
 		get_mode();
@@ -517,7 +516,7 @@ void calculate_null(){
 	Serial.println("CALCULATING NULL");
 
 	cal_flag = true;		//tell ADC ISR that we are calibrating,
-	angle = 0;				//reset the angle. angle will act as accumulator for null calculation
+	accum = 0;				//reset the angle. angle will act as accumulator for null calculation
 	gyro_null = 0;			//make sure to not subract any nulls here
 	gyro_count = 0;
 
@@ -526,9 +525,9 @@ void calculate_null(){
 		//delay(10);
 		//Serial.println(gyro_count);
 	}
-	gyro_null = angle/gyro_count+50;	//calculate the null. the -30 is a fudge factor for 5000 pts.
+	gyro_null = accum/gyro_count-30;	//calculate the null. the -30 is a fudge factor for 5000 pts.
 	cal_flag = false;		//stop calibration
-	angle = 0;
+	accum = 0;
 	
 
 	//should print null here
@@ -540,6 +539,7 @@ void calculate_null(){
 
 void read_FIFO(){
 	uint8_t buffer[2];
+	long temp = 0;
 	int samplz = 0;
 
 	samplz = accelgyro.getFIFOCount() >> 1;
@@ -547,17 +547,18 @@ void read_FIFO(){
 	//Serial.println(samplz,DEC);
 	for (int i=0; i < samplz; i++){
 		accelgyro.getFIFOBytes(buffer, 2);
-		// angle -= ((((int16_t)buffer[0]) << 8) | buffer[1]) + gyro_null;
-		long temp_angle = ((((int16_t)buffer[0]) << 8) | buffer[1]);
-		angle -= temp_angle*10 + gyro_null;
+		temp = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+		accum -= (temp * 10) + gyro_null;
 		gyro_count++;
 		
-		if ((angle > GYRO_CAL) && (!cal_flag)) angle -= GYRO_CAL; //if we are calculating null, don't roll-over
-		if ((angle < 0) && (!cal_flag)) angle += GYRO_CAL;
+		if ((accum > GYRO_CAL) && (!cal_flag)) accum -= GYRO_CAL*2; //if we are calculating null, don't roll-over
+		if ((accum < -GYRO_CAL) && (!cal_flag)) accum += GYRO_CAL*2;
 	}
+	angle = (float)accum/(float)GYRO_CAL * 3.14159;
 
 	return ;
 }
+
 
 void steering_calibration(){
 	// while(manual){
@@ -711,7 +712,7 @@ void setup(){
 	digitalWrite(12, HIGH);
 	Serial.println("**READY TO RUN**");
 
-	while(manual == true) get_mode();	//waits until autonomous mode is enabled and then initializes EVERYTHING and starts the car
+//	while(manual == true) get_mode();	//waits until autonomous mode is enabled and then initializes EVERYTHING and starts the car
 
 	wpr_count = 1;		//set waypoint read counter to first waypoint
 	x=0;
