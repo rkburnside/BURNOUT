@@ -44,10 +44,11 @@ volatile boolean gyro_flag = false, cal_flag = false;
 boolean manual, automatic, aux=false, running=false, first=true;
 volatile byte clicks = 0;
 long gyro_count = 0, gyro_null=0, accum=0, time=0;
-long count, proximity, steer_us, previous_proximity=10000;
+long count, proximity, previous_proximity=10000;
 double x_wp[WAYPOINT_COUNT], y_wp[WAYPOINT_COUNT];
 double angle_diff, angle_last, angle_target, x=0, y=0, angle=0;
-int wpr_count=1, wpw_count=1, speed_cur=0, speed_new=0, speed_old=0, steer_limm = 300;
+int speed_cur=0, speed_new=0, speed_old=0, steer_limm = 300, steer_us;
+byte wpr_count=1, wpw_count=1;
 const byte InterruptPin = 2 ;		//intterupt on digital pin 2
 
 Servo steering, esc;
