@@ -615,7 +615,9 @@ void main_menu(){
 	int loop = 1;
 	menu_choices();
 	Serial.flush();
-	while(loop == 1){
+	get_mode();
+	while((loop == 1) && (manual)){
+		get_mode();
 		if(Serial.available() > 0){
 	 		switch (Serial.read()){
 				case 'a':
@@ -684,9 +686,9 @@ void setup(){
 	Serial.println();
 
 	//main_menu();
-	delay(500);
 	get_mode();
-	if(!aux) main_menu(); 
+	main_menu();
+	delay(500);	
 	setup_mpu6050();
 	calculate_null();
 
