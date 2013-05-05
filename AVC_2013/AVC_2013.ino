@@ -29,6 +29,7 @@ D13 - LED status
 #include "AVC_2013.h"
 #include "EEPROMAnything.h"
 #include "Wire.h"
+#include <MemoryFree.h>
 
 // I2Cdev and MPU6050 must be installed as libraries, or else the .cpp/.h files
 // for both classes must be in the include path of your project
@@ -152,8 +153,10 @@ void print_coordinates(){ //print target, location, and angle
 	Serial.print(" , ");
 	Serial.print(y);
 	Serial.print("\tspeed: ");
-	Serial.println(speed_cur);
-	
+	Serial.print(speed_cur);
+	Serial.print("\tFree Memory = ");
+	Serial.println(freeMemory());
+
 	return ;
 }
 
@@ -559,7 +562,6 @@ void read_FIFO(){
 
 	return ;
 }
-
 
 void steering_calibration(){
 	// while(manual){
