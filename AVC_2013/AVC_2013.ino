@@ -143,7 +143,7 @@ void update_waypoint(){
 	return ;
 }
 
-void print_coordinates(){ //print target, location, and angle
+void print_coordinates(){ //print target, location, etc.
 	Serial.print("target: ");
 	Serial.print(x_wp[wpr_count]);
 	Serial.print(" , ");
@@ -529,7 +529,7 @@ void calculate_null(){
 		//delay(10);
 		//Serial.println(gyro_count);
 	}
-	gyro_null = accum/gyro_count-30;	//calculate the null. the -30 is a fudge factor for 5000 pts.
+	gyro_null = accum/gyro_count + NULL_FF;	//calculate the null. the -30 is a fudge factor for 5000 pts.
 	cal_flag = false;		//stop calibration
 	accum = 0;
 	
@@ -564,32 +564,41 @@ void read_FIFO(){
 }
 
 void steering_calibration(){
-	// while(manual){
-		// uint8_t buffer[2];
-		// int accumulator = 0;
-		// int samplz = 0;
+	Serial.println();
+	Serial.println();
 
-		// samplz = accelgyro.getFIFOCount() >> 1;
-		// for (int i=0; i < samplz; i++){
-			// accelgyro.getFIFOBytes(buffer, 2);
-			// angle -= ((((int16_t)buffer[0]) << 8) | buffer[1])*10 + gyro_null;
-			// gyro_count++;
-			
-			// if ((angle > GYRO_CAL) && (!cal_flag)) angle -= GYRO_CAL; //if we are calculating null, don't roll-over
-			// if ((angle < 0) && (!cal_flag)) angle += GYRO_CAL;
-		// }
+	double steering_temp = 1500;
+	steering.attach(10);
+	steering.writeMicroseconds(steering_temp);
+	delay(500);
+	setup_mpu6050();
+	calculate_null();
 
-				
-		// steering.writeMicroseconds(steer_us);
-		// if (automatic) steering.writeMicroseconds(steer_us);
+	Serial.println("set controller to automatic");
+	get_mode();
+	while(!automatic) get_mode();
+	
+	while(automatic){
+		read_FIFO();
+		if(angle > 0.01) steering_temp = steering_temp - .1;
+		if(angle < -0.01) steering_temp = steering_temp + .1;
 
-		// if((millis()-time)>250){
-			// print_coordinates();
-			// time = millis();
-		// }
+		if(steering_temp > 1750) steering_temp = 1750;
+		if(steering_temp < 1250) steering_temp = 1250;
 		
-		// get_mode();
-	// }
+		steering.writeMicroseconds((int)steering_temp);
+		
+		if((millis()-time)>250){
+			Serial.print("angle: ");
+			Serial.print(angle);
+			Serial.print("\tsteering ms: ");
+			Serial.println((int)steering_temp);
+			time = millis();
+		}
+		get_mode();
+	}
+
+	steering.detach();
 
 	return ;
 }
@@ -620,7 +629,6 @@ void main_menu(){
 	Serial.flush();
 	get_mode();
 	while((loop == 1) && (manual)){
-		get_mode();
 		if(Serial.available() > 0){
 	 		switch (Serial.read()){
 				case 'a':
@@ -668,6 +676,8 @@ void main_menu(){
 					menu_choices();
 					break;
 			}
+		delay(500);
+		get_mode();
 		}
 	}
 	
