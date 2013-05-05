@@ -1,5 +1,5 @@
 //Header file variable
-#define MM
+#define RR
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
@@ -57,7 +57,7 @@ int excel_waypoints[19][2] = {{0, 100}, {100, 100}, {50, 75}, {0, 0}, {0, 0}, {1
 #define L2 20000
 #define L3 200
 #define L4 350
-#define NULL_FF 50
+#define NULL_FF 45
 
 //SENSOR PARAMETERS
 //#define GYRO_CAL 468088300	//this has to be measured by rotating the gyro 360 deg. and reading the output

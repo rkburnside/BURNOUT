@@ -404,7 +404,7 @@ void watch_angle(){
 
 		if((millis()-time)> 250){
 			//Serial.println(angle);
-			Serial.println(angle*180.0/3.14159);
+			Serial.println(angle*180.0/3.14159,5);
 			//Serial.println(accum);
 			time = millis();
 		}
@@ -567,7 +567,7 @@ void steering_calibration(){
 	Serial.println();
 	Serial.println();
 
-	double steering_temp = 1500;
+	double steering_temp = 1450;
 	steering.attach(10);
 	steering.writeMicroseconds(steering_temp);
 	delay(500);
@@ -580,8 +580,8 @@ void steering_calibration(){
 	
 	while(automatic){
 		read_FIFO();
-		if(angle > 0.01) steering_temp = steering_temp - .1;
-		if(angle < -0.01) steering_temp = steering_temp + .1;
+		if(angle > 0.005) steering_temp = steering_temp - .05;
+		if(angle < -0.005) steering_temp = steering_temp + .05;
 
 		if(steering_temp > 1750) steering_temp = 1750;
 		if(steering_temp < 1250) steering_temp = 1250;
@@ -590,7 +590,7 @@ void steering_calibration(){
 		
 		if((millis()-time)>250){
 			Serial.print("angle: ");
-			Serial.print(angle);
+			Serial.print(angle,5);
 			Serial.print("\tsteering ms: ");
 			Serial.println((int)steering_temp);
 			time = millis();
