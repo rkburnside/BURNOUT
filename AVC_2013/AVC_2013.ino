@@ -156,7 +156,7 @@ void print_coordinates(){ //print target, location, etc.
 	Serial.print(" , ");
 	Serial.print(y);
 	Serial.print("\tspeed: ");
-	Serial.print(speed_cur);
+	Serial.println(speed_cur);
 	//Serial.print("\tFree Memory = ");
 	//Serial.println(freeMemory());
 
@@ -677,6 +677,8 @@ void main_menu(){
 					menu_choices();
 					break;
 			}
+		delay(500);
+		get_mode();
 		}
 	}
 	return ;
