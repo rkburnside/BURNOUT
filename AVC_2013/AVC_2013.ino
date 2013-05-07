@@ -382,7 +382,7 @@ void gyro_calibration(){
 		read_FIFO();
 		
 		if((millis()-time)> 250){
-			Serial.println(angle);
+			Serial.println(accum);
 			time = millis();
 		}
 		get_mode();
@@ -424,7 +424,7 @@ void watch_gyro(){
 		read_FIFO();
 
 		if((millis()-time)> 250){
-			Serial.println(angle);
+			Serial.println(accum);
 			time = millis();
 		}
 		get_mode();
@@ -567,9 +567,10 @@ void steering_calibration(){
 	Serial.println();
 	Serial.println();
 
-	double steering_temp = 1450;
+	angle_target = 0.0;
+		
 	steering.attach(10);
-	steering.writeMicroseconds(steering_temp);
+	steering.writeMicroseconds(STEER_ADJUST);
 	delay(500);
 	setup_mpu6050();
 	calculate_null();
@@ -580,19 +581,15 @@ void steering_calibration(){
 	
 	while(automatic){
 		read_FIFO();
-		if(angle > 0.005) steering_temp = steering_temp - .05;
-		if(angle < -0.005) steering_temp = steering_temp + .05;
-
-		if(steering_temp > 1750) steering_temp = 1750;
-		if(steering_temp < 1250) steering_temp = 1250;
 		
-		steering.writeMicroseconds((int)steering_temp);
+		update_steering();
+		steering.writeMicroseconds(steer_us);
 		
-		if((millis()-time)>250){
+		if((millis()-time)>200){
 			Serial.print("angle: ");
 			Serial.print(angle,5);
 			Serial.print("\tsteering ms: ");
-			Serial.println((int)steering_temp);
+			Serial.println(steer_us);
 			time = millis();
 		}
 		get_mode();
