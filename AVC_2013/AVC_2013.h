@@ -1,5 +1,5 @@
 //Header file variable
-#define RR
+#define MM
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \

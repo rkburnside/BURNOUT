@@ -130,6 +130,9 @@ void update_waypoint(){
 	//waypoint acceptance and move to next waypoint
 	if (proximity < WAYPOINT_ACCEPT){
 		wpr_count++;
+		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
+		x_wp[wpr_count] = waypoint.x;
+		y_wp[wpr_count] = waypoint.y;
 		Serial.print("read WP #");
 		Serial.print(wpr_count);
 		Serial.print(": ");
@@ -154,8 +157,8 @@ void print_coordinates(){ //print target, location, etc.
 	Serial.print(y);
 	Serial.print("\tspeed: ");
 	Serial.print(speed_cur);
-	Serial.print("\tFree Memory = ");
-	Serial.println(freeMemory());
+	//Serial.print("\tFree Memory = ");
+	//Serial.println(freeMemory());
 
 	return ;
 }
@@ -231,19 +234,19 @@ void load_waypoints(){
 }
 
 void read_waypoint(){
-	long temp = micros();
+//	long temp = micros();
 	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 	//x_wp = waypoint.x;
 	//y_wp = waypoint.y;
 	//waypoint.last = false
 	//EEPROM_writeAnything(wp_count*WP_SIZE, waypoint);
-	Serial.println("read WP # ");
-	Serial.println(wpr_count);
-	Serial.println(waypoint.x);
-	Serial.println(" , ");
-	Serial.println(waypoint.y);
-	wpr_count++;
-	Serial.println(micros() - temp);
+	// Serial.println("read WP # ");
+	// Serial.println(wpr_count);
+	// Serial.println(waypoint.x);
+	// Serial.println(" , ");
+	// Serial.println(waypoint.y);
+	//wpr_count++;
+	// Serial.println(micros() - temp);
 	
 	return ;
 }    
@@ -626,6 +629,7 @@ void main_menu(){
 	Serial.flush();
 	get_mode();
 	while((loop == 1) && (manual)){
+		get_mode();
 		if(Serial.available() > 0){
 	 		switch (Serial.read()){
 				case 'a':
@@ -673,11 +677,8 @@ void main_menu(){
 					menu_choices();
 					break;
 			}
-		delay(500);
-		get_mode();
 		}
 	}
-	
 	return ;
 }
 
@@ -705,7 +706,7 @@ void setup(){
 	pinMode(InterruptPin, INPUT);	 
 	attachInterrupt(0, encoder_interrupt, CHANGE);	//interrupt 0 is on digital pin 2
 
-	load_waypoints();
+	//load_waypoints();
 
 	//verify that car is in manual mode prior to starting null calculation
 	get_mode();
@@ -727,6 +728,10 @@ void setup(){
 //	while(manual == true) get_mode();	//waits until autonomous mode is enabled and then initializes EVERYTHING and starts the car
 
 	wpr_count = 1;		//set waypoint read counter to first waypoint
+	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
+	x_wp[wpr_count] = waypoint.x;
+	y_wp[wpr_count] = waypoint.y;
+
 	x=0;
 	y=0;
 	angle=0;
