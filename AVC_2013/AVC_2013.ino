@@ -46,7 +46,7 @@ boolean manual, automatic, aux=false, running=false, first=true;
 volatile byte clicks = 0;
 long gyro_count = 0, gyro_null=0, accum=0, time=0;
 long count, proximity, previous_proximity=10000;
-double x_wp[WAYPOINT_COUNT], y_wp[WAYPOINT_COUNT];
+double x_wp = 0, y_wp = 0;
 double angle_diff, angle_last, angle_target, x=0, y=0, angle=0;
 int speed_cur=0, speed_new=0, speed_old=0, steer_limm = 300, steer_us;
 byte wpr_count=1, wpw_count=1;
@@ -78,7 +78,7 @@ void navigate(){
 	calculate_speed();
 	cal_steer_lim();
 	update_position();
-//	print_coordinates();
+	print_coordinates();
 	update_steering();
 	update_waypoint();
 	get_mode();
@@ -99,7 +99,6 @@ void calculate_speed(){
 void cal_steer_lim(){
 	steer_limm = (int)map(speed_cur, L1, L2, L3, L4);
 	if (steer_limm > L4) steer_limm = L4;
-	// Serial.println(gyro_limm);
 	
 	return ;
 }
@@ -108,8 +107,8 @@ void update_position(){
 	//calculate position
 	x += sin(angle);
 	y += cos(angle);
-	angle_target = atan2((x_wp[wpr_count] - x),(y_wp[wpr_count] - y));
-	proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);	
+	angle_target = atan2((x_wp - x),(y_wp - y));
+	proximity = sqrt(pow((x_wp - x),2) + pow((y_wp - y),2));	
 	return ;
 }
 
@@ -131,15 +130,15 @@ void update_waypoint(){
 	if (proximity < WAYPOINT_ACCEPT){
 		wpr_count++;
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
-		x_wp[wpr_count] = waypoint.x;
-		y_wp[wpr_count] = waypoint.y;
+		x_wp = waypoint.x;
+		y_wp = waypoint.y;
 		Serial.print("read WP #");
 		Serial.print(wpr_count);
 		Serial.print(": ");
-		Serial.print(x_wp[wpr_count]);
+		Serial.print(x_wp);
 		Serial.print(" , ");
-		Serial.println(y_wp[wpr_count]);
-		proximity = abs(x_wp[wpr_count]-x) + abs(y_wp[wpr_count]-y);
+		Serial.println(y_wp);
+		proximity = sqrt(pow((x_wp - x),2) + pow((y_wp - y),2));	
 		previous_proximity = proximity;
 	}
 	
@@ -148,15 +147,17 @@ void update_waypoint(){
 
 void print_coordinates(){ //print target, location, etc.
 	Serial.print("target: ");
-	Serial.print(x_wp[wpr_count]);
+	Serial.print(x_wp);
 	Serial.print(" , ");
-	Serial.print(y_wp[wpr_count]);
+	Serial.print(y_wp);
 	Serial.print("\tposition: ");
 	Serial.print(x);
 	Serial.print(" , ");
 	Serial.print(y);
-	Serial.print("\tspeed: ");
-	Serial.println(speed_cur);
+	Serial.print("\tprox: ");
+	Serial.println(proximity);
+	// Serial.print("\tspeed: ");
+	// Serial.println(speed_cur);
 	//Serial.print("\tFree Memory = ");
 	//Serial.println(freeMemory());
 
@@ -214,36 +215,17 @@ void set_waypoint(){
 	return ;
 }    
 
-void load_waypoints(){
-	int temp = 1;
-	Serial.println("LOADING POINTS");
-	delay(1500);
-
-	while (temp <= WAYPOINT_COUNT){
-		EEPROM_readAnything(temp*WP_SIZE, waypoint);
-		x_wp[temp] = waypoint.x;
-		y_wp[temp] = waypoint.y;
-		temp++;
-	}
-
-	Serial.println("ALL POINTS LOADED");
-	Serial.println();
-	delay(1500);
-	
-	return ;
-}
-
 void read_waypoint(){
-//	long temp = micros();
+	//	long temp = micros();
 	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 	//x_wp = waypoint.x;
 	//y_wp = waypoint.y;
 	//waypoint.last = false
 	//EEPROM_writeAnything(wp_count*WP_SIZE, waypoint);
-	// Serial.println("read WP # ");
-	// Serial.println(wpr_count);
-	// Serial.println(waypoint.x);
-	// Serial.println(" , ");
+	// Serial.print("read WP # ");
+	// Serial.print(wpr_count);
+	// Serial.print(waypoint.x);
+	// Serial.print(" , ");
 	// Serial.println(waypoint.y);
 	//wpr_count++;
 	// Serial.println(micros() - temp);
@@ -275,11 +257,6 @@ void import_waypoints(){
 		waypoint.y = excel_waypoints[i][1];
 		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
 		wpw_count++;
-		// Serial.print(i);
-		// Serial.print("\t");
-		// Serial.print(excel_waypoints[i][0]);
-		// Serial.print("\t");
-		// Serial.println(excel_waypoints[i][1]);
 	}
 	
 	wpw_count = 1;	//resets the couter for autonomous mode
@@ -708,8 +685,6 @@ void setup(){
 	pinMode(InterruptPin, INPUT);	 
 	attachInterrupt(0, encoder_interrupt, CHANGE);	//interrupt 0 is on digital pin 2
 
-	//load_waypoints();
-
 	//verify that car is in manual mode prior to starting null calculation
 	get_mode();
 	if(manual == false){
@@ -731,8 +706,8 @@ void setup(){
 
 	wpr_count = 1;		//set waypoint read counter to first waypoint
 	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
-	x_wp[wpr_count] = waypoint.x;
-	y_wp[wpr_count] = waypoint.y;
+	x_wp = waypoint.x;
+	y_wp = waypoint.y;
 
 	x=0;
 	y=0;
