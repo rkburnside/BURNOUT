@@ -108,7 +108,10 @@ void update_position(){
 	x += sin(angle);
 	y += cos(angle);
 	angle_target = atan2((x_wp - x),(y_wp - y));
-	proximity = sqrt(pow((x_wp - x),2) + pow((y_wp - y),2));	
+	double temp = pow((x_wp-x),2);
+	temp += pow((y_wp-y),2);
+	proximity = sqrt(temp);
+	//proximity = sqrt(pow((x_wp - x),2) + pow((y_wp - y),2));	
 	return ;
 }
 
@@ -138,7 +141,10 @@ void update_waypoint(){
 		Serial.print(x_wp);
 		Serial.print(" , ");
 		Serial.println(y_wp);
-		proximity = sqrt(pow((x_wp - x),2) + pow((y_wp - y),2));	
+		double temp = pow((x_wp-x),2);
+		temp += pow((y_wp-y),2);
+		proximity = sqrt(temp);
+		//proximity = sqrt(pow((x_wp - x),2) + pow((y_wp - y),2));	
 		previous_proximity = proximity;
 	}
 	

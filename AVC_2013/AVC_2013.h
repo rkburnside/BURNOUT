@@ -7,7 +7,7 @@ int excel_waypoints[19][2] = {{0, 100}, {100, 100}, {50, 75}, {0, 0}, {0, 0}, {1
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 25	//waypoint acceptance radius
+#define WAYPOINT_ACCEPT 10	//waypoint acceptance radius
 #define S1 1500				// some default values:
 #define S2 1560				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
 #define S3 1580				//This is the speed for negotiating wp's 
