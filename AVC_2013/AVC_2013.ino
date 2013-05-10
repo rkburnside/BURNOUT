@@ -78,7 +78,6 @@ void navigate(){
 	calculate_speed();
 	cal_steer_lim();
 	update_position();
-	print_coordinates();
 	update_steering();
 	update_waypoint();
 	get_mode();
@@ -152,16 +151,24 @@ void update_waypoint(){
 }
 
 void print_coordinates(){ //print target, location, etc.
-	Serial.print("target: ");
+	Serial.print("trgt: ");
 	Serial.print(x_wp);
 	Serial.print(" , ");
 	Serial.print(y_wp);
-	Serial.print("\tposition: ");
+	Serial.print("\t(x,y): ");
 	Serial.print(x);
 	Serial.print(" , ");
 	Serial.print(y);
+	Serial.print("\tagl tgt: ");
+	Serial.print(angle_target);
+	Serial.print("\tagl diff: ");
+	Serial.print(angle_diff);
 	Serial.print("\tprox: ");
-	Serial.println(proximity);
+	Serial.print(proximity);
+	Serial.print("\tlim: ");
+	Serial.print(steer_limm);
+	Serial.print("\tsteer: ");
+	Serial.println(steer_us);
 	// Serial.print("\tspeed: ");
 	// Serial.println(speed_cur);
 	//Serial.print("\tFree Memory = ");
@@ -450,54 +457,54 @@ void setup_mpu6050(){
     Serial.print(F("Z gyro offset = "));
     Serial.println(zgOffset);
 
-            Serial.println(F("Setting clock source to Z Gyro..."));
-            accelgyro.setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
+	Serial.println(F("Setting clock source to Z Gyro..."));
+	accelgyro.setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
 
-            // Serial.println(F("Setting DMP and FIFO_OFLOW interrupts enabled..."));
-            // accelgyro.setIntEnabled(0x12);
+	// Serial.println(F("Setting DMP and FIFO_OFLOW interrupts enabled..."));
+	// accelgyro.setIntEnabled(0x12);
 
-             Serial.println(F("Setting sample rate to 200Hz..."));
-             accelgyro.setRate(0); // 1khz / (1 + 4) = 200 Hz
+	 Serial.println(F("Setting sample rate to 200Hz..."));
+	 accelgyro.setRate(0); // 1khz / (1 + 4) = 200 Hz
 
-            // Serial.println(F("Setting external frame sync to TEMP_OUT_L[0]..."));
-            // accelgyro.setExternalFrameSync(MPU6050_EXT_SYNC_TEMP_OUT_L);
+	// Serial.println(F("Setting external frame sync to TEMP_OUT_L[0]..."));
+	// accelgyro.setExternalFrameSync(MPU6050_EXT_SYNC_TEMP_OUT_L);
 
-            Serial.println(F("Setting DLPF bandwidth to 42Hz..."));
-            accelgyro.setDLPFMode(MPU6050_DLPF_BW_42);
+	Serial.println(F("Setting DLPF bandwidth to 42Hz..."));
+	accelgyro.setDLPFMode(MPU6050_DLPF_BW_42);
 
-            Serial.println(F("Setting gyro sensitivity to +/- 250 deg/sec..."));
-            accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
+	Serial.println(F("Setting gyro sensitivity to +/- 250 deg/sec..."));
+	accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
 
-            // Serial.println(F("Setting X/Y/Z gyro offsets to previous values..."));
-            // accelgyro.setXGyroOffset(xgOffset);
-            // accelgyro.setYGyroOffset(ygOffset);
-            // accelgyro.setZGyroOffset(61);
+	// Serial.println(F("Setting X/Y/Z gyro offsets to previous values..."));
+	// accelgyro.setXGyroOffset(xgOffset);
+	// accelgyro.setYGyroOffset(ygOffset);
+	// accelgyro.setZGyroOffset(61);
 
-            // Serial.println(F("Setting X/Y/Z gyro user offsets to zero..."));
-            // accelgyro.setXGyroOffsetUser(0);
-            // accelgyro.setYGyroOffsetUser(0);
-            //accelgyro.setZGyroOffsetUser(0);
-    //Serial.print(F("Z gyro offset = "));
+	// Serial.println(F("Setting X/Y/Z gyro user offsets to zero..."));
+	// accelgyro.setXGyroOffsetUser(0);
+	// accelgyro.setYGyroOffsetUser(0);
+	//accelgyro.setZGyroOffsetUser(0);
+	//Serial.print(F("Z gyro offset = "));
     //Serial.println(accelgyro.getZGyroOffset());
 
-            // Serial.println(F("Setting motion detection threshold to 2..."));
-            // accelgyro.setMotionDetectionThreshold(2);
+	// Serial.println(F("Setting motion detection threshold to 2..."));
+	// accelgyro.setMotionDetectionThreshold(2);
 
-            // Serial.println(F("Setting zero-motion detection threshold to 156..."));
-            // accelgyro.setZeroMotionDetectionThreshold(156);
+	// Serial.println(F("Setting zero-motion detection threshold to 156..."));
+	// accelgyro.setZeroMotionDetectionThreshold(156);
 
-            // Serial.println(F("Setting motion detection duration to 80..."));
-            // accelgyro.setMotionDetectionDuration(80);
+	// Serial.println(F("Setting motion detection duration to 80..."));
+	// accelgyro.setMotionDetectionDuration(80);
 
-            // Serial.println(F("Setting zero-motion detection duration to 0..."));
-            // accelgyro.setZeroMotionDetectionDuration(0);
+	// Serial.println(F("Setting zero-motion detection duration to 0..."));
+	// accelgyro.setZeroMotionDetectionDuration(0);
 
-            Serial.println(F("Resetting FIFO..."));
-            accelgyro.resetFIFO();
+	Serial.println(F("Resetting FIFO..."));
+	accelgyro.resetFIFO();
 
-            Serial.println(F("Enabling FIFO..."));
-            accelgyro.setFIFOEnabled(true);
-	        accelgyro.setZGyroFIFOEnabled(true);
+	Serial.println(F("Enabling FIFO..."));
+	accelgyro.setFIFOEnabled(true);
+	accelgyro.setZGyroFIFOEnabled(true);
 	
 	return ;
 }
@@ -652,6 +659,8 @@ void main_menu(){
 					menu_choices();
 					break;
 				case 'x':
+					Serial.println();
+					Serial.println();
 					Serial.println("Setting up for the race");
 					loop = 0;
 					break;
