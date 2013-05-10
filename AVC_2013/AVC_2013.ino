@@ -51,6 +51,7 @@ double angle_diff, angle_last, angle_target, x=0, y=0, angle=0;
 int speed_cur=0, speed_new=0, speed_old=0, steer_limm = 300, steer_us;
 byte wpr_count=1, wpw_count=1;
 const byte InterruptPin = 2 ;		//intterupt on digital pin 2
+double cross_product=0, target_x=0, target_y=0;
 
 Servo steering, esc;
 MPU6050 accelgyro;
@@ -78,6 +79,7 @@ void navigate(){
 	calculate_speed();
 	cal_steer_lim();
 	update_position();
+	update_cross_product();
 	update_steering();
 	update_waypoint();
 	get_mode();
@@ -114,13 +116,37 @@ void update_position(){
 	return ;
 }
 
+void update_cross_product(){
+	//calculates the car's current vector
+	double current_x = x_wp - x;
+	double current_y = y_wp - y;
+
+	//determines magnitude of each vector
+	double mag_target = sqrt(target_x*target_x + target_y*target_y);
+	if(mag_target == 0.0) mag_target = 0.0001;
+	double mag_current = sqrt(current_x*current_x + current_y*current_y);
+	if(mag_current == 0.0) mag_current = 0.0001;
+	
+	//make the current and target vectors into unit vectors
+	target_x = target_x / mag_target;
+	target_y = target_y / mag_target;
+	current_x = current_x / mag_current;
+	current_y = current_y / mag_current;
+	
+	//the actual cross product calculation
+	cross_product = -(target_x*current_y - current_x*target_y);
+	
+	return ;
+}
+
 void update_steering(){
-	//calculate and write angles for steering
+	// calculate and write angles for steering
 	angle_diff = angle_target - angle;
 	if (angle_diff < -3.14159) angle_diff += 3.14159*2;   //if angle is less than 180 deg, then add 360 deg
 	if (angle_diff > 3.14159) angle_diff -= 3.14159*2;	//if angle is greater than 180 deg, then subtract 360
-	//now, we have an angle as -180 < angle_diff < 180. 
-	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;
+	// now, we have an angle as -180 < angle_diff < 180.
+	// steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;
+	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN + cross_product*CP_GAIN;	//cross product gain added  here so that the steering is still limited
 	if (steer_us < (0-steer_limm)) steer_us = 0-steer_limm;
 	if (steer_us > steer_limm) steer_us = steer_limm;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
@@ -145,6 +171,10 @@ void update_waypoint(){
 		proximity = sqrt(temp);
 		//proximity = sqrt(pow((x_wp - x),2) + pow((y_wp - y),2));	
 		previous_proximity = proximity;
+
+		//sets up the planned cross product target vectors
+		target_x = x_wp - target_x;
+		target_y = y_wp - target_y;
 	}
 	
 	return ;
@@ -168,11 +198,11 @@ void print_coordinates(){ //print target, location, etc.
 	Serial.print("\tlim: ");
 	Serial.print(steer_limm);
 	Serial.print("\tsteer: ");
-	Serial.println(steer_us);
+	Serial.print(steer_us);
 	// Serial.print("\tspeed: ");
 	// Serial.println(speed_cur);
-	//Serial.print("\tFree Memory = ");
-	//Serial.println(freeMemory());
+	Serial.print("\tFree Memory = ");
+	Serial.println(freeMemory());
 
 	return ;
 }
@@ -717,8 +747,6 @@ void setup(){
 	digitalWrite(12, HIGH);
 	Serial.println("**READY TO RUN**");
 
-//	while(manual == true) get_mode();	//waits until autonomous mode is enabled and then initializes EVERYTHING and starts the car
-
 	wpr_count = 1;		//set waypoint read counter to first waypoint
 	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 	x_wp = waypoint.x;
@@ -729,6 +757,8 @@ void setup(){
 	angle=0;
 	clicks = 0;
 	first = true;
+	target_x = x_wp;
+	target_y = y_wp;
 }
 
 void loop(){
