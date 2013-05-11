@@ -44,6 +44,7 @@ D13 - LED status
 volatile boolean gyro_flag = false, cal_flag = false;
 boolean manual, automatic, aux=false, running=false, first=true;
 volatile byte clicks = 0;
+unsigned int click_calibration_counter = 0;
 long gyro_count = 0, gyro_null=0, accum=0, time=0;
 long count, proximity, previous_proximity=10000;
 double x_wp = 0, y_wp = 0;
@@ -623,6 +624,34 @@ void steering_calibration(){
 	return ;
 }
 
+void click_calibration(){
+	Serial.println();
+	Serial.println();
+	click_calibration_counter = 0;
+	pinMode(InterruptPin, INPUT);
+	attachInterrupt(0, click_calibration_increment, CHANGE);	//interrupt 0 is on digital pin 2
+	get_mode();
+	while(manual){
+		if((millis()-time)>1000){
+			Serial.println(click_calibration_counter);
+			time = millis();
+		}
+		get_mode();
+	}
+	detachInterrupt(0);
+	Serial.println();
+	Serial.print("Total clicks: ");
+	Serial.println(click_calibration_counter);
+	Serial.println();
+	Serial.println();
+	return ;
+}
+
+void click_calibration_increment(){
+    click_calibration_counter++;
+	return ;
+}
+
 void menu_choices(){
 	Serial.println();
 	Serial.println();
@@ -632,6 +661,7 @@ void menu_choices(){
 	Serial.println("c = clear EEPROM");
 	Serial.println("d = display waypoints");
 	Serial.println("e = edit waypoint");
+	Serial.println("f = click calibration");
 	Serial.println("g = (re)initialize gyro");
 	Serial.println("i = import waypoints");
 	Serial.println("l = gyro calibration");
@@ -666,6 +696,10 @@ void main_menu(){
 					break;
 				case 'e':
 					edit_waypoint();
+					menu_choices();
+					break;
+				case 'f':
+					click_calibration();
 					menu_choices();
 					break;
 				case 'g':
