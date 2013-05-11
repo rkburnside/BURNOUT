@@ -3,7 +3,7 @@
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-int excel_waypoints[19][2] = {{24.07,131.26}, {-374.59,200.95}, {-502.73,176.66}, {-613.58,232.41}, {-864.93,248.96}, {-1058.33,240}, {-1058.33,130.61}, {-1011.68,-51.44}, {-658.5,-116.11}, {-545.21,-128.71}, {26.41,-154.48}, {47.48,-35.67}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
+int excel_waypoints[19][2] = {{24,131}, {-375,201}, {-503,177}, {-614,232}, {-865,249}, {-1058,240}, {-1058,131}, {-1012,-51}, {-659,-116}, {-545,-129}, {26,-154}, {47,-36}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
@@ -26,16 +26,15 @@ int excel_waypoints[19][2] = {{24.07,131.26}, {-374.59,200.95}, {-502.73,176.66}
 //SENSOR PARAMETERS
 //#define GYRO_CAL 470868410	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define GYRO_CAL 235434205	//this has to be measured by rotating the gyro 360 deg. and reading the output
-#define TIRE_CAL 1.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define STEER_ADJUST 1425	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 3500		// proportional gain, default it 4.0
 #define CP_GAIN 250		//cross product gain. if steering is 
+#define CLICK_INCHES 2.6311	//used to determine the number of inches per click
 
 //FIXED PARAMETERS
 #define CAR_NAME "***MINUTEMAN***" //car name
 #define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
-#define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations default 1000
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
@@ -63,23 +62,22 @@ int excel_waypoints[19][2] = {{24.07,131.26}, {-374.59,200.95}, {-502.73,176.66}
 //SENSOR PARAMETERS
 //#define GYRO_CAL 466186233	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define GYRO_CAL 233093117	//234044150
-#define TIRE_CAL 1.5		//tire calibration factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define STEER_ADJUST 1480	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 4000		//proportional gain, if navigation gets unstable, reduce.
 #define CP_GAIN 250		//cross product gain. if steering is 
+#define CLICK_INCHES 3.52941	//85 clicks in 25 feet (300 inches)
 
 //FIXED PARAMETERS
 #define CAR_NAME "***ROADRUNNER***" //car name
 #define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
-#define GYRO_LIMIT 1000		//defines how many gyro samples are taken between angle calculations default 1000
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 1			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 #define WP_SIZE 20 			//number of bytes for each waypoint
 #endif
 
-/*
+/* ROADRUNNER
 1500 - stop
 1550 - slow
 1600 - medium, but still slow
@@ -88,12 +86,4 @@ int excel_waypoints[19][2] = {{24.07,131.26}, {-374.59,200.95}, {-502.73,176.66}
 1800 - VERY fast - spinouts occur
 2000 - OOC - LOTS of spinouts, out of control
 */
-
-/*
-0%	1500	20%	1600	40%	1700	60%	1800	80%	1900	100% 2000
-5%	1525	25%	1625	45%	1725	65%	1825	85%	1925
-10%	1550	30%	2311650	50%	1750	70%	1850	90%	1950
-15%	1575	35%	1675	55%	1775	75%	1875	95%	1975
-*/
-
 

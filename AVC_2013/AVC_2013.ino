@@ -22,6 +22,10 @@ D10 - Steering contorl out (internally connected to MUX 2
 D11 - ESC control out (connect to MUX 3)
 D12 - LED status
 D13 - LED status
+
+FULLY AUTONOMOUS MODE - MOVE THROTTLE INPUT TO 3 AND THROTTLE OUTPUT TO 3
+STEERING AUTONOMOUS MODE - MOVE THROLLER INPUT TO 4 AND THROTTLE OUTPUT TO 4
+
 */
 
 #include <Servo.h>
@@ -164,9 +168,9 @@ void update_waypoint(){
 		Serial.print("read WP #");
 		Serial.print(wpr_count);
 		Serial.print(": ");
-		Serial.print(x_wp);
+		Serial.print(x_wp*CLICK_INCHES);
 		Serial.print(" , ");
-		Serial.println(y_wp);
+		Serial.println(y_wp*CLICK_INCHES);
 		double temp = pow((x_wp-x),2);
 		temp += pow((y_wp-y),2);
 		proximity = sqrt(temp);
@@ -183,19 +187,19 @@ void update_waypoint(){
 
 void print_coordinates(){ //print target, location, etc.
 	Serial.print("trgt: ");
-	Serial.print(x_wp);
+	Serial.print(x_wp*CLICK_INCHES);
 	Serial.print(" , ");
-	Serial.print(y_wp);
+	Serial.print(y_wp*CLICK_INCHES);
 	Serial.print("\t(x,y): ");
-	Serial.print(x);
+	Serial.print(x*CLICK_INCHES);
 	Serial.print(" , ");
-	Serial.print(y);
+	Serial.print(y*CLICK_INCHES);
 	Serial.print("\tagl tgt: ");
 	Serial.print(angle_target);
 	Serial.print("\tagl diff: ");
 	Serial.print(angle_diff);
 	Serial.print("\tprox: ");
-	Serial.print(proximity);
+	Serial.print(proximity*CLICK_INCHES);
 	Serial.print("\tlim: ");
 	Serial.print(steer_limm);
 	Serial.print("\tsteer: ");
@@ -250,9 +254,9 @@ void set_waypoint(){
 	Serial.print("set WP #");
 	Serial.print(wpw_count);
 	Serial.print(":  ");
-	Serial.print(waypoint.x);
+	Serial.print(waypoint.x*CLICK_INCHES);
 	Serial.print(" , ");
-	Serial.println(waypoint.y);
+	Serial.println(waypoint.y*CLICK_INCHES);
 	wpw_count++;
 	while(aux) get_mode();
 
@@ -297,8 +301,8 @@ void import_waypoints(){
 	WAYPOINTS_STRING    //edit this in header file to change waypoints
 	
 	for(int i=0; i < WAYPOINT_COUNT; i++){
-		waypoint.x = excel_waypoints[i][0];
-		waypoint.y = excel_waypoints[i][1];
+		waypoint.x = float(excel_waypoints[i][0])/CLICK_INCHES;
+		waypoint.y = float(excel_waypoints[i][1])/CLICK_INCHES;
 		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
 		wpw_count++;
 	}
@@ -320,9 +324,9 @@ void display_waypoints(){
 		EEPROM_readAnything(i*WP_SIZE, waypoint);
 		Serial.print(i);
 		Serial.print(": ");
-		Serial.print(waypoint.x);
+		Serial.print(waypoint.x*CLICK_INCHES);
 		Serial.print(" , ");
-		Serial.println(waypoint.y);
+		Serial.println(waypoint.y*CLICK_INCHES);
 	}
 	Serial.println();
 
@@ -337,22 +341,33 @@ void edit_waypoint(){
 		Serial.print("Edit wp #?  ");
 		int i = Serial.parseInt();
 		EEPROM_readAnything(i*WP_SIZE, waypoint);
+		
 		Serial.println();
-		Serial.print("current values: "); Serial.print(waypoint.x); Serial.print(" , "); Serial.println(waypoint.y);
+		Serial.print("current values: ");
+		Serial.print(waypoint.x*CLICK_INCHES);
+		Serial.print(" , ");
+		Serial.println(waypoint.y*CLICK_INCHES);
 		Serial.println();
+		
 		Serial.print("enter new coordinates \"x , y\":  ");
 		int x_temp = Serial.parseInt();
 		int y_temp = Serial.parseInt();
 		Serial.println();
-		Serial.print("current values: "); Serial.print(waypoint.x); Serial.print(" , "); Serial.println(waypoint.y);
-		Serial.print("new values: "); Serial.print(x_temp); Serial.print(" , "); Serial.println(y_temp);
+		Serial.print("current values: ");
+		Serial.print(waypoint.x*CLICK_INCHES);
+		Serial.print(" , ");
+		Serial.println(waypoint.y*CLICK_INCHES);
+		Serial.print("new values: ");
+		Serial.print(x_temp);
+		Serial.print(" , ");
+		Serial.println(y_temp);
 		
 		while(1){
 			Serial.print("accept values (y=1, n=0)?  ");
 			int y_or_n = Serial.parseInt();
 			if(y_or_n == 1){
-				waypoint.x = x_temp;
-				waypoint.y = y_temp;
+				waypoint.x = float(x_temp)/CLICK_INCHES;
+				waypoint.y = float(y_temp)/CLICK_INCHES;
 				EEPROM_writeAnything(i*WP_SIZE, waypoint);
 				Serial.println();
 				Serial.println("waypoint changed");
@@ -638,6 +653,7 @@ void click_calibration(){
 		}
 		get_mode();
 	}
+	
 	detachInterrupt(0);
 	Serial.println();
 	Serial.print("Total clicks: ");
