@@ -30,7 +30,7 @@ int excel_waypoints[19][2] = {{24,131}, {-375,201}, {-503,177}, {-614,232}, {-86
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 3500		// proportional gain, default it 4.0
 #define CP_GAIN 250		//cross product gain. if steering is 
-#define CLICK_INCHES 2.6311	//used to determine the number of inches per click
+#define CLICK_INCHES 2.09380	//used to determine the number of inches per click
 
 //FIXED PARAMETERS
 #define CAR_NAME "***MINUTEMAN***" //car name
@@ -66,7 +66,7 @@ int excel_waypoints[19][2] = {{24,131}, {-375,201}, {-503,177}, {-614,232}, {-86
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 4000		//proportional gain, if navigation gets unstable, reduce.
 #define CP_GAIN 250		//cross product gain. if steering is 
-#define CLICK_INCHES 3.52941	//85 clicks in 25 feet (300 inches)
+#define CLICK_INCHES 2.09380	//85 clicks in 25 feet (300 inches)
 
 //FIXED PARAMETERS
 #define CAR_NAME "***ROADRUNNER***" //car name
