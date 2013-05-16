@@ -160,7 +160,7 @@ void update_steering(){
 
 void update_waypoint(){
 	//waypoint acceptance and move to next waypoint
-	if (proximity < WAYPOINT_ACCEPT){
+	if (proximity < (WAYPOINT_ACCEPT/CLICK_INCHES)){
 		wpr_count++;
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		x_wp = waypoint.x;
@@ -215,13 +215,13 @@ void print_coordinates(){ //print target, location, etc.
 void speed(){
 	running = true;			// make sure running is updated.
 
-	if((previous_proximity - proximity) <= P1) esc.writeMicroseconds(S2); //allow car to line up with the next point
-	else if(proximity < P2) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
-	else if(proximity >= P2 && proximity < P3){ //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
+	if((previous_proximity - proximity) <= (P1/CLICK_INCHES)) esc.writeMicroseconds(S2); //allow car to line up with the next point
+	else if(proximity < (P2/CLICK_INCHES)) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
+	else if(proximity >= (P2/CLICK_INCHES) && proximity < (P3/CLICK_INCHES)){ //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
 		if (speed_cur < BREAKING_SPEED)  esc.writeMicroseconds(SB);  // less than 8000 means high speed, apply brakes
 		else esc.writeMicroseconds(S3);  //once speed is low enough, resume normal slow-down
 	}
-	else if(proximity >= P3) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
+	else if(proximity >= (P3/CLICK_INCHES)) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
 
 	return ;
 }

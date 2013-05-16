@@ -1,5 +1,5 @@
 //Header file variable
-#define MM
+#define RR
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
@@ -7,15 +7,15 @@ int excel_waypoints[19][2] = {{24,131}, {-375,201}, {-503,177}, {-614,232}, {-86
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 10	//waypoint acceptance radius
+#define WAYPOINT_ACCEPT 21	//waypoint acceptance radius in inches
 #define S1 1500				// some default values:
 #define S2 1560				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
 #define S3 1580				//This is the speed for negotiating wp's 
 #define S4 2000 				//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
 #define SB 1250				//breaking speed default 1300
-#define P1 25				//proximity to allow car to align with next waypoint 
-#define P2 50				//close proximity to waypoint
-#define P3 300				//far proximity to waypoint default 250
+#define P1 50				//proximity to allow car to align with next waypoint in inches
+#define P2 100				//close proximity to waypoint in inches
+#define P3 625				//far proximity to waypoint in inches
 #define BREAKING_SPEED 4000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed default 6000
 #define L1 5400
 #define L2 20000
@@ -43,15 +43,15 @@ int excel_waypoints[19][2] = {{24,131}, {-375,201}, {-503,177}, {-614,232}, {-86
 
 #ifdef RR
 //WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 25	//waypoint acceptance radius
+#define WAYPOINT_ACCEPT 50	//waypoint acceptance radius in inches
 #define S1 1500				//stationary speed
 #define S2 1600				//1650 is a creeping speed
 #define S3 1700				//This is the speed for negotiating wp's 
 #define S4 1750				//1800 is pretty ridiculously fast. Don't use for general use.
 #define SB 1250				//breaking. adjust this parameter to allow creeping up on waypoints
-#define P1 50				//proximity to allow car to align with next waypoint 
-#define P2 50				//close proximity to waypoint
-#define P3 300				//far proximity to waypoint
+#define P1 100				//proximity to allow car to align with next waypoint in inches
+#define P2 100				//close proximity to waypoint in inches
+#define P3 625				//far proximity to waypoint in inches
 #define BREAKING_SPEED 3000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
 #define L1 5000
 #define L2 20000
