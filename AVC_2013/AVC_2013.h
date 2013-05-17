@@ -84,6 +84,6 @@ int excel_waypoints[19][2] = {{24,131}, {-375,201}, {-503,177}, {-614,232}, {-86
 1650 - medium
 1700 - medium fast
 1800 - VERY fast - spinouts occur
-2000 - OOC - LOTS of spinouts, out of control
+2000 - OOC (out of control) - LOTS of spinouts, dangerous
 */
 

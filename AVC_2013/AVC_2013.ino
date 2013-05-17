@@ -264,32 +264,20 @@ void set_waypoint(){
 }    
 
 void read_waypoint(){
-	//	long temp = micros();
 	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
-	//x_wp = waypoint.x;
-	//y_wp = waypoint.y;
-	//waypoint.last = false
-	//EEPROM_writeAnything(wp_count*WP_SIZE, waypoint);
-	// Serial.print("read WP # ");
-	// Serial.print(wpr_count);
-	// Serial.print(waypoint.x);
-	// Serial.print(" , ");
-	// Serial.println(waypoint.y);
-	//wpr_count++;
-	// Serial.println(micros() - temp);
 	
 	return ;
 }    
 
 void eeprom_clear(){  //EEPROM Clear
-	// write a 0 to all 512 bytes of the EEPROM
-	for (int i = 0; i < 512; i++) EEPROM.write(i, 0);
+	// write a 0 to all 1024 bytes of the EEPROM
+	for (int i = 0; i < 1024; i++) EEPROM.write(i, 0);
 
 	Serial.println();
 	Serial.println("EEPROM clear");
 	Serial.println();
 	
-	delay(1500);
+	delay(1000);
 
 	return ;
 }
@@ -387,24 +375,6 @@ void edit_waypoint(){
 		else break;
 	}
 	
-	Serial.println();
-	
-	return ;
-}
-
-void gyro_initialization(){
-
-	Serial.println();
-	Serial.println();
-	Serial.println("gyro (re)initialization starting");
-	Serial.println();
-	
-	setup_mpu6050();
-	calculate_null();
-
-	Serial.println();
-	Serial.println("gyro (re)initialization complete");
-	Serial.println();
 	Serial.println();
 	
 	return ;
@@ -674,13 +644,12 @@ void menu_choices(){
 	Serial.println("Main Menu");
 	Serial.println("----------");
 	Serial.println("a = watch angle");
-	Serial.println("c = clear EEPROM");
 	Serial.println("d = display waypoints");
 	Serial.println("e = edit waypoint");
 	Serial.println("f = click calibration");
-	Serial.println("g = (re)initialize gyro");
 	Serial.println("i = import waypoints");
 	Serial.println("l = gyro calibration");
+	Serial.println("m = free memory");
 	Serial.println("s = steering calibration");
 	Serial.println("w = watch gyro");
 	Serial.println("x = exit. start setup routine for the race");
@@ -702,10 +671,6 @@ void main_menu(){
 					watch_angle();
 					menu_choices();
 					break;
-				case 'c':
-					eeprom_clear();
-					menu_choices();
-					break;
 				case 'd':
 					display_waypoints();
 					menu_choices();
@@ -718,16 +683,21 @@ void main_menu(){
 					click_calibration();
 					menu_choices();
 					break;
-				case 'g':
-					gyro_initialization();
-					menu_choices();
-					break;
 				case 'i':
 					import_waypoints();
 					menu_choices();
 					break;
 				case 'l':
 					gyro_calibration();
+					menu_choices();
+					break;
+				case 'm':
+					Serial.println();
+					Serial.println();
+					Serial.print("available memory: ");
+					Serial.println(freeMemory());
+					Serial.println();
+					Serial.println();
 					menu_choices();
 					break;
 				case 's':
