@@ -75,6 +75,19 @@ to (*old_pos).x.*/
     //boolean last;
 } waypoint;
 
+struct variables {
+	int waypoint_accept;
+	int s1;
+	int s2;
+	int s3;
+	int s4;
+	int sb;
+	int p1;
+	int p2;
+	int p3;
+	int breaking_speed;
+} params;
+
 void encoder_interrupt(){
     clicks++;
 	return ;
@@ -253,7 +266,7 @@ void set_waypoint(){
 	EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
 	Serial.print("set WP #");
 	Serial.print(wpw_count);
-	Serial.print(":  ");
+	Serial.print(": ");
 	Serial.print(waypoint.x*CLICK_INCHES);
 	Serial.print(" , ");
 	Serial.println(waypoint.y*CLICK_INCHES);
@@ -326,7 +339,7 @@ void edit_waypoint(){
 		display_waypoints();
 		Serial.println();
 
-		Serial.print("Edit wp #?  ");
+		Serial.print("Edit wp #? ");
 		int i = Serial.parseInt();
 		EEPROM_readAnything(i*WP_SIZE, waypoint);
 		
@@ -337,7 +350,7 @@ void edit_waypoint(){
 		Serial.println(waypoint.y*CLICK_INCHES);
 		Serial.println();
 		
-		Serial.print("enter new coordinates \"x , y\":  ");
+		Serial.print("enter new coordinates \"x , y\": ");
 		int x_temp = Serial.parseInt();
 		int y_temp = Serial.parseInt();
 		Serial.println();
@@ -351,7 +364,7 @@ void edit_waypoint(){
 		Serial.println(y_temp);
 		
 		while(1){
-			Serial.print("accept values (y=1, n=0)?  ");
+			Serial.print("accept values (y=1, n=0)? ");
 			int y_or_n = Serial.parseInt();
 			if(y_or_n == 1){
 				waypoint.x = float(x_temp)/CLICK_INCHES;
@@ -379,6 +392,108 @@ void edit_waypoint(){
 	
 	return ;
 }
+
+/*
+void display_variables(){
+
+	Serial.println();
+	Serial.println();
+	EEPROM_readAnything(750*30, params);
+	Serial.println("1.  WP Accept: ");					Serial.println(params.waypoint_accept);
+	Serial.println("2.  S1-Stationary: ");				Serial.println(params.s1);
+	Serial.println("3.  S2-Creeping: ");				Serial.println(params.s2);
+	Serial.println("4.  S3-Medium Speed: ");			Serial.println(params.s3);
+	Serial.println("5.  S4-Warp Speed: ");				Serial.println(params.s4);
+	Serial.println("6.  SB-Breaking Speed: ");			Serial.println(params.sb);
+	Serial.println("7.  P1-Previous Proximity: ");		Serial.println(params.p1);
+	Serial.println("8.  P2-WP Accept Proximity: ");		Serial.println(params.p2);
+	Serial.println("9.  P3-Intermediate Proximity: ");	Serial.println(params.p3);
+	Serial.println("10. BMS-Breaking Milliseconds: ");	Serial.println(params.breaking_speed);
+	Serial.println();
+	Serial.println();
+	
+	return ;
+}
+
+
+
+void import_variables(){
+
+	params.waypoint_accept = WAYPOINT_ACCEPT;
+	params.s1 = S1;
+	params.s2 = S2;
+	params.s3 = S3;
+	params.s4 = S4;
+	params.sb = SB;
+	params.p1 = P1;
+	params.p2 = P2;
+	params.p3 = P3;
+	params.breaking_speed = BREAKING_SPEED;
+
+	EEPROM_writeAnything(750*30, params);
+
+	Serial.println();
+	Serial.println();
+	display_variables();
+	Serial.println();
+	Serial.println();
+	Serial.println("variables imported successfully");
+	Serial.println();
+	Serial.println();
+	
+	return ;
+}
+
+int variable_display(int current_value){
+	Serial.println();
+	Serial.print("current value: ");
+	Serial.println(current_value);
+	Serial.print("enter new value: ");
+	return Serial.parseInt();
+}
+
+int accept_change(){
+	Serial.print("accept value (y=1, n=0)? ");
+	while(1){
+		int i = Serial.parseInt();
+		if(i == 0 || i == 1) return i;
+		else Serial.println("invalid. try again");
+	}
+
+	// return ;
+}
+
+void edit_variables(){
+	while(1){
+		
+		display_variables();
+		Serial.println();
+
+		Serial.print("Edit variable #? ");
+		int i = Serial.parseInt();
+
+		if(i == 1){
+			int temp_variable = variable_display(params.s1);
+			if(accept_change() == 1){
+				params.s1 = temp_variable;
+				EEPROM_writeAnything(750*30, params);
+				break;
+			}
+			else Serial.println("no change made");
+			break;
+		}
+		
+		Serial.println();
+		Serial.print("edit another variable (y=1, n=0)? ");
+		int n_or_y = Serial.parseInt();
+		if(n_or_y == 1) ;
+		else break;
+	}
+	return ;
+}
+
+*/
+
 
 void gyro_calibration(){
 	Serial.println();
@@ -647,10 +762,12 @@ void menu_choices(){
 	Serial.println("d = display waypoints");
 	Serial.println("e = edit waypoint");
 	Serial.println("f = click calibration");
-	Serial.println("i = import waypoints");
+	Serial.println("i = import header waypoint values");
+	// Serial.println("j = import header variable values");
 	Serial.println("l = gyro calibration");
 	Serial.println("m = free memory");
 	Serial.println("s = steering calibration");
+	// Serial.println("v = edit variables");
 	Serial.println("w = watch gyro");
 	Serial.println("x = exit. start setup routine for the race");
 	Serial.println();
@@ -687,6 +804,11 @@ void main_menu(){
 					import_waypoints();
 					menu_choices();
 					break;
+				// case 'j':
+					// import_variables();
+					// display_variables();
+					// menu_choices();
+					// break;
 				case 'l':
 					gyro_calibration();
 					menu_choices();
@@ -704,6 +826,10 @@ void main_menu(){
 					steering_calibration();
 					menu_choices();
 					break;
+				// case 'v':
+					// edit_variables();
+					// menu_choices();
+					// break;
 				case 'w':
 					watch_gyro();
 					menu_choices();
