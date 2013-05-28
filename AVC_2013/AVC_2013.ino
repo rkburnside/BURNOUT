@@ -89,8 +89,8 @@ void navigate(){
 	update_steering();
 	update_waypoint();
 	get_mode();
-	if (automatic) steering.writeMicroseconds(steer_us);
-	if (automatic) speed();
+	if(automatic) steering.writeMicroseconds(steer_us);
+	if(automatic) speed();
 	
 	return ;
 }
@@ -105,7 +105,7 @@ void calculate_speed(){
 
 void cal_steer_lim(){
 	steer_limm = (int)map(speed_cur, L1, L2, L3, L4);
-	if (steer_limm > L4) steer_limm = L4;
+	if(steer_limm > L4) steer_limm = L4;
 	
 	return ;
 }
@@ -148,20 +148,20 @@ void update_cross_product(){
 void update_steering(){
 	// calculate and write angles for steering
 	angle_diff = angle_target - angle;
-	if (angle_diff < -3.14159) angle_diff += 3.14159*2;   //if angle is less than 180 deg, then add 360 deg
-	if (angle_diff > 3.14159) angle_diff -= 3.14159*2;	//if angle is greater than 180 deg, then subtract 360
+	if(angle_diff < -3.14159) angle_diff += 3.14159*2;   //if angle is less than 180 deg, then add 360 deg
+	if(angle_diff > 3.14159) angle_diff -= 3.14159*2;	//if angle is greater than 180 deg, then subtract 360
 	// now, we have an angle as -180 < angle_diff < 180.
 	// steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;
 	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN + cross_product*CP_GAIN;	//cross product gain added  here so that the steering is still limited
-	if (steer_us < (0-steer_limm)) steer_us = 0-steer_limm;
-	if (steer_us > steer_limm) steer_us = steer_limm;
+	if(steer_us < (0-steer_limm)) steer_us = 0-steer_limm;
+	if(steer_us > steer_limm) steer_us = steer_limm;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
 	return ;
 }
 
 void update_waypoint(){
 	//waypoint acceptance and move to next waypoint
-	if (proximity < (WAYPOINT_ACCEPT/CLICK_INCHES)){
+	if(proximity < (WAYPOINT_ACCEPT/CLICK_INCHES)){
 		wpr_count++;
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		x_wp = waypoint.x;
@@ -220,7 +220,7 @@ void speed(){
 	if((previous_proximity - proximity) <= (P1/CLICK_INCHES)) esc.writeMicroseconds(S2); //allow car to line up with the next point
 	else if(proximity < (P2/CLICK_INCHES)) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
 	else if(proximity >= (P2/CLICK_INCHES) && proximity < (P3/CLICK_INCHES)){ //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
-		if (speed_cur < BREAKING_SPEED)  esc.writeMicroseconds(SB);  // less than 8000 means high speed, apply brakes
+		if(speed_cur < BREAKING_SPEED)  esc.writeMicroseconds(SB);  // less than 8000 means high speed, apply brakes
 		else esc.writeMicroseconds(S3);  //once speed is low enough, resume normal slow-down
 	}
 	else if(proximity >= (P3/CLICK_INCHES)) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
@@ -229,12 +229,12 @@ void speed(){
 }
 
 void get_mode(){
-    if (!digitalRead(TMISO)){
+    if(!digitalRead(TMISO)){
 		manual = true;
 		automatic = false;
 		aux = false;
     }
-    else if (!digitalRead(MODE)){
+    else if(!digitalRead(MODE)){
 		manual = false;
 		automatic = false;
 		aux = true;
@@ -273,7 +273,7 @@ void read_waypoint(){
 
 void eeprom_clear(){  //EEPROM Clear
 	// write a 0 to all 1024 bytes of the EEPROM
-	for (int i = 0; i < 1024; i++) EEPROM.write(i, 0);
+	for(int i = 0; i < 1024; i++) EEPROM.write(i, 0);
 
 	Serial.println();
 	Serial.println("EEPROM clear");
@@ -305,7 +305,7 @@ void import_waypoints(){
 
 void display_waypoints(){
 	Serial.println();
-	for (int i=1; i <= WAYPOINT_COUNT; i++){
+	for(int i=1; i <= WAYPOINT_COUNT; i++){
 		EEPROM_readAnything(i*WP_SIZE, waypoint);
 		Serial.print(i);
 		Serial.print(": ");
@@ -415,7 +415,7 @@ void watch_angle(){
 			time = millis();
 		}
 		get_mode();
-	} while (manual);		//keep summing unitil we turn the mode switch off.
+	} while(manual);		//keep summing unitil we turn the mode switch off.
 
 	return ;
 }
@@ -434,7 +434,7 @@ void watch_gyro(){
 			time = millis();
 		}
 		get_mode();
-	} while (manual);		//keep summing unitil we turn the mode switch off.
+	} while(manual);		//keep summing unitil we turn the mode switch off.
 
 	return ;
 }
@@ -530,7 +530,7 @@ void calculate_null(){
 	gyro_null = 0;			//make sure to not subract any nulls here
 	gyro_count = 0;
 
-	while (gyro_count < 5000){
+	while(gyro_count < 5000){
 		read_FIFO();
 		//delay(10);
 		//Serial.println(gyro_count);
@@ -555,14 +555,14 @@ void read_FIFO(){
 	samplz = accelgyro.getFIFOCount() >> 1;
 	//Serial.println("FIFO_COUNTH : ");
 	//Serial.println(samplz,DEC);
-	for (int i=0; i < samplz; i++){
+	for(int i=0; i < samplz; i++){
 		accelgyro.getFIFOBytes(buffer, 2);
 		temp = ((((int16_t)buffer[0]) << 8) | buffer[1]);
 		accum -= (temp * 10) + gyro_null;
 		gyro_count++;
 		
-		if ((accum > GYRO_CAL) && (!cal_flag)) accum -= GYRO_CAL*2; //if we are calculating null, don't roll-over
-		if ((accum < -GYRO_CAL) && (!cal_flag)) accum += GYRO_CAL*2;
+		if((accum > GYRO_CAL) && (!cal_flag)) accum -= GYRO_CAL*2; //if we are calculating null, don't roll-over
+		if((accum < -GYRO_CAL) && (!cal_flag)) accum += GYRO_CAL*2;
 	}
 	angle = (float)accum/(float)GYRO_CAL * 3.14159;
 
@@ -657,7 +657,7 @@ void main_menu(){
 	while((loop == 1) && (manual)){
 		get_mode();
 		if(Serial.available() > 0){
-	 		switch (Serial.read()){
+	 		switch(Serial.read()){
 				case 'a':
 					watch_angle();
 					menu_choices();
@@ -779,54 +779,46 @@ void loop(){
 	/* in the main loop here, we should wait for thing to happen, then act on them. Watch clicks and wait for it to reach CLICK_MAX, then calculate position and such.*/
 	get_mode();
 
-	if (clicks >= CLICK_MAX){
+	if(clicks >= CLICK_MAX){
 		clicks = 0;
 		navigate();
 	}
 
-	if (aux && DEBUG == 2) watch_angle(); // i think we can remove this as well since we have an "watch angle" function in the menu system
-	
-	if (automatic){	//this function makes the car be stationary when in manual waypoint setting mode
-		if (!running){
+	if(automatic){	//this function makes the car be stationary when in manual waypoint setting mode
+		if(!running){
 			esc.write(S2);	//i don't understand this function...help...i changed this to S1 so the car is stationary?
 			running = true;
 		}
-		if (first){
+		if(first){
 			angle = 0;
 			first = false;
 		}
 	}
 	
-	if (manual){	//this function makes the car be stationary when in manual waypoint setting mode
-		if (running){
+	if(manual){	//this function makes the car be stationary when in manual waypoint setting mode
+		if(running){
 			esc.write(S1);	//i changed this to S1 so the car is stationary?
 			running = false;
 		}
 	}
 
-	if (wpr_count >= WAYPOINT_COUNT){	//this locks the car into this loop and makes it stationary WHEN the course is completed
+	if(wpr_count >= WAYPOINT_COUNT){	//this locks the car into this loop and makes it stationary WHEN the course is completed
 		esc.writeMicroseconds(S1);
-		while (true);
+		while(true);
 	}
 	
-	if (aux && DEBUG == 0){		//I believe that DEBUG can be removed from ALL of our code. it is no longer needed
+	if(aux){
 		temp = millis();
-		while (aux){
+		while(aux){
 			get_mode();
 			read_FIFO();
 		}
 
 		temp = millis() - temp;
-		if (temp > 500) set_waypoint();
-		//if (temp > 5000) read_waypoint();
+		if(temp > 500) set_waypoint();
+		//if(temp > 5000) read_waypoint();
 	}
 	
-	if (aux && DEBUG == 3){	// ***CAN THIS BE DELETED???*** not really sure what use this is in the code anymore.
-		temp = millis();
-		while (aux) get_mode();
-		read_waypoint();
-	}
-
 	if((millis()-time)>500){
 		print_coordinates();
 		time = millis();

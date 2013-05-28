@@ -34,7 +34,6 @@ int excel_waypoints[19][2] = {{-8,248}, {-878,267}, {-1828,235}, {-2010,92}, {-1
 
 //FIXED PARAMETERS
 #define CAR_NAME "***MINUTEMAN***" //car name
-#define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
@@ -70,7 +69,6 @@ int excel_waypoints[19][2] = {{-8,248}, {-878,267}, {-1828,235}, {-2010,92}, {-1
 
 //FIXED PARAMETERS
 #define CAR_NAME "***ROADRUNNER***" //car name
-#define DEBUG 0				//debug state  1=cal gyro, 2=watch angle, 3=read waypoints
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
 #define CLICK_MAX 1			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
