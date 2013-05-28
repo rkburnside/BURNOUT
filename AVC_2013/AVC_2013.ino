@@ -187,14 +187,13 @@ void update_waypoint(){
 }
 
 void print_coordinates(){ //print target, location, etc.
-	Serial.print("trgt: ");
-	Serial.print(x_wp*CLICK_INCHES);
-	Serial.print(" , ");
-	Serial.print(y_wp*CLICK_INCHES);
-	Serial.print("  (x,y): ");
+	Serial.print("(x,y): ");
 	Serial.print(x*CLICK_INCHES);
 	Serial.print(" , ");
-	Serial.print(y*CLICK_INCHES);
+	Serial.print(y*CLICK_INCHES);	Serial.print("   trgt: ");
+	Serial.print(x_wp*CLICK_INCHES);
+	Serial.print(" , ");
+	Serial.println(y_wp*CLICK_INCHES);
 	// Serial.print("  crnt spd: ");
 	// Serial.println(speed_cur);
 	// Serial.print("\tagl tgt: ");
@@ -779,16 +778,17 @@ void loop(){
 	//watch_gyro();
 	/* in the main loop here, we should wait for thing to happen, then act on them. Watch clicks and wait for it to reach CLICK_MAX, then calculate position and such.*/
 	get_mode();
+
 	if (clicks >= CLICK_MAX){
 		clicks = 0;
 		navigate();
 	}
 
-	if (aux && DEBUG == 2) watch_angle();
+	if (aux && DEBUG == 2) watch_angle(); // i think we can remove this as well since we have an "watch angle" function in the menu system
 	
 	if (automatic){	//this function makes the car be stationary when in manual waypoint setting mode
 		if (!running){
-			esc.write(S2);	//i changed this to S1 so the car is stationary?
+			esc.write(S2);	//i don't understand this function...help...i changed this to S1 so the car is stationary?
 			running = true;
 		}
 		if (first){
@@ -804,20 +804,24 @@ void loop(){
 		}
 	}
 
-	if (wpr_count >= WAYPOINT_COUNT){
+	if (wpr_count >= WAYPOINT_COUNT){	//this locks the car into this loop and makes it stationary WHEN the course is completed
 		esc.writeMicroseconds(S1);
 		while (true);
 	}
 	
-	if (aux && DEBUG == 0){
+	if (aux && DEBUG == 0){		//I believe that DEBUG can be removed from ALL of our code. it is no longer needed
 		temp = millis();
-		while (aux) get_mode();
+		while (aux){
+			get_mode();
+			read_FIFO();
+		}
+
 		temp = millis() - temp;
 		if (temp > 500) set_waypoint();
 		//if (temp > 5000) read_waypoint();
 	}
 	
-	if (aux && DEBUG == 3){
+	if (aux && DEBUG == 3){	// ***CAN THIS BE DELETED???*** not really sure what use this is in the code anymore.
 		temp = millis();
 		while (aux) get_mode();
 		read_waypoint();
