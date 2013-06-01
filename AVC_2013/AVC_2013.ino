@@ -14,7 +14,7 @@ D2 - NC (normally Ch1 in)
 D3 - Steering input (connected to Ch2 in on board)
 D4 - MUX enble input (input only. manual if low, auto if high)
 D5 - Mode input (switched by Ch3)
-D6 - NC
+D6 - Toggle
 D7 - NC
 D8 - NC
 D9 - NC (internally connected to MUX 1)  **consider connecting to MUX 3
@@ -229,7 +229,7 @@ void speed(){
 }
 
 void get_mode(){
-    if(!digitalRead(TMISO)){
+	if(!digitalRead(TMISO)){
 		manual = true;
 		automatic = false;
 		aux = false;
@@ -721,8 +721,9 @@ void setup(){
 	//Pin assignments:
 	pinMode(TMISO, INPUT);
 	pinMode(MODE, INPUT);
+	pinMode(TOGGLE, INPUT);
 	pinMode(12, OUTPUT);
-	digitalWrite(12, LOW);
+	digitalWrite(12, LOW); 
 
 	Wire.begin();
 
@@ -730,32 +731,53 @@ void setup(){
 	Serial.setTimeout(100000);
 	Serial.println(CAR_NAME);
 	Serial.println();
-
+	
 	get_mode();
 	main_menu();
 	delay(500);	
+
+	if(digitalRead(TOGGLE)){
+		Serial.println("FLIP SWITCH TO CONTINUE");
+		Serial.println();
+	}
+	while(digitalRead(TOGGLE)) get_mode();		//waits until the switch is flipped to start the race
+	delay(2000);
+
 	setup_mpu6050();
 	calculate_null();
 
 	pinMode(InterruptPin, INPUT);	 
 	attachInterrupt(0, encoder_interrupt, CHANGE);	//interrupt 0 is on digital pin 2
 
-	//verify that car is in manual mode prior to starting null calculation
-	get_mode();
-	if(manual == false){
-		Serial.println("SET CAR TO");
-		Serial.println("MANUAL MODE!");
-	}
-	while(manual == false) get_mode();
-	delay(500);
-	
 	steering.attach(10);
 	steering.writeMicroseconds(STEER_ADJUST);
-
 	esc.attach(11);
 	esc.writeMicroseconds(S1);
+
+	Serial.println();
+	Serial.println();
+
+	//verify that car is in automatic mode
+	get_mode();
+	if(!automatic){
+		Serial.println("1. SET CAR TO AUTOMATIC MODE!");
+		Serial.println();
+	}
+	while(!automatic) get_mode();
+	delay(500);
+
+	//by turning off the radio, the automatic mode is locked in
+	Serial.println("2. TURN OFF THE RADIO!");
+	Serial.println();
+	delay(2000);
+
+	Serial.println("***READY TO RUN***");
+	Serial.println("3. FLIP THE SWITCH TO START THE RACE!");
+	Serial.println();
 	digitalWrite(12, HIGH);
-	Serial.println("**READY TO RUN**");
+
+	while(!digitalRead(TOGGLE)) get_mode();		//waits until the switch is flipped to start the race
+	delay(2000);
 
 	wpr_count = 1;		//set waypoint read counter to first waypoint
 	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
@@ -784,7 +806,7 @@ void loop(){
 		navigate();
 	}
 
-	if(automatic){	//this function makes the car be stationary when in manual waypoint setting mode
+	if(automatic){	//this function get the car started moving and then clicks will take over
 		if(!running){
 			esc.write(S2);	//i don't understand this function...help...i changed this to S1 so the car is stationary?
 			running = true;

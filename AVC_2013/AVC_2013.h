@@ -3,7 +3,7 @@
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-int excel_waypoints[19][2] = {{-8,248}, {-878,267}, {-1828,235}, {-2010,92}, {-1972,-333}, {-1622,-361}, {-608,-360}, {-100,-200}, {-50,0}, {-50,0}, {-50,0}, {-50,0}, {-50,0}, {-50,0}, {-50,0}, {-50,0}, {-50,0}, {-50,0}, {-50,0}};
+int excel_waypoints[19][2] = {{0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}, {0,60}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
@@ -36,6 +36,7 @@ int excel_waypoints[19][2] = {{-8,248}, {-878,267}, {-1828,235}, {-2010,92}, {-1
 #define CAR_NAME "***MINUTEMAN***" //car name
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
+#define TOGGLE 6			//digital pin for autopilot switch
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 #define WP_SIZE 20 			//number of bytes for each waypoint
 #endif
@@ -71,6 +72,7 @@ int excel_waypoints[19][2] = {{-8,248}, {-878,267}, {-1828,235}, {-2010,92}, {-1
 #define CAR_NAME "***ROADRUNNER***" //car name
 #define MODE 5				//digital pin for mode select, default 5
 #define TMISO 4				//digital pin for autopilot enable/disable, default 4
+#define TOGGLE 6			//digital pin for autopilot switch
 #define CLICK_MAX 1			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 #define WP_SIZE 20 			//number of bytes for each waypoint
 #endif
