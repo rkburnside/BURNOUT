@@ -654,7 +654,7 @@ void main_menu(){
 	menu_choices();
 	Serial.flush();
 	get_mode();
-	while((loop == 1) && (manual)){
+	while((loop) && (manual)){
 		get_mode();
 		if(Serial.available() > 0){
 	 		switch(Serial.read()){
@@ -760,24 +760,39 @@ void setup(){
 	//verify that car is in automatic mode
 	get_mode();
 	if(!automatic){
-		Serial.println("1. SET CAR TO AUTOMATIC MODE!");
+		Serial.println("1. SET CAR TO AUTOMATIC MODE! or press AUX to exit");
 		Serial.println();
 	}
-	while(!automatic) get_mode();
-	delay(500);
+	while(!automatic && !aux){
+		get_mode();		//waits until the switch is flipped to start the race
+		read_FIFO();
+	}
+	for(int i=0; i<500; i++){
+		delay(1);
+		read_FIFO();
+	}
 
 	//by turning off the radio, the automatic mode is locked in
 	Serial.println("2. TURN OFF THE RADIO!");
 	Serial.println();
-	delay(2000);
+	for(int i=0; i<2000; i++){
+		delay(1);
+		read_FIFO();
+	}
 
 	Serial.println("***READY TO RUN***");
 	Serial.println("3. FLIP THE SWITCH TO START THE RACE!");
 	Serial.println();
 	digitalWrite(12, HIGH);
 
-	while(!digitalRead(TOGGLE)) get_mode();		//waits until the switch is flipped to start the race
-	delay(2000);
+	while(!digitalRead(TOGGLE) && (automatic)){	//waits for the switch to be flipped
+		get_mode();		//waits until the switch is flipped to start the race
+		read_FIFO();
+	}
+	for(int i=0; i<1000; i++){	//waits 1 second before starting
+		delay(1);
+		read_FIFO();
+	}
 
 	wpr_count = 1;		//set waypoint read counter to first waypoint
 	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
