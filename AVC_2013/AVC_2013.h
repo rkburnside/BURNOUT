@@ -1,5 +1,5 @@
 //Header file variable
-#define RR
+#define MM
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
@@ -29,8 +29,8 @@ int excel_waypoints[19][2] = {{17,932}, {-2194,1000}, {-2190,-119}, {-75,-250}, 
 #define STEER_ADJUST 1425	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 3500		// proportional gain, default it 4.0
-#define CP_GAIN 250		//cross product gain. if steering is 
-#define CLICK_INCHES 2.09380	//used to determine the number of inches per click
+#define CP_GAIN 0		//cross product gain. if steering is 
+#define CLICK_INCHES 0.852	//used to determine the number of inches per click
 
 //FIXED PARAMETERS
 #define CAR_NAME "***MINUTEMAN***" //car name

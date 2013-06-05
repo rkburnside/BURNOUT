@@ -33,7 +33,7 @@ STEERING AUTONOMOUS MODE - MOVE THROLLER INPUT TO 4 AND THROTTLE OUTPUT TO 4
 #include "AVC_2013.h"
 #include "EEPROMAnything.h"
 #include "Wire.h"
-#include <MemoryFree.h>
+//#include <MemoryFree.h>
 
 // I2Cdev and MPU6050 must be installed as libraries, or else the .cpp/.h files
 // for both classes must be in the include path of your project
@@ -686,7 +686,7 @@ void main_menu(){
 					Serial.println();
 					Serial.println();
 					Serial.print("available memory: ");
-					Serial.println(freeMemory());
+					//Serial.println(freeMemory());
 					Serial.println();
 					Serial.println();
 					menu_choices();
