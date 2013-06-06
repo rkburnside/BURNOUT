@@ -166,6 +166,7 @@ void update_waypoint(){
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		x_wp = waypoint.x;
 		y_wp = waypoint.y;
+		if (((int)x_wp == 0) && ((int)y_wp == 0)) end_run(); // 0,0 is interpreted as the final waypoint. end run.
 		Serial.print("read WP #");
 		Serial.print(wpr_count);
 		Serial.print(": ");
@@ -184,6 +185,12 @@ void update_waypoint(){
 	}
 	
 	return ;
+}
+
+void end_run() {    // go straight forward, slowly at last waypoint
+	esc.writeMicroseconds(S2); //reduce speed
+	steer_us = STEER_ADJUST;  // go straight
+	while(true); //loop endlessly
 }
 
 void print_coordinates(){ //print target, location, etc.
@@ -722,6 +729,7 @@ void setup(){
 	pinMode(TMISO, INPUT);
 	pinMode(MODE, INPUT);
 	pinMode(TOGGLE, INPUT);
+	digitalWrite(TOGGLE, HIGH);
 	pinMode(12, OUTPUT);
 	digitalWrite(12, LOW); 
 
