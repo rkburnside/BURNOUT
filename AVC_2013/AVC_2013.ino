@@ -775,7 +775,7 @@ void setup(){
 		get_mode();		//waits until the switch is flipped to start the race
 		read_FIFO();
 	}
-	for(int i=0; i<500; i++){
+	for(int i=0; i<100; i++){
 		delay(1);
 		read_FIFO();
 	}
@@ -783,7 +783,7 @@ void setup(){
 	//by turning off the radio, the automatic mode is locked in
 	Serial.println("2. TURN OFF THE RADIO!");
 	Serial.println();
-	for(int i=0; i<2000; i++){
+	for(int i=0; i<500; i++){
 		delay(1);
 		read_FIFO();
 	}
@@ -797,7 +797,7 @@ void setup(){
 		get_mode();		//waits until the switch is flipped to start the race
 		read_FIFO();
 	}
-	for(int i=0; i<1000; i++){	//waits 1 second before starting
+	for(int i=0; i<100; i++){	//waits 1 second before starting
 		delay(1);
 		read_FIFO();
 	}
