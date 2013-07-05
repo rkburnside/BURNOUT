@@ -3,6 +3,11 @@
 #include <Pushbutton.h>
 #include <QTRSensors.h>
 #include <ZumoReflectanceSensorArray.h>
+
+const int close1 = 4;   //10 cm sensor
+const int close2 = 5;   //10 cm sensor
+const int far1 = 0;    //10-80 cm sensor
+const int far2 = 1;    //10-80 cm sensor
  
 #define LED 13
  
@@ -12,7 +17,7 @@
 // these might need to be tuned for different motor types
 #define REVERSE_SPEED     200 // 0 is stopped, 400 is full speed
 #define TURN_SPEED        200
-#define FORWARD_SPEED     200
+#define FORWARD_SPEED     400
 #define REVERSE_DURATION  200 // ms
 #define TURN_DURATION     400 // ms
  
@@ -47,7 +52,9 @@ void setup()
   // uncomment if necessary to correct motor directions
   //motors.flipLeftMotor(true);
   //motors.flipRightMotor(true);
-   
+   Serial.begin(115200);
+   pinMode(close1, INPUT);   // the close sensors are digital
+  pinMode(close2, INPUT);
   pinMode(LED, HIGH);
    
   waitForButtonAndCountDown();
@@ -55,6 +62,63 @@ void setup()
 
 void loop()
 {
+int val[4];
+  val[0] = digitalRead(close1);
+  val[1] = digitalRead(close2);
+  val[2] = analogRead(far1);    // the far sensors are analog
+  val[3] = analogRead(far2);
+
+ if (val[2] < 80 && val[3]<80) //search spin
+ {
+  motors.setSpeeds(TURN_SPEED*0.5, -TURN_SPEED*0.5);
+ }
+ else
+  
+  
+ if (val[2] > 80 && val[3]<80)    // long range turn right
+ {
+ motors.setSpeeds(TURN_SPEED, TURN_SPEED*.8); //turn right slow
+    //delay(50);
+	}
+
+
+else 
+if (val[2] < 80 && val[3]>80)    // long range turn right
+ {
+ motors.setSpeeds(TURN_SPEED*.8, TURN_SPEED); //turn left slow
+    //delay(50);
+	}
+else 
+ 
+ 
+    if (val[2] > 150 && val[3]<160)
+	{
+    motors.setSpeeds(TURN_SPEED, -TURN_SPEED*0.5); //short range turn right medium
+//    delay(50);
+	}
+	
+else 
+  if (val[2] <150 && val[3]>160)
+	{
+    motors.setSpeeds(-TURN_SPEED*.5, TURN_SPEED); //short range turn right medium
+//    delay(50);
+	}
+	
+else
+
+ 	
+  if (val[2] >190 && val[3]>190)
+   {
+ motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED); //attack
+   }
+   
+  
+ 
+ 
+ 
+   
+ 
+  
   if (button.isPressed())
   {
     // if button is pressed, stop and wait for another press to go again
@@ -66,27 +130,14 @@ void loop()
 
   sensors.read(sensor_values);
   
-  if (sensor_values[0] < QTR_THRESHOLD)
-  {
-    // if leftmost sensor detects line, reverse and turn to the right
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-    delay(200);
-    motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
-    delay(300);
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-  }
-  else if (sensor_values[5] < QTR_THRESHOLD)
-  {
-    // if rightmost sensor detects line, reverse and turn to the left
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-    delay(200);
-    motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-    delay(300);
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-  }
-  else
-  {
-    // otherwise, go straight
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-  }
+ //Serial.print(val[0]);
+  //Serial.print("\t");      // this prints a tab
+  //Serial.print(val[1]);
+  //Serial.print("\t");
+  Serial.print(val[2]);
+  Serial.print("\t");
+  Serial.println(val[3]);  //serial.println make a new line
+
+  delay(50);   // wait 100 ms between loops
+  
 }
