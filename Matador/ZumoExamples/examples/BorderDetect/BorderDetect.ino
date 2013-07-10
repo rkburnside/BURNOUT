@@ -10,12 +10,18 @@ const int far2 = 1;    //10-80 cm sensor
 #define LED 13
  
 // this might need to be tuned for different lighting conditions, surfaces, etc.
-#define QTR_THRESHOLD  1500 // microseconds
+#define QTR_THRESHOLD  800 // microseconds
   
 // these might need to be tuned for different motor types
-#define REVERSE_SPEED     100 // 0 is stopped, 400 is full speed
-#define TURN_SPEED        200
-#define FORWARD_SPEED     200
+#define REVERSE_SPEED     150 // 0 is stopped, 400 is full speed
+#define TURN_SPEED        150
+#define FORWARD_SPEED     150
+#define LINE_DETECTED		1
+#define SEARCH_ENEMY		2
+
+#define SENSOR_FR		1
+#define SENSOR_FL		2
+#define SENSOR_RL		4
 //#define REVERSE_DURATION  200 // ms
 //#define TURN_DURATION     200 // ms
  
@@ -26,7 +32,9 @@ Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 // Numbers of sensors and pins
 #define NUM_SENSORS 3 
 unsigned int sensor_values[NUM_SENSORS];
-byte pins[] = {4, 11,  5};
+byte state, sensors_detected = 0;
+int val[4];
+byte pins[] = {4, 11, 5};
 ZumoReflectanceSensorArray sensors(pins, 3);
  
 
@@ -46,6 +54,67 @@ void waitForButtonAndCountDown()
   buzzer.playNote(NOTE_G(4), 500, 15);  
   delay(1000);
 }
+
+byte lineDetected()
+{
+	if(sensors_detected & SENSOR_RL) {
+		motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
+		buzzer.playNote(NOTE_G(4), 500, 15);
+		delay(500);
+		
+		
+	}
+	
+	else {
+		motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+		while(readLineSensors());
+		 buzzer.playNote(NOTE_G(3), 200, 15);
+		delay(500);
+	}
+    return(SEARCH_ENEMY);
+}
+
+byte readLineSensors()
+{
+	sensors_detected=0;
+	sensors.read(sensor_values);
+    if (sensor_values[0] < QTR_THRESHOLD) sensors_detected += SENSOR_FL;
+    if (sensor_values[1] < QTR_THRESHOLD) sensors_detected += SENSOR_RL;
+    if (sensor_values[2] < QTR_THRESHOLD) sensors_detected += SENSOR_FR;
+	return (sensors_detected);
+}
+
+byte searchEnemy()
+{
+	while(true) {
+		readReflectorValues();
+		if (val[0] < 200 && val[1]<200) //search spin
+			{
+				motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
+				sensors_detected = readLineSensors();
+				if(sensors_detected > 0) return(LINE_DETECTED);
+			}
+		else {
+			motors.setSpeeds(TURN_SPEED, TURN_SPEED);	
+			sensors_detected = readLineSensors();
+			if(sensors_detected > 0) return(LINE_DETECTED);
+		}
+	}
+}
+
+void readReflectorValues() {
+  val[0] = analogRead(far1);    // the far sensors are analog
+  val[1] = analogRead(far2);
+ //Serial.print(val[0]);
+  //Serial.print("\t");      // this prints a tab
+  Serial.print(state);
+  Serial.print("\t");
+  Serial.print(val[0]);
+  Serial.print("\t");
+  Serial.println(val[1]);  //serial.println make a new line
+
+  
+}
  
 void setup()
 {
@@ -53,7 +122,7 @@ void setup()
   //motors.flipLeftMotor(true);
   //motors.flipRightMotor(true);
    Serial.begin(115200);
-   
+  state = SEARCH_ENEMY; 
   pinMode(LED, HIGH);
    
   waitForButtonAndCountDown();
@@ -61,84 +130,95 @@ void setup()
 
 void loop()
 {
-int val[4];
-
-  val[2] = analogRead(far1);    // the far sensors are analog
-  val[3] = analogRead(far2);
-  
+  readReflectorValues();
   sensors.read(sensor_values);
+
+
+switch (state) {
+    case LINE_DETECTED:
+		state = lineDetected();
+ //do something when var equals 1
+      break;
+    case SEARCH_ENEMY:
+	state = searchEnemy();
+      //do something when var equals 2
+      break;
+    //default: 
+      // if nothing else matches, do the default
+      // default is optional
+  }
+
+
+
+
   
-if (sensor_values[0] < QTR_THRESHOLD)
-  {
-    // if leftmost sensor detects line, reverse and turn to the right
-    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-    delay(500);
+// if (sensor_values[0] < QTR_THRESHOLD)
+  // {
+    // // if leftmost sensor detects line, reverse and turn to the right
+    // motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+    // delay(500);
    
-  }
-  else 
-  if (sensor_values[2] < QTR_THRESHOLD)
-  {
-    // if rightmost sensor detects line, reverse and turn to the left
+  // }
+  // else 
+  // if (sensor_values[2] < QTR_THRESHOLD)
+  // {
+    // // if rightmost sensor detects line, reverse and turn to the left
     
-   motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-  delay(500);  }
+   // motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+  // delay(500);  }
     
 
-  else 
-  if (sensor_values[1]  <1500)
-  {
-    // if rightmost sensor detects line, reverse and turn to the left
+  // else 
+  // if (sensor_values[1]  <1500)
+  // {
+    // // if rightmost sensor detects line, reverse and turn to the left
     
-    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-    delay(500);
-  }
+    // motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+    // delay(500);
+  // }
 
 
 
- if (val[2] < 80 && val[3]<80) //search spin
- {
-  motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
- }
- else
+ // else
   
   
   
- if (val[2] > 80 && val[3]<80)    // long range turn right
- {
- motors.setSpeeds(TURN_SPEED, TURN_SPEED*.8); //turn right slow
-    //delay(50);
-	}
+ // if (val[2] > 80 && val[3]<80)    // long range turn right
+ // {
+ // motors.setSpeeds(TURN_SPEED, TURN_SPEED*.8); //turn right slow
+    // //delay(50);
+	// }
 
 
-else 
-if (val[2] < 80 && val[3]>80)    // long range turn right
- {
- motors.setSpeeds(TURN_SPEED*.8, TURN_SPEED); //turn left slow
-    //delay(50);
-	}
-else 
+// else 
+// if (val[2] < 80 && val[3]>80)    // long range turn right
+ // {
+ // motors.setSpeeds(TURN_SPEED*.8, TURN_SPEED); //turn left slow
+    // //delay(50);
+	// }
+// else 
  
  
-    if (val[2] > 150 && val[3]<160)
-	{
-    motors.setSpeeds(TURN_SPEED, -TURN_SPEED*0.5); //short range turn right medium
-//    delay(50);
-	}
+    // if (val[2] > 150 && val[3]<160)
+	// {
+    // motors.setSpeeds(TURN_SPEED, -TURN_SPEED*0.5); //short range turn right medium
+// //    delay(50);
+	// }
 	
-else 
-  if (val[2] <150 && val[3]>160)
-	{
-    motors.setSpeeds(-TURN_SPEED*.5, TURN_SPEED); //short range turn right medium
-//    delay(50);
-	}
+// else 
+  // if (val[2] <150 && val[3]>160)
+	// {
+    // motors.setSpeeds(-TURN_SPEED*.5, TURN_SPEED); //short range turn right medium
+// //    delay(50);
+	// }
 	
-else
+// else
 
  	
-  if (val[2] >300 && val[3]>300)
-   {
- motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED); //attack
-   }
+  // if (val[2] >300 && val[3]>300)
+   // {
+ // motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED); //attack
+   // }
    
   
  
@@ -158,14 +238,6 @@ else
 
   sensors.read(sensor_values);
   
- //Serial.print(val[0]);
-  //Serial.print("\t");      // this prints a tab
-  //Serial.print(val[1]);
-  //Serial.print("\t");
-  Serial.print(val[2]);
-  Serial.print("\t");
-  Serial.println(val[3]);  //serial.println make a new line
-
   //delay(50);   // wait 100 ms between loops
   
 }
