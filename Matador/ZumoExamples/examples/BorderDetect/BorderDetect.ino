@@ -4,31 +4,31 @@
 #include <QTRSensors.h>
 #include <ZumoReflectanceSensorArray.h>
 
-const int close1 = 4;   //10 cm sensor
-const int close2 = 5;   //10 cm sensor
 const int far1 = 0;    //10-80 cm sensor
 const int far2 = 1;    //10-80 cm sensor
- 
+
 #define LED 13
  
 // this might need to be tuned for different lighting conditions, surfaces, etc.
 #define QTR_THRESHOLD  1500 // microseconds
   
 // these might need to be tuned for different motor types
-#define REVERSE_SPEED     200 // 0 is stopped, 400 is full speed
+#define REVERSE_SPEED     100 // 0 is stopped, 400 is full speed
 #define TURN_SPEED        200
-#define FORWARD_SPEED     400
-#define REVERSE_DURATION  200 // ms
-#define TURN_DURATION     400 // ms
+#define FORWARD_SPEED     200
+//#define REVERSE_DURATION  200 // ms
+//#define TURN_DURATION     200 // ms
  
 ZumoBuzzer buzzer;
 ZumoMotors motors;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
- 
-#define NUM_SENSORS 6
+
+// Numbers of sensors and pins
+#define NUM_SENSORS 3 
 unsigned int sensor_values[NUM_SENSORS];
+byte pins[] = {4, 11,  5};
+ZumoReflectanceSensorArray sensors(pins, 3);
  
-ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 
 void waitForButtonAndCountDown()
 {
@@ -37,7 +37,7 @@ void waitForButtonAndCountDown()
   digitalWrite(LED, LOW);
    
   // play audible countdown
-  for (int i = 0; i < 3; i++)
+  for (int i = 0; i < 4; i++)
   {
     delay(1000);
     buzzer.playNote(NOTE_G(3), 200, 15);
@@ -53,8 +53,7 @@ void setup()
   //motors.flipLeftMotor(true);
   //motors.flipRightMotor(true);
    Serial.begin(115200);
-   pinMode(close1, INPUT);   // the close sensors are digital
-  pinMode(close2, INPUT);
+   
   pinMode(LED, HIGH);
    
   waitForButtonAndCountDown();
@@ -63,16 +62,45 @@ void setup()
 void loop()
 {
 int val[4];
-  val[0] = digitalRead(close1);
-  val[1] = digitalRead(close2);
+
   val[2] = analogRead(far1);    // the far sensors are analog
   val[3] = analogRead(far2);
+  
+  sensors.read(sensor_values);
+  
+if (sensor_values[0] < QTR_THRESHOLD)
+  {
+    // if leftmost sensor detects line, reverse and turn to the right
+    motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+    delay(500);
+   
+  }
+  else 
+  if (sensor_values[2] < QTR_THRESHOLD)
+  {
+    // if rightmost sensor detects line, reverse and turn to the left
+    
+   motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+  delay(500);  }
+    
+
+  else 
+  if (sensor_values[1]  <1500)
+  {
+    // if rightmost sensor detects line, reverse and turn to the left
+    
+    motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+    delay(500);
+  }
+
+
 
  if (val[2] < 80 && val[3]<80) //search spin
  {
-  motors.setSpeeds(TURN_SPEED*0.5, -TURN_SPEED*0.5);
+  motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
  }
  else
+  
   
   
  if (val[2] > 80 && val[3]<80)    // long range turn right
@@ -107,7 +135,7 @@ else
 else
 
  	
-  if (val[2] >190 && val[3]>190)
+  if (val[2] >300 && val[3]>300)
    {
  motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED); //attack
    }
@@ -138,6 +166,6 @@ else
   Serial.print("\t");
   Serial.println(val[3]);  //serial.println make a new line
 
-  delay(50);   // wait 100 ms between loops
+  //delay(50);   // wait 100 ms between loops
   
 }
