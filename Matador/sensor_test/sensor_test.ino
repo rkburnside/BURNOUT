@@ -22,14 +22,14 @@ void setup() {
 
 void loop() {
   int val[4];
-  val[0] = digitalRead(close1);
-  val[1] = digitalRead(close2);
-  val[2] = analogRead(A0);    // the far sensors are analog
-  val[3] = analogRead(A1);
+  val[1] = digitalRead(close1);
+  val[2] = digitalRead(close2);
+  val[0] = analogRead(A0);    // the far sensors are analog
+  val[1] = analogRead(A1);
   
-  Serial.print(val[0]);
-  Serial.print("\t");      // this prints a tab
   Serial.print(val[1]);
+  Serial.print("\t");      // this prints a tab
+  Serial.print(val[0]);
   Serial.print("\t");
   Serial.print(val[2]);
   Serial.print("\t");

@@ -10,15 +10,16 @@ const int far2 = 1;    //10-80 cm sensor
 #define LED 13
  
 // this might need to be tuned for different lighting conditions, surfaces, etc.
-#define QTR_THRESHOLD  800 // microseconds
+#define QTR_THRESHOLD  500 // microseconds
   
 // these might need to be tuned for different motor types
-#define REVERSE_SPEED     150 // 0 is stopped, 400 is full speed
-#define TURN_SPEED        150
-#define FORWARD_SPEED     150
+#define REVERSE_SPEED     300 // 0 is stopped, 400 is full speed
+#define TURN_SPEED        300
+#define FORWARD_SPEED     300
 #define LINE_DETECTED		1
 #define SEARCH_ENEMY		2
-
+#define ENEMY_LONG	        3
+#define STOP_ROBOT	        4
 #define SENSOR_FR		1
 #define SENSOR_FL		2
 #define SENSOR_RL		4
@@ -52,24 +53,35 @@ void waitForButtonAndCountDown()
   }
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);  
-  delay(1000);
+ // delay(1000);
 }
 
+// byte stopRobot()
+// {
+	    // motors.setSpeeds(0, 0);
+		// button.waitForRelease();
+		// waitForButtonAndCountDown();
+		// state = SEARCH_ENEMY;
+	
+// }
 byte lineDetected()
 {
 	if(sensors_detected & SENSOR_RL) {
-		motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
+		readReflectorValues();
+		motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
 		buzzer.playNote(NOTE_G(4), 500, 15);
-		delay(500);
+		while(readLineSensors());
+		delay(100);
 		
 		
 	}
 	
 	else {
+	    readReflectorValues();
 		motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+		buzzer.playNote(NOTE_G(3), 200, 15);
 		while(readLineSensors());
-		 buzzer.playNote(NOTE_G(3), 200, 15);
-		delay(500);
+		delay(100);
 	}
     return(SEARCH_ENEMY);
 }
@@ -84,21 +96,82 @@ byte readLineSensors()
 	return (sensors_detected);
 }
 
+
+byte enemyLong ()
+{
+	
+	while(true) {
+	readReflectorValues();
+		if (val[0] > 200 && val[1]<200)    // long range turn right
+			{
+				motors.setSpeeds(TURN_SPEED, TURN_SPEED*.1); //turn right slow
+				sensors_detected = readLineSensors();
+				if(sensors_detected > 0) return(LINE_DETECTED);
+			//delay(50);
+			}
+		else if (val[0] < 200 && val[1]>200)    // long range turn right
+			{
+				motors.setSpeeds(-TURN_SPEED*.3, TURN_SPEED); //turn left slow
+				sensors_detected = readLineSensors();
+				if(sensors_detected > 0) return(LINE_DETECTED);
+				//delay(50);
+			}	
+		
+		// if (val[0] > 150 && val[1]<160)
+			// {
+				// motors.setSpeeds(TURN_SPEED, -TURN_SPEED*.3); //short range turn right medium
+				// sensors_detected = readLineSensors();
+				// if(sensors_detected > 0) return(LINE_DETECTED);//    delay(50);
+			// }
+	
+		// else 
+		
+		// if (val[0] <150 && val[1]>160)
+			// {
+				// motors.setSpeeds(-TURN_SPEED*.3, TURN_SPEED); //short range turn right medium
+			    // sensors_detected = readLineSensors();
+				// if(sensors_detected > 0) return(LINE_DETECTED);// delay(50);
+			// }
+	
+		// else
+
+ 
+		//else
+
+		else if (val[0] >200 && val[1]>200)
+		{
+			motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED); //attack
+		    sensors_detected = readLineSensors();
+		    if(sensors_detected > 0) return(LINE_DETECTED);
+		}
+		
+		// if (button.isPressed())
+		// {
+		// // if button is pressed, stop and wait for another press to go again
+			// return(STOP_ROBOT);
+		// }   
+		
+		else return(SEARCH_ENEMY);
+
+	}
+}
+
 byte searchEnemy()
 {
 	while(true) {
 		readReflectorValues();
-		if (val[0] < 200 && val[1]<200) //search spin
+		if (val[0] < 90 && val[1]<90) //search spin turn right
 			{
 				motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
 				sensors_detected = readLineSensors();
 				if(sensors_detected > 0) return(LINE_DETECTED);
 			}
 		else {
-			motors.setSpeeds(TURN_SPEED, TURN_SPEED);	
-			sensors_detected = readLineSensors();
-			if(sensors_detected > 0) return(LINE_DETECTED);
+		//motors.setSpeeds(0, 0);
+		return(ENEMY_LONG);
 		}
+		
+		
 	}
 }
 
@@ -130,8 +203,8 @@ void setup()
 
 void loop()
 {
-  readReflectorValues();
-  sensors.read(sensor_values);
+//  readReflectorValues();
+//  sensors.read(sensor_values);
 
 
 switch (state) {
@@ -143,13 +216,19 @@ switch (state) {
 	state = searchEnemy();
       //do something when var equals 2
       break;
+	case ENEMY_LONG:
+	state = enemyLong();
+      //do something when var equals 2
+      break;
+	
+//	case STOP_ROBOT:
+//	state = stopRobot();
+      //do something when var equals 2
+//      break;
     //default: 
       // if nothing else matches, do the default
       // default is optional
   }
-
-
-
 
   
 // if (sensor_values[0] < QTR_THRESHOLD)
@@ -227,16 +306,10 @@ switch (state) {
    
  
   
-  if (button.isPressed())
-  {
-    // if button is pressed, stop and wait for another press to go again
-    motors.setSpeeds(0, 0);
-    button.waitForRelease();
-    waitForButtonAndCountDown();
-  }
+  
    
 
-  sensors.read(sensor_values);
+//  sensors.read(sensor_values);
   
   //delay(50);   // wait 100 ms between loops
   
