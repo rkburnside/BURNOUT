@@ -4,8 +4,8 @@
 #include <QTRSensors.h>
 #include <ZumoReflectanceSensorArray.h>
 
-const int far1 = 1;    //10-80 cm sensor
-const int far2 = 0;    //10-80 cm sensor
+const int far1 = 0;    //top left 10-80 cm sensor
+const int far2 = 1;    //top right 10-80 cm sensor
 
 #define LED 13
  
@@ -147,30 +147,30 @@ byte enemyLong ()
 	
 	while(true) {
 	readReflectorValues();
-		if (val[0] > 90 && val[1]<90)    // long range turn right
+		if (val[0] > 90 && val[1]<90)    // long range turn left
 			{
-				motors.setSpeeds(TURN_SPEED, TURN_SPEED*4); //turn right slow
+				motors.setSpeeds(TURN_SPEED*5, TURN_SPEED); //turn left slow
 				sensors_detected = readLineSensors();
 				if(sensors_detected > 0) return(LINE_DETECTED);
 			//delay(50);
 			}
 		else if (val[0] < 90 && val[1]>90)    // long range turn right
 			{
-				motors.setSpeeds(TURN_SPEED*.2, TURN_SPEED); //turn left slow
+				motors.setSpeeds(TURN_SPEED*.2, TURN_SPEED); //turn right slow
 				sensors_detected = readLineSensors();
 				if(sensors_detected > 0) return(LINE_DETECTED);
 				//delay(50);
 			}	
-		if (val[0] > 390 && val[1]<90)    // long range turn right
+		if (val[0] > 300 && val[1]<90)    // long range turn left
 			{
-				motors.setSpeeds(TURN_SPEED, -TURN_SPEED*5); //turn right slow
+				motors.setSpeeds(-TURN_SPEED*5, TURN_SPEED); //turn left slow
 				sensors_detected = readLineSensors();
 				if(sensors_detected > 0) return(LINE_DETECTED);
 			//delay(50);
 			}
 		else if (val[0] < 90 && val[1]>300)    // long range turn right
 			{
-				motors.setSpeeds(-TURN_SPEED*.5, TURN_SPEED); //turn left slow
+				motors.setSpeeds(TURN_SPEED, -TURN_SPEED*.5); //turn right slow
 				sensors_detected = readLineSensors();
 				if(sensors_detected > 0) return(LINE_DETECTED);
 				//delay(50);
@@ -232,9 +232,9 @@ byte searchEnemy()
 	}
 }
 
-void readReflectorValues() {	// Read the sharp distance sensors
-  val[0] = analogRead(far1);    // the far sensors are analog
-  val[1] = analogRead(far2);
+void readReflectorValues() {	// Read the sharp distance sensors  the far sensors are analog
+  val[0] = analogRead(far1);    // Top Left 
+  val[1] = analogRead(far2);    // Top Right
  // //Serial.print(val[0]);
   // //Serial.print("\t");      // this prints a tab
   // Serial.print(state);
