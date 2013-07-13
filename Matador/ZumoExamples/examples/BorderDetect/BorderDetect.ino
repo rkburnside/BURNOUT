@@ -64,14 +64,14 @@ void waitForButtonAndCountDown()
  // delay(1000);
 }
 
-// byte stopRobot()
-// {
-	    // motors.setSpeeds(0, 0);
-		// button.waitForRelease();
-		// waitForButtonAndCountDown();
-		// state = SEARCH_ENEMY;
+byte stopRobot()
+{
+	    motors.setSpeeds(0, 0);
+		button.waitForRelease();
+		waitForButtonAndCountDown();
+		state = SEARCH_ENEMY;
 	
-// }
+}
 byte lineDetected()
 {
 	if(sensors_detected & SENSOR_RL) {
@@ -208,11 +208,11 @@ byte enemyLong ()
 		    if(sensors_detected > 0) return(LINE_DETECTED);
 		}
 		
-		// if (button.isPressed())
-		// {
-		// // if button is pressed, stop and wait for another press to go again
-			// return(STOP_ROBOT);
-		// }   
+		if (button.isPressed())
+		{
+		// if button is pressed, stop and wait for another press to go again
+			return(STOP_ROBOT);
+		}   
 		
 		else return(SEARCH_ENEMY);
 
@@ -280,11 +280,11 @@ byte enemyLongRear()
 		    if(sensors_detected > 0) return(LINE_DETECTED);
 		}
 		
-		// if (button.isPressed())
-		// {
-		// // if button is pressed, stop and wait for another press to go again
-			// return(STOP_ROBOT);
-		// }   
+		if (button.isPressed())
+		 {
+		 // if button is pressed, stop and wait for another press to go again
+			 return(STOP_ROBOT);
+		}   
 		
 		else return(SEARCH_ENEMY);
 
@@ -361,10 +361,10 @@ switch (state) {
 	state = enemyLongRear();
       break;
 	
-//	case STOP_ROBOT:
-//	state = stopRobot();
-      //do something when var equals 2
-//      break;
+	case STOP_ROBOT:
+	state = stopRobot();
+     // do something when var equals 2
+     break;
     //default: 
       // if nothing else matches, do the default
       // default is optional
