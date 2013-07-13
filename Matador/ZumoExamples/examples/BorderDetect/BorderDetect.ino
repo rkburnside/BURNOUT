@@ -6,6 +6,8 @@
 
 const int far1 = 0;    //top left 10-80 cm sensor
 const int far2 = 1;    //top right 10-80 cm sensor
+const int far3 = 2;    //bottom left 10-80 cm sensor
+const int far4 = 3;    //bottom right 10-80 cm sensor
 
 #define LED 13
  
@@ -23,10 +25,12 @@ const int far2 = 1;    //top right 10-80 cm sensor
 #define SEARCH_ENEMY		2
 #define ENEMY_LONG	        3
 #define STOP_ROBOT	        4
-#define SENSOR_FR		1
-#define SENSOR_FL		2
-#define SENSOR_RL		4
-#define SENSOR_RR		8
+#define ENEMY_LONG_REAR     5
+#define SENSOR_FR		    1
+#define SENSOR_FL		    2
+#define SENSOR_RL		    4
+#define SENSOR_RR			8
+#define MAX_SEARCH			200
 //#define REVERSE_DURATION  200 // ms
 //#define TURN_DURATION     200 // ms
  
@@ -147,28 +151,28 @@ byte enemyLong ()
 	
 	while(true) {
 	readReflectorValues();
-		if (val[0] > 90 && val[1]<90)    // long range turn left
+		if (val[0] > MAX_SEARCH && val[1]<MAX_SEARCH)    // long range turn left
 			{
 				motors.setSpeeds(TURN_SPEED*5, TURN_SPEED); //turn left slow
 				sensors_detected = readLineSensors();
 				if(sensors_detected > 0) return(LINE_DETECTED);
 			//delay(50);
 			}
-		else if (val[0] < 90 && val[1]>90)    // long range turn right
+		else if (val[0] < MAX_SEARCH && val[1]>MAX_SEARCH)    // long range turn right
 			{
 				motors.setSpeeds(TURN_SPEED*.2, TURN_SPEED); //turn right slow
 				sensors_detected = readLineSensors();
 				if(sensors_detected > 0) return(LINE_DETECTED);
 				//delay(50);
 			}	
-		if (val[0] > 300 && val[1]<90)    // long range turn left
+		if (val[0] > MAX_SEARCH+50 && val[1]<MAX_SEARCH)    // long range turn left
 			{
 				motors.setSpeeds(-TURN_SPEED*5, TURN_SPEED); //turn left slow
 				sensors_detected = readLineSensors();
 				if(sensors_detected > 0) return(LINE_DETECTED);
 			//delay(50);
 			}
-		else if (val[0] < 90 && val[1]>300)    // long range turn right
+		else if (val[0] < MAX_SEARCH && val[1]>MAX_SEARCH+50)    // long range turn right
 			{
 				motors.setSpeeds(TURN_SPEED, -TURN_SPEED*.5); //turn right slow
 				sensors_detected = readLineSensors();
@@ -197,7 +201,7 @@ byte enemyLong ()
  
 		//else
 
-		else if (val[0] >200 && val[1]>200)
+		else if (val[0] >MAX_SEARCH && val[1]>MAX_SEARCH)
 		{
 			motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED); //attack
 		    sensors_detected = readLineSensors();
@@ -214,27 +218,107 @@ byte enemyLong ()
 
 	}
 }
+byte enemyLongRear()
+{
+	
+	while(true) {
+	readReflectorValues();
+		if (val[2] > MAX_SEARCH && val[3]<MAX_SEARCH)    // long range turn left
+			{
+				motors.setSpeeds(-TURN_SPEED*5, -TURN_SPEED); //turn left slow
+				sensors_detected = readLineSensors();
+				if(sensors_detected > 0) return(LINE_DETECTED);
+			//delay(50);
+			}
+		else if (val[2] < MAX_SEARCH && val[3]>MAX_SEARCH)    // long range turn right
+			{
+				motors.setSpeeds(-TURN_SPEED*.2, -TURN_SPEED); //turn right slow
+				sensors_detected = readLineSensors();
+				if(sensors_detected > 0) return(LINE_DETECTED);
+				//delay(50);
+			}	
+		if (val[2] > MAX_SEARCH+50 && val[3]<MAX_SEARCH)    // long range turn left
+			{
+				motors.setSpeeds(TURN_SPEED*5, -TURN_SPEED); //turn left slow
+				sensors_detected = readLineSensors();
+				if(sensors_detected > 0) return(LINE_DETECTED);
+			//delay(50);
+			}
+		else if (val[2] < MAX_SEARCH && val[3]>MAX_SEARCH+50)    // long range turn right
+			{
+				motors.setSpeeds(-TURN_SPEED, TURN_SPEED*.5); //turn right slow
+				sensors_detected = readLineSensors();
+				if(sensors_detected > 0) return(LINE_DETECTED);
+				//delay(50);
+			}	
+		
+		// if (val[0] > 150 && val[1]<160)
+			// {
+				// motors.setSpeeds(TURN_SPEED, -TURN_SPEED*.3); //short range turn right medium
+				// sensors_detected = readLineSensors();
+				// if(sensors_detected > 0) return(LINE_DETECTED);//    delay(50);
+			// }
+	
+		// else 
+		
+		// if (val[0] <150 && val[1]>160)
+			// {
+				// motors.setSpeeds(-TURN_SPEED*.3, TURN_SPEED); //short range turn right medium
+			    // sensors_detected = readLineSensors();
+				// if(sensors_detected > 0) return(LINE_DETECTED);// delay(50);
+			// }
+	
+		// else
 
+ 
+		//else
+
+		else if (val[2] >MAX_SEARCH && val[3]>MAX_SEARCH)
+		{
+			motors.setSpeeds(-FORWARD_SPEED, -FORWARD_SPEED); //attack
+		    sensors_detected = readLineSensors();
+		    if(sensors_detected > 0) return(LINE_DETECTED);
+		}
+		
+		// if (button.isPressed())
+		// {
+		// // if button is pressed, stop and wait for another press to go again
+			// return(STOP_ROBOT);
+		// }   
+		
+		else return(SEARCH_ENEMY);
+
+	}
+}
 byte searchEnemy()
 {
 	while(true) {
 		readReflectorValues();
-		if (val[0] < 90 || val[1]<90) //search spin turn right
+		if (val[0] < MAX_SEARCH && val[1]<MAX_SEARCH && val[2]<MAX_SEARCH && val[3]<MAX_SEARCH ) //search spin turn right
 			{
 				motors.setSpeeds(TURN_SPEED*.7, -TURN_SPEED*.7);
 				sensors_detected = readLineSensors();
 				if(sensors_detected > 0) return(LINE_DETECTED);
 			}
-		else {
-		//motors.setSpeeds(0, 0);
-		return(ENEMY_LONG);
-		}
+		else if (val[0] > MAX_SEARCH || val[1]>MAX_SEARCH ) //search spin turn right
+			{
+			//motors.setSpeeds(0, 0);
+			return(ENEMY_LONG);
+			}
+		
+		else if (val[2] > MAX_SEARCH || val[3]>MAX_SEARCH ) //search spin turn right
+			{
+			//motors.setSpeeds(0, 0);
+			return(ENEMY_LONG_REAR);
+			}
 	}
 }
 
 void readReflectorValues() {	// Read the sharp distance sensors  the far sensors are analog
   val[0] = analogRead(far1);    // Top Left 
   val[1] = analogRead(far2);    // Top Right
+  val[2] = analogRead(far3);    // Bottom Left 
+  val[3] = analogRead(far4);    // Bottom Right
  // //Serial.print(val[0]);
   // //Serial.print("\t");      // this prints a tab
   // Serial.print(state);
@@ -272,6 +356,9 @@ switch (state) {
       break;
 	case ENEMY_LONG:
 	state = enemyLong();
+      break;
+	case ENEMY_LONG_REAR:
+	state = enemyLongRear();
       break;
 	
 //	case STOP_ROBOT:
