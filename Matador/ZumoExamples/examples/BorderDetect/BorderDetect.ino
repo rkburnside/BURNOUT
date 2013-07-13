@@ -23,6 +23,7 @@ const int far2 = 1;    //10-80 cm sensor
 #define SENSOR_FR		1
 #define SENSOR_FL		2
 #define SENSOR_RL		4
+#define SENSOR_RR		8
 //#define REVERSE_DURATION  200 // ms
 //#define TURN_DURATION     200 // ms
  
@@ -35,8 +36,8 @@ Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 unsigned int sensor_values[NUM_SENSORS];
 byte state, sensors_detected = 0;
 int val[4];
-byte pins[] = {4, 11, 5};
-ZumoReflectanceSensorArray sensors(pins, 3);
+byte pins[] = {4, 11, 5, 6};
+ZumoReflectanceSensorArray sensors(pins, 4, 800, QTR_NO_EMITTER_PIN);
  
 
 void waitForButtonAndCountDown()
@@ -72,8 +73,6 @@ byte lineDetected()
 		buzzer.playNote(NOTE_G(4), 500, 15);
 		while(readLineSensors());
 		delay(100);
-		
-		
 	}
 	
 	else {
@@ -93,6 +92,7 @@ byte readLineSensors()
     if (sensor_values[0] < QTR_THRESHOLD) sensors_detected += SENSOR_FL;
     if (sensor_values[1] < QTR_THRESHOLD) sensors_detected += SENSOR_RL;
     if (sensor_values[2] < QTR_THRESHOLD) sensors_detected += SENSOR_FR;
+    if (sensor_values[3] < QTR_THRESHOLD) sensors_detected += SENSOR_RR;
 	return (sensors_detected);
 }
 
@@ -314,3 +314,4 @@ switch (state) {
   //delay(50);   // wait 100 ms between loops
   
 }
+
