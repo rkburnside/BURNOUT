@@ -14,7 +14,7 @@ need to be connected to an appropriate power supply.
 
 // This line specifies what pin we will use for sending the
 // signal to the servo.  You can change this.
-#define SERVO_PIN 11
+#define SERVO_PIN 2
 
 // This is the time since the last rising edge in units of 0.5us.
 uint16_t volatile servoTime = 0;

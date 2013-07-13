@@ -11,25 +11,30 @@ void setup() {
   // make the pins outputs:
   pinMode(close1, INPUT);   // the close sensors are digital
   pinMode(close2, INPUT);
+  pinMode(A0, INPUT);
+  pinMode(A1, INPUT);
   pinMode(A2, INPUT);
   pinMode(A3, INPUT);
-  pinMode(A5, INPUT);
+  digitalWrite(A0, LOW);
+  digitalWrite(A1, LOW);
   digitalWrite(A2, LOW);
   digitalWrite(A3, LOW);
-  digitalWrite(A5, LOW);
+
   
 }
 
 void loop() {
   int val[4];
-  val[1] = digitalRead(close1);
-  val[2] = digitalRead(close2);
+ 
   val[0] = analogRead(A0);    // the far sensors are analog
   val[1] = analogRead(A1);
+  val[2] = analogRead(A2);
+  val[3] = analogRead(A3);;
   
-  Serial.print(val[1]);
-  Serial.print("\t");      // this prints a tab
+  
   Serial.print(val[0]);
+  Serial.print("\t");      // this prints a tab
+  Serial.print(val[1]);
   Serial.print("\t");
   Serial.print(val[2]);
   Serial.print("\t");

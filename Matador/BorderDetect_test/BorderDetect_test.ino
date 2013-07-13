@@ -20,12 +20,12 @@ ZumoBuzzer buzzer;
 ZumoMotors motors;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
  
-#define NUM_SENSORS 3
+#define NUM_SENSORS 4
 unsigned int sensor_values[NUM_SENSORS];
 
-byte pins[] = {4, 11,  5};
+byte pins[] = {4, 11, 6, 5};
 
-ZumoReflectanceSensorArray sensors(pins, 3);
+ZumoReflectanceSensorArray sensors(pins, 4);
  
 
 void waitForButtonAndCountDown()
@@ -96,7 +96,7 @@ void loop()
   }
   
   
-  Serial.begin(9600);
+  Serial.begin(115200);
 Serial.print(sensor_values[5]);
   Serial.print("\t"); 
   Serial.print(sensor_values[4]);
