@@ -12,12 +12,12 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 #define LED 13
  
 // this might need to be tuned for different lighting conditions, surfaces, etc.
-#define QTR_THRESHOLD  300 // microseconds
+#define QTR_THRESHOLD  200 // microseconds
   
 // these might need to be tuned for different motor types
 #define REVERSE_SPEED     300 // 0 is stopped, 400 is full speed
 #define TURN_SPEED        300
-#define FORWARD_SPEED     300
+#define FORWARD_SPEED     350
 #define FAST_SPEED     	  400 // 0 is stopped, 400 is full speed
 #define MEDIUM_SPEED      300
 #define SLOW_SPEED     	  200
@@ -30,7 +30,8 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 #define SENSOR_FL		    2
 #define SENSOR_RL		    4
 #define SENSOR_RR			8
-#define MAX_SEARCH			200
+#define MAX_SEARCH			140
+
 //#define REVERSE_DURATION  200 // ms
 //#define TURN_DURATION     200 // ms
  
@@ -46,6 +47,23 @@ int val[4];
 byte pins[] = {4, 5, 11, 6};
 ZumoReflectanceSensorArray sensors(pins, 4, 700, QTR_NO_EMITTER_PIN);
  
+// void raise_flag(){
+  // for (int i = 0; i<40; i++) {
+    // digitalWrite(2, LOW);
+    // delay(20);
+    // digitalWrite(2, HIGH);
+    // delayMicroseconds(800);
+  // }
+// }  
+
+// void lower_flag(){
+  // for (int i = 0; i<40; i++) {
+    // digitalWrite(2, LOW);
+    // delay(20);
+    // digitalWrite(2, HIGH);
+    // delayMicroseconds(2200);
+  // }
+// }  
 
 void waitForButtonAndCountDown()
 {
@@ -61,36 +79,38 @@ void waitForButtonAndCountDown()
   }
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);  
+  //lower_flag();
+
  // delay(1000);
 }
 
-byte stopRobot()
-{
-	    motors.setSpeeds(0, 0);
-		button.waitForRelease();
-		waitForButtonAndCountDown();
-		state = SEARCH_ENEMY;
+// byte stopRobot()
+// {		//raise_flag();//raise the flag when button is pressed to stop
+	    // motors.setSpeeds(0, 0);
+		// button.waitForRelease();
+		// waitForButtonAndCountDown();
+		// state = SEARCH_ENEMY;
 	
-}
-byte lineDetected()
-{
-	if(sensors_detected & SENSOR_RL) {
-		readReflectorValues();
-		motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-		buzzer.playNote(NOTE_G(4), 500, 15);
-		while(readLineSensors());
-		delay(100);
-	}
+// }
+// byte lineDetected()
+// {
+	// if(sensors_detected & SENSOR_RL) {
+		// readReflectorValues();
+		// motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+		// buzzer.playNote(NOTE_G(4), 500, 15);
+		// while(readLineSensors());
+		// delay(100);
+	// }
 	
-	else {
-	    readReflectorValues();
-		motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-		buzzer.playNote(NOTE_G(3), 200, 15);
-		while(readLineSensors());
-		delay(100);
-	}
-    return(SEARCH_ENEMY);
-}
+	// else {
+	    // readReflectorValues();
+		// motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
+		// buzzer.playNote(NOTE_G(3), 200, 15);
+		// while(readLineSensors());
+		// delay(100);
+	// }
+    // return(SEARCH_ENEMY);
+// }
 
 byte lineDetected2()
 {
@@ -126,9 +146,9 @@ byte lineDetected2()
 			Serial.println("Rear Both");
 		break;
 		
-		default: 
-			Serial.println("None");
-		break;
+		// default: 
+			// Serial.println("None");
+		// break;
 		}
 	delay(300);
 	return(SEARCH_ENEMY);
@@ -208,11 +228,11 @@ byte enemyLong ()
 		    if(sensors_detected > 0) return(LINE_DETECTED);
 		}
 		
-		if (button.isPressed())
-		{
-		// if button is pressed, stop and wait for another press to go again
-			return(STOP_ROBOT);
-		}   
+		// if (button.isPressed())
+		// {
+		// // if button is pressed, stop and wait for another press to go again
+			// return(STOP_ROBOT);
+		// }   
 		
 		else return(SEARCH_ENEMY);
 
@@ -275,16 +295,28 @@ byte enemyLongRear()
 
 		else if (val[2] >MAX_SEARCH && val[3]>MAX_SEARCH)
 		{
-			motors.setSpeeds(-FORWARD_SPEED, -FORWARD_SPEED); //attack
-		    sensors_detected = readLineSensors();
-		    if(sensors_detected > 0) return(LINE_DETECTED);
+					//	int i;		
+					//while(i < 4) 		
+					//{
+					// do something repetitive 200 times
+					//	for (int e = 0; e < 4; e++)
+					//{
+				motors.setSpeeds(-FORWARD_SPEED, -FORWARD_SPEED); //attack
+				sensors_detected = readLineSensors();
+				if(sensors_detected > 0) return(LINE_DETECTED);
+					//delay(1000);
+					//i++;
+					//var++;
+					//} 
+					//motors.setSpeeds(0, 0); //attack
+
 		}
 		
-		if (button.isPressed())
-		 {
-		 // if button is pressed, stop and wait for another press to go again
-			 return(STOP_ROBOT);
-		}   
+		// if (button.isPressed())
+		 // {
+		 // // if button is pressed, stop and wait for another press to go again
+			 // return(STOP_ROBOT);
+		// }   
 		
 		else return(SEARCH_ENEMY);
 
@@ -336,6 +368,8 @@ void setup()
    Serial.begin(115200);
   state = SEARCH_ENEMY; 
   pinMode(LED, HIGH);
+ // pinMode(2, OUTPUT);  
+
    
   waitForButtonAndCountDown();
 }
@@ -361,10 +395,10 @@ switch (state) {
 	state = enemyLongRear();
       break;
 	
-	case STOP_ROBOT:
-	state = stopRobot();
-     // do something when var equals 2
-     break;
+	// case STOP_ROBOT:
+	// state = stopRobot();
+     // // do something when var equals 2
+     // break;
     //default: 
       // if nothing else matches, do the default
       // default is optional
