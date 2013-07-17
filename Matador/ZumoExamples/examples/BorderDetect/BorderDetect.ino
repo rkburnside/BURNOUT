@@ -15,12 +15,12 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 #define QTR_THRESHOLD  200 // microseconds
   
 // these might need to be tuned for different motor types
-#define REVERSE_SPEED     300 // 0 is stopped, 400 is full speed
-#define TURN_SPEED        300
-#define FORWARD_SPEED     350
+#define REVERSE_SPEED     200 // 0 is stopped, 400 is full speed
+#define TURN_SPEED        200
+#define FORWARD_SPEED     200
 #define FAST_SPEED     	  400 // 0 is stopped, 400 is full speed
-#define MEDIUM_SPEED      300
-#define SLOW_SPEED     	  200
+#define MEDIUM_SPEED      200
+#define SLOW_SPEED     	  100
 #define LINE_DETECTED		1
 #define SEARCH_ENEMY		2
 #define ENEMY_LONG	        3
@@ -40,7 +40,7 @@ ZumoMotors motors;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 
 // Numbers of sensors and pins
-#define NUM_SENSORS 3 
+#define NUM_SENSORS 4 
 unsigned int sensor_values[NUM_SENSORS];
 byte state, sensors_detected = 0;
 int val[4];
@@ -133,16 +133,19 @@ byte lineDetected2()
 
 		case (SENSOR_RL):
 			motors.setSpeeds(MEDIUM_SPEED, SLOW_SPEED);
+			buzzer.playNote(NOTE_G(3), 200, 15);
 			Serial.println("Rear Left");
 		break;
 
 		case (SENSOR_RR):
 			motors.setSpeeds(SLOW_SPEED, MEDIUM_SPEED);
+			buzzer.playNote(NOTE_G(3), 200, 15);
 			Serial.println("Rear Right");
 		break;
 
 		case (SENSOR_RL+SENSOR_RR):
 			motors.setSpeeds(MEDIUM_SPEED, MEDIUM_SPEED);
+			buzzer.playNote(NOTE_G(3), 200, 15);
 			Serial.println("Rear Both");
 		break;
 		
@@ -240,7 +243,7 @@ byte enemyLong ()
 }
 byte enemyLongRear()
 {
-	
+	int var2=0;
 	while(true) {
 	readReflectorValues();
 		if (val[2] > MAX_SEARCH && val[3]<MAX_SEARCH)    // long range turn left
@@ -295,21 +298,44 @@ byte enemyLongRear()
 
 		else if (val[2] >MAX_SEARCH && val[3]>MAX_SEARCH)
 		{
-					//	int i;		
-					//while(i < 4) 		
+					//do
+					//{					
+					//while(var2=0 ) 		
 					//{
 					// do something repetitive 200 times
-					//	for (int e = 0; e < 4; e++)
-					//{
-				motors.setSpeeds(-FORWARD_SPEED, -FORWARD_SPEED); //attack
-				sensors_detected = readLineSensors();
-				if(sensors_detected > 0) return(LINE_DETECTED);
-					//delay(1000);
-					//i++;
-					//var++;
+					for (int i = 0; i < 5000; i++)
+					{
+						motors.setSpeeds(0, 0); //attack
+						sensors_detected = readLineSensors();
+						if(sensors_detected > 0) 
+						
+							// {
+								// buzzer.playNote(NOTE_G(4), 500, 15);
+								// Serial.println(sensors_detected, BIN);
+								// return(LINE_DETECTED);
+								
+								 i=5000;						
+						// }
+						// var2++;
+							Serial.println(sensors_detected, BIN);
+						delay(1);
+						};
+						//return(LINE_DETECTED);
 					//} 
+					Serial.println("Senor");
+						Serial.println(sensors_detected, BIN);
+						buzzer.playNote(NOTE_G(4), 500, 15);
+						delay(5000);
+					
+					// if (var2=6) {  
+					 // Serial.print("\t"); 					
+					// Serial.print(LINE_DETECTED);
+					// buzzer.playNote(NOTE_G(4), 500, 15);  
+                    // return(LINE_DETECTED);					
+					//}
 					//motors.setSpeeds(0, 0); //attack
-
+					//delay(2000);
+					
 		}
 		
 		// if (button.isPressed())
