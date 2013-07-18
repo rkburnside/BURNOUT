@@ -15,9 +15,9 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 #define QTR_THRESHOLD  200 // microseconds
   
 // these might need to be tuned for different motor types
-#define REVERSE_SPEED     200 // 0 is stopped, 400 is full speed
-#define TURN_SPEED        200
-#define FORWARD_SPEED     200
+#define REVERSE_SPEED     400 // 0 is stopped, 400 is full speed
+#define TURN_SPEED        400
+#define FORWARD_SPEED     400
 #define FAST_SPEED     	  400 // 0 is stopped, 400 is full speed
 #define MEDIUM_SPEED      200
 #define SLOW_SPEED     	  100
@@ -26,6 +26,8 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 #define ENEMY_LONG	        3
 #define STOP_ROBOT	        4
 #define ENEMY_LONG_REAR     5
+#define SWITCH_ATTACK		6
+#define SWITCH_ATTACK_REAR	7
 #define SENSOR_FR		    1
 #define SENSOR_FL		    2
 #define SENSOR_RL		    4
@@ -169,9 +171,58 @@ byte readLineSensors()
 	return (edge_sensors);
 }
 
+
+byte switchAttack ()
+		
+
+{//half speed time at 400
+
+motors.setSpeeds(-TURN_SPEED, TURN_SPEED*0.8);
+						// sensors_detected = readLineSensors();
+						// if(sensors_detected > 0) return(LINE_DETECTED);
+delay(170);
+ motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
+						// // sensors_detected = readLineSensors();
+						// // if(sensors_detected > 0) return(LINE_DETECTED);
+delay(110);
+// motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+						// // sensors_detected = readLineSensors();
+						// // if(sensors_detected > 0) return(LINE_DETECTED);
+// delay(180);
+//motors.setSpeeds(TURN_SPEED*5, TURN_SPEED);
+return(SEARCH_ENEMY);
+}
+
+byte switchAttackRear ()
+		
+
+{//half speed time at 400
+motors.setSpeeds(TURN_SPEED*0.6, TURN_SPEED);
+					    // sensors_detected = readLineSensors();
+						// if(sensors_detected > 0) return(LINE_DETECTED);
+delay(90);
+motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+						// sensors_detected = readLineSensors();
+						// if(sensors_detected > 0) return(LINE_DETECTED);
+delay(160);
+motors.setSpeeds(TURN_SPEED, TURN_SPEED);
+						// sensors_detected = readLineSensors();
+						// if(sensors_detected > 0) return(LINE_DETECTED);
+delay(130);
+motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+						// sensors_detected = readLineSensors();
+						// if(sensors_detected > 0) return(LINE_DETECTED);
+delay(180);
+//motors.setSpeeds(TURN_SPEED*5, TURN_SPEED);
+return(SEARCH_ENEMY);
+}
+
+
+
+
 byte enemyLong ()
 {
-	
+long start_time = millis();
 	while(true) {
 	readReflectorValues();
 		if (val[0] > MAX_SEARCH && val[1]<MAX_SEARCH)    // long range turn left
@@ -200,6 +251,7 @@ byte enemyLong ()
 				motors.setSpeeds(TURN_SPEED, -TURN_SPEED*.5); //turn right slow
 				sensors_detected = readLineSensors();
 				if(sensors_detected > 0) return(LINE_DETECTED);
+
 				//delay(50);
 			}	
 		
@@ -229,6 +281,8 @@ byte enemyLong ()
 			motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED); //attack
 		    sensors_detected = readLineSensors();
 		    if(sensors_detected > 0) return(LINE_DETECTED);
+			if ((millis() - start_time) > 2000)  return(SWITCH_ATTACK);
+
 		}
 		
 		// if (button.isPressed())
@@ -244,6 +298,7 @@ byte enemyLong ()
 byte enemyLongRear()
 {
 	int var2=0;
+	long start_time = millis();
 	while(true) {
 	readReflectorValues();
 		if (val[2] > MAX_SEARCH && val[3]<MAX_SEARCH)    // long range turn left
@@ -289,7 +344,7 @@ byte enemyLongRear()
 				// motors.setSpeeds(-TURN_SPEED*.3, TURN_SPEED); //short range turn right medium
 			    // sensors_detected = readLineSensors();
 				// if(sensors_detected > 0) return(LINE_DETECTED);// delay(50);
-			// }
+			// }	
 	
 		// else
 
@@ -298,34 +353,35 @@ byte enemyLongRear()
 
 		else if (val[2] >MAX_SEARCH && val[3]>MAX_SEARCH)
 		{
+		
 					//do
 					//{					
 					//while(var2=0 ) 		
 					//{
 					// do something repetitive 200 times
-					for (int i = 0; i < 5000; i++)
-					{
-						motors.setSpeeds(0, 0); //attack
+					//for (int i = 0; i < 5000; i // working for
+					//{ // working for
+						motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED); //attack
 						sensors_detected = readLineSensors();
-						if(sensors_detected > 0) 
+						if(sensors_detected > 0) return(LINE_DETECTED);
 						
 							// {
 								// buzzer.playNote(NOTE_G(4), 500, 15);
 								// Serial.println(sensors_detected, BIN);
 								// return(LINE_DETECTED);
 								
-								 i=5000;						
+							//	 i=5000;						// working for
 						// }
 						// var2++;
-							Serial.println(sensors_detected, BIN);
-						delay(1);
-						};
-						//return(LINE_DETECTED);
+							//Serial.println(sensors_detected, BIN); // working for
+						//delay(1); // working for
+						//};// working for
+						//
 					//} 
-					Serial.println("Senor");
-						Serial.println(sensors_detected, BIN);
-						buzzer.playNote(NOTE_G(4), 500, 15);
-						delay(5000);
+					//Serial.println("Senor"); 
+						//Serial.println(sensors_detected, BIN);
+						//buzzer.playNote(NOTE_G(4), 500, 15);
+						//delay(5000);
 					
 					// if (var2=6) {  
 					 // Serial.print("\t"); 					
@@ -335,6 +391,8 @@ byte enemyLongRear()
 					//}
 					//motors.setSpeeds(0, 0); //attack
 					//delay(2000);
+					
+					if ((millis() - start_time) > 2000)  return(SWITCH_ATTACK_REAR);
 					
 		}
 		
@@ -420,6 +478,12 @@ switch (state) {
 	case ENEMY_LONG_REAR:
 	state = enemyLongRear();
       break;
+	case SWITCH_ATTACK:
+	state = switchAttack();
+	  break;
+	case SWITCH_ATTACK_REAR:
+	state = switchAttackRear();
+	  break;
 	
 	// case STOP_ROBOT:
 	// state = stopRobot();
