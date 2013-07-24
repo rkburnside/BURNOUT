@@ -19,8 +19,8 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 #define TURN_SPEED        400
 #define FORWARD_SPEED     400
 #define FAST_SPEED     	  400 // 0 is stopped, 400 is full speed
-#define MEDIUM_SPEED      200
-#define SLOW_SPEED     	  100
+#define MEDIUM_SPEED      400
+#define SLOW_SPEED     	  300
 #define LINE_DETECTED		1
 #define SEARCH_ENEMY		2
 #define ENEMY_LONG	        3
@@ -28,6 +28,7 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 #define ENEMY_LONG_REAR     5
 #define SWITCH_ATTACK		6
 #define SWITCH_ATTACK_REAR	7
+#define ATTACK_1				8
 #define SENSOR_FR		    1
 #define SENSOR_FL		    2
 #define SENSOR_RL		    4
@@ -36,6 +37,12 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 
 //#define REVERSE_DURATION  200 // ms
 //#define TURN_DURATION     200 // ms
+
+// Variables will change:
+int buttonPushCounter = 0;   // counter for the number of button presses
+int buttonState = 0;         // current state of the button
+int lastButtonState = 0;     // previous state of the button
+
  
 ZumoBuzzer buzzer;
 ZumoMotors motors;
@@ -49,30 +56,62 @@ int val[4];
 byte pins[] = {4, 5, 11, 6};
 ZumoReflectanceSensorArray sensors(pins, 4, 700, QTR_NO_EMITTER_PIN);
  
-// void raise_flag(){
-  // for (int i = 0; i<40; i++) {
-    // digitalWrite(2, LOW);
-    // delay(20);
-    // digitalWrite(2, HIGH);
-    // delayMicroseconds(800);
-  // }
-// }  
+void raise_flag(){
+  for (int i = 0; i<40; i++) {
+    digitalWrite(2, LOW);
+    delay(20);
+    digitalWrite(2, HIGH);
+    delayMicroseconds(1700);
+  }
+}  
 
-// void lower_flag(){
-  // for (int i = 0; i<40; i++) {
-    // digitalWrite(2, LOW);
-    // delay(20);
-    // digitalWrite(2, HIGH);
-    // delayMicroseconds(2200);
-  // }
-// }  
+void lower_flag(){
+  for (int i = 0; i<40; i++) {
+    digitalWrite(2, LOW);
+    delay(20);
+    digitalWrite(2, HIGH);
+    delayMicroseconds(800);
+  }
+}  
 
-void waitForButtonAndCountDown()
+byte waitForButtonAndCountDown()
 {
-  digitalWrite(LED, HIGH);
-  button.waitForButton();
-  digitalWrite(LED, LOW);
-   
+  //digitalWrite(LED, HIGH);
+  //button.waitForButton();
+  //digitalWrite(LED, LOW);
+
+  buttonState = digitalRead(12);
+ // Serial.println(buttonState);
+ // Serial.println(button.isPressed());
+
+// if (buttonState == 1){  buzzer.playNote(NOTE_G(3), 200, 15);}
+// if (buttonState == 0){  buzzer.playNote(NOTE_G(8), 200, 15);}
+// delay(2000);
+long start_time = millis();
+  Serial.println(buttonState);
+while  ((millis() - start_time) < 6000)  {  
+
+		// if the state has changed, increment the counter
+		//if (buttonState == 1) 
+		//	{
+				// if the current state is HIGH then the button
+				// wend from off to on:
+				buttonPushCounter++;
+				// Serial.println(buttonState);
+				// Serial.println("on");
+				// Serial.print("number of button pushes:  ");
+				// Serial.println(buttonPushCounter);
+				 buzzer.playNote(NOTE_G(6), 200, 15);
+				   Serial.println(buttonPushCounter);
+		//	} 
+			
+
+button.waitForButton();
+		
+  }
+Serial.println(buttonPushCounter);
+ buzzer.playNote(NOTE_G(8), 500, 15); 
+    button.waitForButton();
   // play audible countdown
   for (int i = 0; i < 4; i++)
   {
@@ -81,7 +120,21 @@ void waitForButtonAndCountDown()
   }
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);  
-  //lower_flag();
+ 
+ // lower_flag();
+   switch (buttonPushCounter) {
+    case 1:
+     state = SEARCH_ENEMY;
+	 return(SEARCH_ENEMY);
+	 //do something when var equals 1
+      break;
+    case 2:
+	state = ATTACK_1;
+	 return(ATTACK_1);
+      //do something when var equals 2
+      break;
+
+  }
 
  // delay(1000);
 }
@@ -93,25 +146,6 @@ void waitForButtonAndCountDown()
 		// waitForButtonAndCountDown();
 		// state = SEARCH_ENEMY;
 	
-// }
-// byte lineDetected()
-// {
-	// if(sensors_detected & SENSOR_RL) {
-		// readReflectorValues();
-		// motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-		// buzzer.playNote(NOTE_G(4), 500, 15);
-		// while(readLineSensors());
-		// delay(100);
-	// }
-	
-	// else {
-	    // readReflectorValues();
-		// motors.setSpeeds(-REVERSE_SPEED, -REVERSE_SPEED);
-		// buzzer.playNote(NOTE_G(3), 200, 15);
-		// while(readLineSensors());
-		// delay(100);
-	// }
-    // return(SEARCH_ENEMY);
 // }
 
 byte lineDetected2()
@@ -171,20 +205,64 @@ byte readLineSensors()
 	return (edge_sensors);
 }
 
-
-byte switchAttack ()
-		
-
-{//half speed time at 400
-
-motors.setSpeeds(-TURN_SPEED, TURN_SPEED*0.8);
+byte attack1 ()		
+{
+motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
 						// sensors_detected = readLineSensors();
 						// if(sensors_detected > 0) return(LINE_DETECTED);
+delay(350);
+ motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+						// // sensors_detected = readLineSensors();
+						// // if(sensors_detected > 0) return(LINE_DETECTED);
+delay(130);
+motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
+						// sensors_detected = readLineSensors();
+						// if(sensors_detected > 0) return(LINE_DETECTED);
+delay(330);
+ motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+						// // sensors_detected = readLineSensors();
+						// // if(sensors_detected > 0) return(LINE_DETECTED);
 delay(170);
+ motors.setSpeeds(-0, 0);
+						// // sensors_detected = readLineSensors();
+						// // if(sensors_detected > 0) return(LINE_DETECTED);
+// delay(180);
+//motors.setSpeeds(TURN_SPEED*5, TURN_SPEED);
+return(SEARCH_ENEMY);
+}
+
+// byte switchAttack ()		
+// {
+// motors.setSpeeds(-TURN_SPEED, TURN_SPEED*0.5);
+						// // sensors_detected = readLineSensors();
+						// // if(sensors_detected > 0) return(LINE_DETECTED);
+// delay(170);
+ // motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
+						// // // sensors_detected = readLineSensors();
+						// // // if(sensors_detected > 0) return(LINE_DETECTED);
+// delay(110);
+// // motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+						// // // sensors_detected = readLineSensors();
+						// // // if(sensors_detected > 0) return(LINE_DETECTED);
+// // delay(180);
+// //motors.setSpeeds(TURN_SPEED*5, TURN_SPEED);
+// return(SEARCH_ENEMY);
+// }
+
+byte switchAttack ()		
+{
+motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+						// sensors_detected = readLineSensors();
+						// if(sensors_detected > 0) return(LINE_DETECTED);
+delay(175);
  motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
 						// // sensors_detected = readLineSensors();
 						// // if(sensors_detected > 0) return(LINE_DETECTED);
-delay(110);
+delay(175);
+ motors.setSpeeds(-0, -0);
+						// // sensors_detected = readLineSensors();
+						// // if(sensors_detected > 0) return(LINE_DETECTED);
+delay(2000);
 // motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
 						// // sensors_detected = readLineSensors();
 						// // if(sensors_detected > 0) return(LINE_DETECTED);
@@ -193,10 +271,11 @@ delay(110);
 return(SEARCH_ENEMY);
 }
 
+
 byte switchAttackRear ()
 		
 
-{//half speed time at 400
+{
 motors.setSpeeds(TURN_SPEED*0.6, TURN_SPEED);
 					    // sensors_detected = readLineSensors();
 						// if(sensors_detected > 0) return(LINE_DETECTED);
@@ -204,7 +283,7 @@ delay(90);
 motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
 						// sensors_detected = readLineSensors();
 						// if(sensors_detected > 0) return(LINE_DETECTED);
-delay(160);
+delay(150);
 motors.setSpeeds(TURN_SPEED, TURN_SPEED);
 						// sensors_detected = readLineSensors();
 						// if(sensors_detected > 0) return(LINE_DETECTED);
@@ -212,7 +291,7 @@ delay(130);
 motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
 						// sensors_detected = readLineSensors();
 						// if(sensors_detected > 0) return(LINE_DETECTED);
-delay(180);
+delay(150);
 //motors.setSpeeds(TURN_SPEED*5, TURN_SPEED);
 return(SEARCH_ENEMY);
 }
@@ -281,6 +360,7 @@ long start_time = millis();
 			motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED); //attack
 		    sensors_detected = readLineSensors();
 		    if(sensors_detected > 0) return(LINE_DETECTED);
+//			if ((millis() - start_time) > 1000)  raise_flag();
 			if ((millis() - start_time) > 2000)  return(SWITCH_ATTACK);
 
 		}
@@ -391,7 +471,7 @@ byte enemyLongRear()
 					//}
 					//motors.setSpeeds(0, 0); //attack
 					//delay(2000);
-					
+	//				if ((millis() - start_time) > 1000)  raise_flag();
 					if ((millis() - start_time) > 2000)  return(SWITCH_ATTACK_REAR);
 					
 		}
@@ -450,11 +530,9 @@ void setup()
   //motors.flipLeftMotor(true);
   //motors.flipRightMotor(true);
    Serial.begin(115200);
-  state = SEARCH_ENEMY; 
+  //state = SEARCH_ENEMY; 
   pinMode(LED, HIGH);
- // pinMode(2, OUTPUT);  
-
-   
+  pinMode(2, OUTPUT);  //flag
   waitForButtonAndCountDown();
 }
 
@@ -483,6 +561,9 @@ switch (state) {
 	  break;
 	case SWITCH_ATTACK_REAR:
 	state = switchAttackRear();
+	  break;
+	case ATTACK_1:
+	state = attack1();
 	  break;
 	
 	// case STOP_ROBOT:
