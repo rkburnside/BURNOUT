@@ -20,7 +20,7 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 #define FORWARD_SPEED     400
 #define FAST_SPEED     	  400 // 0 is stopped, 400 is full speed
 #define MEDIUM_SPEED      400
-#define SLOW_SPEED     	  300
+#define SLOW_SPEED     	  170
 #define LINE_DETECTED		1
 #define SEARCH_ENEMY		2
 #define ENEMY_LONG	        3
@@ -42,7 +42,7 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 int buttonPushCounter = 0;   // counter for the number of button presses
 int buttonState = 0;         // current state of the button
 int lastButtonState = 0;     // previous state of the button
-
+int waitToSwitch = 2000;
  
 ZumoBuzzer buzzer;
 ZumoMotors motors;
@@ -89,35 +89,35 @@ byte waitForButtonAndCountDown()
 // delay(2000);
 long start_time = millis();
   Serial.println(buttonState);
-while  ((millis() - start_time) < 6000)  {  
+while  ((millis() - start_time) < 6000)  
+	{  
 
 		// if the state has changed, increment the counter
 		//if (buttonState == 1) 
 		//	{
 				// if the current state is HIGH then the button
 				// wend from off to on:
-				buttonPushCounter++;
+			buttonPushCounter++;
 				// Serial.println(buttonState);
 				// Serial.println("on");
 				// Serial.print("number of button pushes:  ");
 				// Serial.println(buttonPushCounter);
-				 buzzer.playNote(NOTE_G(6), 200, 15);
-				   Serial.println(buttonPushCounter);
+			buzzer.playNote(NOTE_G(6), 200, 15);
+			//Serial.println(buttonPushCounter);
 		//	} 
-			
-
-button.waitForButton();
+	
+			button.waitForButton();
 		
   }
 Serial.println(buttonPushCounter);
- buzzer.playNote(NOTE_G(8), 500, 15); 
-    button.waitForButton();
+buzzer.playNote(NOTE_G(8), 500, 15); 
+button.waitForButton();
   // play audible countdown
   for (int i = 0; i < 4; i++)
-  {
-    delay(1000);
-    buzzer.playNote(NOTE_G(3), 200, 15);
-  }
+	{
+		delay(1000);
+		buzzer.playNote(NOTE_G(3), 200, 15);
+	}
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);  
  
@@ -129,14 +129,11 @@ Serial.println(buttonPushCounter);
 	 //do something when var equals 1
       break;
     case 2:
-	state = ATTACK_1;
+	 state = ATTACK_1;
 	 return(ATTACK_1);
       //do something when var equals 2
       break;
-
   }
-
- // delay(1000);
 }
 
 // byte stopRobot()
@@ -150,6 +147,7 @@ Serial.println(buttonPushCounter);
 
 byte lineDetected2()
 {
+
 	Serial.println(sensors_detected, BIN);
 	switch (sensors_detected) {
 		case (SENSOR_FL):
@@ -189,7 +187,10 @@ byte lineDetected2()
 			// Serial.println("None");
 		// break;
 		}
-	delay(300);
+		
+	// sensors_detected = readLineSensors();
+	// if(sensors_detected > 0) return(LINE_DETECTED);
+	delay(200);
 	return(SEARCH_ENEMY);
 }
 
@@ -251,18 +252,29 @@ return(SEARCH_ENEMY);
 
 byte switchAttack ()		
 {
-motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+long start_time = millis();
+while  ((millis() - start_time) < 175)  
+	{
+		motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+		sensors_detected = readLineSensors();
+		if(sensors_detected > 0) return(LINE_DETECTED);
 						// sensors_detected = readLineSensors();
 						// if(sensors_detected > 0) return(LINE_DETECTED);
-delay(175);
- motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
+//delay(175);
+	}
+while  ((millis() - start_time) < 275)  
+	{
+		motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
+		sensors_detected = readLineSensors();
+		if(sensors_detected > 0) return(LINE_DETECTED);
 						// // sensors_detected = readLineSensors();
 						// // if(sensors_detected > 0) return(LINE_DETECTED);
-delay(175);
- motors.setSpeeds(-0, -0);
-						// // sensors_detected = readLineSensors();
-						// // if(sensors_detected > 0) return(LINE_DETECTED);
-delay(2000);
+//delay(80);
+	}
+ // motors.setSpeeds(-0, -0);
+						// // // sensors_detected = readLineSensors();
+						// // // if(sensors_detected > 0) return(LINE_DETECTED);
+// delay(1000);
 // motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
 						// // sensors_detected = readLineSensors();
 						// // if(sensors_detected > 0) return(LINE_DETECTED);
@@ -273,7 +285,7 @@ return(SEARCH_ENEMY);
 
 
 byte switchAttackRear ()
-		
+//long start_time = millis();		
 
 {
 motors.setSpeeds(TURN_SPEED*0.6, TURN_SPEED);
@@ -361,7 +373,15 @@ long start_time = millis();
 		    sensors_detected = readLineSensors();
 		    if(sensors_detected > 0) return(LINE_DETECTED);
 //			if ((millis() - start_time) > 1000)  raise_flag();
-			if ((millis() - start_time) > 2000)  return(SWITCH_ATTACK);
+// Serial.println(waitToSwitch);
+			if ((millis() - start_time) > waitToSwitch)  
+			{
+				waitToSwitch = waitToSwitch + 2000;
+				// Serial.println("waitToSwitch");
+				// Serial.println(waitToSwitch);
+				// delay (2000);
+				return(SWITCH_ATTACK);
+			}
 
 		}
 		
@@ -472,7 +492,12 @@ byte enemyLongRear()
 					//motors.setSpeeds(0, 0); //attack
 					//delay(2000);
 	//				if ((millis() - start_time) > 1000)  raise_flag();
-					if ((millis() - start_time) > 2000)  return(SWITCH_ATTACK_REAR);
+					if ((millis() - start_time) > waitToSwitch)  
+						{
+							waitToSwitch = waitToSwitch + 2000;
+							return(SWITCH_ATTACK_REAR);
+						}
+				
 					
 		}
 		
