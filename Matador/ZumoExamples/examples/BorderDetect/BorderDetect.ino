@@ -20,7 +20,7 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 #define FORWARD_SPEED     400
 #define FAST_SPEED     	  400 // 0 is stopped, 400 is full speed
 #define MEDIUM_SPEED      400
-#define SLOW_SPEED     	  170
+#define SLOW_SPEED     	  150
 #define LINE_DETECTED		1
 #define SEARCH_ENEMY		2
 #define ENEMY_LONG	        3
@@ -28,7 +28,7 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 #define ENEMY_LONG_REAR     5
 #define SWITCH_ATTACK		6
 #define SWITCH_ATTACK_REAR	7
-#define ATTACK_1				8
+#define ATTACK_1			8
 #define SENSOR_FR		    1
 #define SENSOR_FL		    2
 #define SENSOR_RL		    4
@@ -41,7 +41,6 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 // Variables will change:
 int buttonPushCounter = 0;   // counter for the number of button presses
 int buttonState = 0;         // current state of the button
-int lastButtonState = 0;     // previous state of the button
 int waitToSwitch = 2000;
  
 ZumoBuzzer buzzer;
@@ -109,7 +108,7 @@ while  ((millis() - start_time) < 6000)
 			button.waitForButton();
 		
   }
-Serial.println(buttonPushCounter);
+//Serial.println(buttonPushCounter);
 buzzer.playNote(NOTE_G(8), 500, 15); 
 button.waitForButton();
   // play audible countdown
@@ -167,19 +166,19 @@ byte lineDetected2()
 
 		case (SENSOR_RL):
 			motors.setSpeeds(MEDIUM_SPEED, SLOW_SPEED);
-			buzzer.playNote(NOTE_G(3), 200, 15);
+			//buzzer.playNote(NOTE_G(3), 200, 15);
 			Serial.println("Rear Left");
 		break;
 
 		case (SENSOR_RR):
 			motors.setSpeeds(SLOW_SPEED, MEDIUM_SPEED);
-			buzzer.playNote(NOTE_G(3), 200, 15);
+			//buzzer.playNote(NOTE_G(3), 200, 15);
 			Serial.println("Rear Right");
 		break;
 
 		case (SENSOR_RL+SENSOR_RR):
 			motors.setSpeeds(MEDIUM_SPEED, MEDIUM_SPEED);
-			buzzer.playNote(NOTE_G(3), 200, 15);
+			//buzzer.playNote(NOTE_G(3), 200, 15);
 			Serial.println("Rear Both");
 		break;
 		
@@ -208,23 +207,36 @@ byte readLineSensors()
 
 byte attack1 ()		
 {
-motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
-						// sensors_detected = readLineSensors();
-						// if(sensors_detected > 0) return(LINE_DETECTED);
-delay(350);
- motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-						// // sensors_detected = readLineSensors();
-						// // if(sensors_detected > 0) return(LINE_DETECTED);
-delay(130);
-motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
-						// sensors_detected = readLineSensors();
-						// if(sensors_detected > 0) return(LINE_DETECTED);
-delay(330);
- motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-						// // sensors_detected = readLineSensors();
-						// // if(sensors_detected > 0) return(LINE_DETECTED);
-delay(170);
- motors.setSpeeds(-0, 0);
+long start_time = millis();
+	while  ((millis() - start_time) < 350)  
+		{
+			motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
+			sensors_detected = readLineSensors();
+			if(sensors_detected > 0) return(LINE_DETECTED);
+			//delay(350);
+		}
+	while  ((millis() - start_time) < 480)  
+		{
+			motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+			sensors_detected = readLineSensors();
+			if(sensors_detected > 0) return(LINE_DETECTED);
+			//delay(130);
+		}
+	while  ((millis() - start_time) < 810)  
+		{
+			motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
+			sensors_detected = readLineSensors();
+			if(sensors_detected > 0) return(LINE_DETECTED);
+			//delay(330);
+		}
+		while  ((millis() - start_time) < 980)  
+		{
+			motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+			sensors_detected = readLineSensors();
+			if(sensors_detected > 0) return(LINE_DETECTED);
+			//delay(170);
+		}
+ //motors.setSpeeds(-0, 0);
 						// // sensors_detected = readLineSensors();
 						// // if(sensors_detected > 0) return(LINE_DETECTED);
 // delay(180);
@@ -258,8 +270,7 @@ while  ((millis() - start_time) < 175)
 		motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
 		sensors_detected = readLineSensors();
 		if(sensors_detected > 0) return(LINE_DETECTED);
-						// sensors_detected = readLineSensors();
-						// if(sensors_detected > 0) return(LINE_DETECTED);
+
 //delay(175);
 	}
 while  ((millis() - start_time) < 275)  
@@ -267,44 +278,47 @@ while  ((millis() - start_time) < 275)
 		motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
 		sensors_detected = readLineSensors();
 		if(sensors_detected > 0) return(LINE_DETECTED);
-						// // sensors_detected = readLineSensors();
-						// // if(sensors_detected > 0) return(LINE_DETECTED);
+
 //delay(80);
 	}
- // motors.setSpeeds(-0, -0);
-						// // // sensors_detected = readLineSensors();
-						// // // if(sensors_detected > 0) return(LINE_DETECTED);
-// delay(1000);
-// motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-						// // sensors_detected = readLineSensors();
-						// // if(sensors_detected > 0) return(LINE_DETECTED);
-// delay(180);
-//motors.setSpeeds(TURN_SPEED*5, TURN_SPEED);
+ 
 return(SEARCH_ENEMY);
 }
 
 
-byte switchAttackRear ()
-//long start_time = millis();		
-
+byte switchAttackRear ()		
 {
-motors.setSpeeds(TURN_SPEED*0.6, TURN_SPEED);
-					    // sensors_detected = readLineSensors();
-						// if(sensors_detected > 0) return(LINE_DETECTED);
-delay(90);
-motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-						// sensors_detected = readLineSensors();
-						// if(sensors_detected > 0) return(LINE_DETECTED);
-delay(150);
-motors.setSpeeds(TURN_SPEED, TURN_SPEED);
-						// sensors_detected = readLineSensors();
-						// if(sensors_detected > 0) return(LINE_DETECTED);
-delay(130);
-motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-						// sensors_detected = readLineSensors();
-						// if(sensors_detected > 0) return(LINE_DETECTED);
-delay(150);
-//motors.setSpeeds(TURN_SPEED*5, TURN_SPEED);
+long start_time = millis();
+	while  ((millis() - start_time) < 90)  
+		{
+			motors.setSpeeds(TURN_SPEED*0.6, TURN_SPEED);
+			sensors_detected = readLineSensors();
+			if(sensors_detected > 0) return(LINE_DETECTED);
+			//delay(90);
+		}
+	while  ((millis() - start_time) < 240)
+		{
+			motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+			sensors_detected = readLineSensors();
+			if(sensors_detected > 0) return(LINE_DETECTED);
+			//delay(150);
+		}
+	while  ((millis() - start_time) < 370)
+		{
+			motors.setSpeeds(TURN_SPEED, TURN_SPEED);
+			sensors_detected = readLineSensors();
+			if(sensors_detected > 0) return(LINE_DETECTED);
+			//delay(130);
+
+		}
+	while  ((millis() - start_time) < 520)
+		{
+			motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+			sensors_detected = readLineSensors();
+			if(sensors_detected > 0) return(LINE_DETECTED);
+			//delay(150);
+		}
+
 return(SEARCH_ENEMY);
 }
 
@@ -517,7 +531,7 @@ byte searchEnemy()
 		readReflectorValues();
 		if (val[0] < MAX_SEARCH && val[1]<MAX_SEARCH && val[2]<MAX_SEARCH && val[3]<MAX_SEARCH ) //search spin turn right
 			{
-				motors.setSpeeds(TURN_SPEED*.7, -TURN_SPEED*.7);
+				motors.setSpeeds(TURN_SPEED*.8, -TURN_SPEED*.8);
 				sensors_detected = readLineSensors();
 				if(sensors_detected > 0) return(LINE_DETECTED);
 			}
