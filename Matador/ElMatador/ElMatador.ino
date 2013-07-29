@@ -41,7 +41,7 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 // Variables will change:
 int buttonPushCounter = 0;   // counter for the number of button presses
 int buttonState = 0;         // current state of the button
-int waitToSwitch = 2000;
+int waitToSwitch = 6000;
  
 ZumoBuzzer buzzer;
 ZumoMotors motors;
@@ -193,6 +193,59 @@ byte lineDetected2()
 	return(SEARCH_ENEMY);
 }
 
+byte lineDetectedAttacking()
+{
+
+	Serial.println(sensors_detected, BIN);
+	switch (sensors_detected) {
+		case (SENSOR_FL):
+			motors.setSpeeds(-MEDIUM_SPEED, -SLOW_SPEED);
+			Serial.println("Front Left");
+		break;
+		
+		case (SENSOR_FR):
+			motors.setSpeeds(-SLOW_SPEED, -MEDIUM_SPEED);
+			Serial.println("Front Right");
+		break;
+		  
+		case (SENSOR_FL+SENSOR_FR):
+			motors.setSpeeds(-MEDIUM_SPEED, -MEDIUM_SPEED);
+			Serial.println("Front Both");
+		break;
+
+		case (SENSOR_RL):
+			motors.setSpeeds(MEDIUM_SPEED, SLOW_SPEED);
+			//buzzer.playNote(NOTE_G(3), 200, 15);
+			Serial.println("Rear Left");
+		break;
+
+		case (SENSOR_RR):
+			motors.setSpeeds(SLOW_SPEED, MEDIUM_SPEED);
+			//buzzer.playNote(NOTE_G(3), 200, 15);
+			Serial.println("Rear Right");
+		break;
+
+		case (SENSOR_RL+SENSOR_RR):
+			
+			motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+			delay(300);
+			motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
+			delay(300);
+			//motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+		//delay(150);
+			Serial.println("Rear Both");
+		break;
+		
+		// default: 
+			// Serial.println("None");
+		// break;
+		}
+		
+	// sensors_detected = readLineSensors();
+	// if(sensors_detected > 0) return(LINE_DETECTED);
+	delay(200);
+	return(SEARCH_ENEMY);
+}
 byte readLineSensors()
 {
 	byte edge_sensors=0;
@@ -583,7 +636,7 @@ void loop()
 
 switch (state) {
     case LINE_DETECTED:
-		state = lineDetected2();
+		state = lineDetectedAttacking();
  //do something when var equals 1
       break;
     case SEARCH_ENEMY:
