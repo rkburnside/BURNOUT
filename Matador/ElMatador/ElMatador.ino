@@ -17,11 +17,12 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 // these might need to be tuned for different motor types
 #define REVERSE_SPEED     400 // 0 is stopped, 400 is full speed
 #define TURN_SPEED        400
-#define FORWARD_SPEED     400
+#define FORWARD_SPEED     350
 #define FAST_SPEED     	  400 // 0 is stopped, 400 is full speed
 #define MEDIUM_SPEED      400
 #define SLOW_SPEED     	  150
 #define LINE_DETECTED		1
+
 #define SEARCH_ENEMY		2
 #define ENEMY_LONG	        3
 #define STOP_ROBOT	        4
@@ -29,6 +30,7 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 #define SWITCH_ATTACK		6
 #define SWITCH_ATTACK_REAR	7
 #define ATTACK_1			8
+#define LINE_DETECTED_ATTACK_FRONT 	9
 #define SENSOR_FR		    1
 #define SENSOR_FL		    2
 #define SENSOR_RL		    4
@@ -41,7 +43,7 @@ const int far4 = 3;    //bottom right 10-80 cm sensor
 // Variables will change:
 int buttonPushCounter = 0;   // counter for the number of button presses
 int buttonState = 0;         // current state of the button
-int waitToSwitch = 6000;
+int waitToSwitch = 8000;
  
 ZumoBuzzer buzzer;
 ZumoMotors motors;
@@ -144,7 +146,7 @@ button.waitForButton();
 	
 // }
 
-byte lineDetected2()
+byte lineDetected()
 {
 
 	Serial.println(sensors_detected, BIN);
@@ -193,18 +195,19 @@ byte lineDetected2()
 	return(SEARCH_ENEMY);
 }
 
-byte lineDetectedAttacking()
+byte lineDetectedAttackFront()
 {
 
 	Serial.println(sensors_detected, BIN);
 	switch (sensors_detected) {
 		case (SENSOR_FL):
-			motors.setSpeeds(-MEDIUM_SPEED, -SLOW_SPEED);
+			motors.setSpeeds(-TURN_SPEED*.2, TURN_SPEED);
+			
 			Serial.println("Front Left");
 		break;
 		
 		case (SENSOR_FR):
-			motors.setSpeeds(-SLOW_SPEED, -MEDIUM_SPEED);
+			motors.setSpeeds(TURN_SPEED, -TURN_SPEED*.2);
 			Serial.println("Front Right");
 		break;
 		  
@@ -214,23 +217,48 @@ byte lineDetectedAttacking()
 		break;
 
 		case (SENSOR_RL):
-			motors.setSpeeds(MEDIUM_SPEED, SLOW_SPEED);
-			//buzzer.playNote(NOTE_G(3), 200, 15);
+			//motors.setSpeeds(MEDIUM_SPEED, SLOW_SPEED);
+			motors.setSpeeds(-TURN_SPEED*.2, TURN_SPEED);
+	//		delay(2000);
+						// // motors.setSpeeds(0, -0*.4);
+// // delay(2000);
+						// motors.setSpeeds(TURN_SPEED*.6, TURN_SPEED);
+									// delay(50);
+												// // motors.setSpeeds(0, -0*.4);
+// // delay(2000);
+			// motors.setSpeeds(-TURN_SPEED, -TURN_SPEED*0.3);
+			// delay(300);
+									// motors.setSpeeds(0, -0*.4);
+			
+			
 			Serial.println("Rear Left");
 		break;
 
 		case (SENSOR_RR):
-			motors.setSpeeds(SLOW_SPEED, MEDIUM_SPEED);
-			//buzzer.playNote(NOTE_G(3), 200, 15);
+					
+					buzzer.playNote(NOTE_G(3), 200, 15);
+					
+					motors.setSpeeds(-TURN_SPEED*.2, TURN_SPEED);
+
+			// //motors.setSpeeds(SLOW_SPEED, MEDIUM_SPEED);
+
+			// motors.setSpeeds(TURN_SPEED, -TURN_SPEED*.4);
+			// delay(500);
+			// motors.setSpeeds(0, -0*.4);
+			// delay(2000);
+			// motors.setSpeeds(TURN_SPEED, -TURN_SPEED);
+			// delay(250);
+									// motors.setSpeeds(0, -0*.4);
+			// delay(2000);
+			// //buzzer.playNote(NOTE_G(3), 200, 15);
 			Serial.println("Rear Right");
 		break;
 
 		case (SENSOR_RL+SENSOR_RR):
 			
+
 			motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-			delay(300);
-			motors.setSpeeds(-TURN_SPEED, -TURN_SPEED);
-			delay(300);
+//			delay(300);
 			//motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
 		//delay(150);
 			Serial.println("Rear Both");
@@ -438,7 +466,7 @@ long start_time = millis();
 		{
 			motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED); //attack
 		    sensors_detected = readLineSensors();
-		    if(sensors_detected > 0) return(LINE_DETECTED);
+		    if(sensors_detected > 0) return(LINE_DETECTED_ATTACK_FRONT); 
 //			if ((millis() - start_time) > 1000)  raise_flag();
 // Serial.println(waitToSwitch);
 			if ((millis() - start_time) > waitToSwitch)  
@@ -636,7 +664,11 @@ void loop()
 
 switch (state) {
     case LINE_DETECTED:
-		state = lineDetectedAttacking();
+		state = lineDetected();
+ //do something when var equals 1
+      break;
+	case LINE_DETECTED_ATTACK_FRONT:
+		state = lineDetectedAttackFront();
  //do something when var equals 1
       break;
     case SEARCH_ENEMY:
