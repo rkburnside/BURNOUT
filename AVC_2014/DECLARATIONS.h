@@ -23,6 +23,14 @@ void edit_waypoint();
 
 //NAVIGATION FUNCTIONS
 void end_run();
+void update_cross_product();
+void update_steering();
+void calculate_speed();
+void speed();
+void cal_steer_lim();
+void update_position();
+void update_waypoint();
+
 
 
 //STATE STATUS FUNCTIONS
