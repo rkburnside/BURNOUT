@@ -2,18 +2,19 @@
 
 #include "DECLARATIONS.h"
 
+//INTERNAL VARIABLES variables
 static long gyro_count = 0, gyro_null = 0; //visible only to GYRO.cpp
 static bool cal_flag = false;
 long accum = 0; //required for main program to reset gyro accum (so that the angle can actually be reset)
 double angle = 0;
+
+//external variables
 extern long time;
 extern bool manual;
 
 MPU6050 accelgyro;
 
-void get_mode();
-
-void setup_mpu6050(){ //clean! ...i think
+void setup_mpu6050(){
     // initialize device
     Serial.println("Initializing I2C devices...");
     accelgyro.initialize();
@@ -96,7 +97,7 @@ void setup_mpu6050(){ //clean! ...i think
 	return ;
 }
 
-void read_FIFO(){ //clean! ...i think
+void read_FIFO(){
 	uint8_t buffer[2];
 	long temp = 0;
 	int samplz = 0;
@@ -119,7 +120,7 @@ void read_FIFO(){ //clean! ...i think
 	return ;
 }
 
-void calculate_null(){ //clean! ...i think
+void calculate_null(){
 	Serial.println("CALCULATING NULL");
 
 	cal_flag = true;		//tell ADC ISR that we are calibrating,
@@ -145,7 +146,7 @@ void calculate_null(){ //clean! ...i think
 	return ;
 }
 
-void gyro_calibration(){ //clean! ...i think
+void gyro_calibration(){
 	Serial.println();
 	setup_mpu6050();
 	calculate_null();
@@ -167,7 +168,7 @@ void gyro_calibration(){ //clean! ...i think
 	return ;
 }
 
-void watch_angle(){ //clean! ...i think
+void watch_angle(){
 	Serial.println();
 	setup_mpu6050();
 	calculate_null();
@@ -188,7 +189,7 @@ void watch_angle(){ //clean! ...i think
 	return ;
 }
 
-void watch_gyro(){ //clean! ...i think
+void watch_gyro(){
 	Serial.println();
 	setup_mpu6050();
 	calculate_null();

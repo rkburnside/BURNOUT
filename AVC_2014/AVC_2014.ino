@@ -30,12 +30,19 @@ STEERING AUTONOMOUS MODE - MOVE THROLLER INPUT TO 4 AND THROTTLE OUTPUT TO 4
 
 /*to do
 x1. move the gyro to another file, make all values local, then static, then global
-2. move the servo functions to another file
-3. move the steering to another file
+2. move the steering to another file
+3. move the servo functions to another file
 4. move the menu to another file
 etc.
 */
 
+
+//#INCLUDE FILES
+/* the arduino ide is honky...
+see: http://jamesreubenknowles.com/including-libraries-in-the-arduino-ide-1625
+Any Arduino libraries that are needed by the files outside of the sketch (.ino) file must also be listed in the sketch file itself.
+The sketch is parsed for include files. The sketch, all included header files, and the corresponding source files, are copied to another directory for compiling. From that directory, library-based include files are NOT available unless they are included in the sketch and copied to the build directory.
+*/
 #include "DECLARATIONS.h"
 #include <Servo.h>
 #include <EEPROM.h>
@@ -43,16 +50,9 @@ etc.
 #include <I2Cdev.h>
 #include <MPU6050.h>
 
-/* arduino ide is honky...
-see: http://jamesreubenknowles.com/including-libraries-in-the-arduino-ide-1625
-Any Arduino libraries that are needed by the files outside of the sketch (.ino) file must also be listed in the sketch file itself.
-The sketch is parsed for include files. The sketch, all included header files, and the corresponding source files, are copied to another directory for compiling. From that directory, library-based include files are NOT available unless they are included in the sketch and copied to the build directory.
-*/
 
+//INTERNAL VARIABLES
 //these are used for setting and clearing bits in special control registers on ATmega
-extern long accum; //this is ONLY used to reset the 0 the gyro angle for real (setting angle to 0 does nothing!!! (never forget last year's debacle))
-extern double angle;
-
 volatile boolean gyro_flag = false;
 bool manual, automatic, aux=false, running=false, first=true;
 volatile byte clicks = 0;
@@ -67,22 +67,18 @@ byte wpr_count=1, wpw_count=1;
 const byte InterruptPin = 2 ;		//interrupt on digital pin 2
 double cross_product=0, target_x=0, target_y=0;
 
+
+//OBJECT DECLARATIONS
 Servo steering, esc;
+position_structure waypoint;
 
-struct position_structure {
 
-/* Using structures to contain location information. Will record old position 
-and new position. The actual structures will be position[0] and position[1], 
-but will use pointers old_pos and new_pos to access them. This way we can simply
-swap the pointers instead of copying entire structure from one to the other. Access
-data in the structures as follows: old_pos->x or new_pos->time, etc. this is equivalent
-to (*old_pos).x.*/
+//EXTERNAL VARIABLES
+extern long accum; //this is ONLY used to reset the 0 the gyro angle for real (setting angle to 0 does nothing!!! (never forget last year's debacle))
+extern double angle;
 
-    double x;
-    double y;
-    //boolean last;
-} waypoint;
 
+//PROGRAM FUNCTIONS
 void encoder_interrupt(){
     clicks++;
 	return ;

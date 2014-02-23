@@ -15,7 +15,6 @@ void get_mode();
 
 #endif
 
-
 #ifndef __INCLUDE_FILES__
 #define __INCLUDE_FILES__
 
@@ -38,5 +37,24 @@ see: http://jamesreubenknowles.com/including-libraries-in-the-arduino-ide-1625
 Any Arduino libraries that are needed by the files outside of the sketch (.ino) file must also be listed in the sketch file itself.
 The sketch is parsed for include files. The sketch, all included header files, and the corresponding source files, are copied to another directory for compiling. From that directory, library-based include files are NOT available unless they are included in the sketch and copied to the build directory.
 */
+
+#endif
+
+#ifndef __STRUCTURES_DEFINITION__
+#define __STRUCTURES_DEFINITION__
+
+struct position_structure {
+
+/* Using structures to contain location information. Will record old position 
+and new position. The actual structures will be position[0] and position[1], 
+but will use pointers old_pos and new_pos to access them. This way we can simply
+swap the pointers instead of copying entire structure from one to the other. Access
+data in the structures as follows: old_pos->x or new_pos->time, etc. this is equivalent
+to (*old_pos).x.*/
+
+    double x;
+    double y;
+    //boolean last;
+};
 
 #endif
