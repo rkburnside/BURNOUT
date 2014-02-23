@@ -1,19 +1,26 @@
 //AVC_2014 multi-file branch, gyro code
 
+//#INCLUDE FILES
 #include "DECLARATIONS.h"
 
-//INTERNAL VARIABLES variables
+
+//INTERNAL VARIABLES
 static long gyro_count = 0, gyro_null = 0; //visible only to GYRO.cpp
 static bool cal_flag = false;
 long accum = 0; //required for main program to reset gyro accum (so that the angle can actually be reset)
 double angle = 0;
 
-//external variables
+
+//EXTERNAL VARIABLES
 extern long time;
 extern bool manual;
 
+
+//OBJECT DECLARATIONS
 MPU6050 accelgyro;
 
+
+//PROGRAM FUNCTIONS
 void setup_mpu6050(){
     // initialize device
     Serial.println("Initializing I2C devices...");

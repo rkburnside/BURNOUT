@@ -1,8 +1,9 @@
 // functions declaration file. FUNCTIONS.cpp
+
 #ifndef __FUNCTION_DECLARATIONS__
 #define __FUNCTION_DECLARATIONS__
 
-//gyro functions
+//GYRO FUNCTIONS
 void setup_mpu6050();
 void read_FIFO();
 void calculate_null();
@@ -11,7 +12,17 @@ void watch_angle();
 void watch_gyro();
 
 
+//WAYPOINT FUNCTIONS
+void set_waypoint();
+void read_waypoint();
+void eeprom_clear();
+void import_waypoints();
+void display_waypoints();
+void edit_waypoint();
+
+
 void get_mode();
+
 
 #endif
 
@@ -22,7 +33,6 @@ void get_mode();
 #include "EEPROMAnything.h"
 #include <I2Cdev.h> //declared 2x (1 here and 1 in the .ino)(shouldn't be, but arduino is dumb...see note below)
 #include <MPU6050.h> //declared 2x (1 here and 1 in the .ino)(shouldn't be, but arduino is dumb...see note below)
-
 //#include <MemoryFree.h>
 
 // I2Cdev and MPU6050 must be installed as libraries, or else the .cpp/.h files
