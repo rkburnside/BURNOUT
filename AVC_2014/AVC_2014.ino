@@ -190,12 +190,6 @@ void update_waypoint(){
 	return ;
 }
 
-void end_run() {    // go straight forward, slowly at last waypoint
-	esc.writeMicroseconds(S2); //reduce speed
-	steer_us = STEER_ADJUST;  // go straight
-	while(true); //loop endlessly
-}
-
 void print_coordinates(){ //print target, location, etc.
 	Serial.print("(x,y): ");
 	Serial.print(x*CLICK_INCHES);

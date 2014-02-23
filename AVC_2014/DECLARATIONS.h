@@ -21,6 +21,11 @@ void display_waypoints();
 void edit_waypoint();
 
 
+//NAVIGATION FUNCTIONS
+void end_run();
+
+
+//STATE STATUS FUNCTIONS
 void get_mode();
 
 
@@ -31,6 +36,7 @@ void get_mode();
 
 #include "AVC_2014.h"
 #include "EEPROMAnything.h"
+#include <Servo.h>
 #include <I2Cdev.h> //declared 2x (1 here and 1 in the .ino)(shouldn't be, but arduino is dumb...see note below)
 #include <MPU6050.h> //declared 2x (1 here and 1 in the .ino)(shouldn't be, but arduino is dumb...see note below)
 //#include <MemoryFree.h>
