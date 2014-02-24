@@ -32,6 +32,11 @@ void update_position();
 void update_waypoint();
 
 
+//CALIBRATION FUNCTIONS
+void steering_calibration();
+void click_calibration();
+void click_calibration_increment();
+
 
 //STATE STATUS FUNCTIONS
 void get_mode();

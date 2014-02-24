@@ -5,10 +5,10 @@
 
 
 //INTERNAL VARIABLES
-static long gyro_count = 0, gyro_null = 0; //visible only to GYRO.cpp
-static bool cal_flag = false;
 long accum = 0; //required for main program to reset gyro accum (so that the angle can actually be reset)
 double angle = 0;
+static long gyro_count = 0, gyro_null = 0; //visible only to GYRO.cpp
+static bool cal_flag = false;
 
 
 //EXTERNAL VARIABLES

@@ -30,10 +30,10 @@ STEERING AUTONOMOUS MODE - MOVE THROLLER INPUT TO 4 AND THROTTLE OUTPUT TO 4
 
 /*to do
 x1. move the gyro to another file, make all values local, then static, then global
-2. move the steering to another file
+x2. move the navigation to another file
 3. move the servo functions to another file
 4. move the menu to another file
-etc.
+5. move all the calibration functions to another file
 */
 
 
@@ -55,20 +55,19 @@ The sketch is parsed for include files. The sketch, all included header files, a
 //these are used for setting and clearing bits in special control registers on ATmega
 bool manual, automatic, aux=false, running=false, first=true;
 volatile byte clicks = 0;
-unsigned int click_calibration_counter = 0;
 long time=0;
 const byte InterruptPin = 2 ;		//interrupt on digital pin 2
 
 
 //EXTERNAL VARIABLES
+extern byte wpr_count;
+extern int steer_us;
 extern long accum; //this is ONLY used to reset the 0 the gyro angle for real (setting angle to 0 does nothing!!! (never forget last year's debacle))
 extern double angle;
-extern byte wpr_count;
-extern position_structure waypoint;
 extern double x_wp, y_wp;
-extern int steer_us;
 extern double target_x, target_y;
 extern double angle_target, x, y;
+extern position_structure waypoint;
 
 
 //OBJECT DECLARATIONS
@@ -125,68 +124,6 @@ void get_mode(){
     }
 
 	return ;	
-}
-
-void steering_calibration(){
-	Serial.println();
-	angle_target = 0.0;
-		
-	steering.attach(10);
-	steering.writeMicroseconds(STEER_ADJUST);
-	delay(500);
-	setup_mpu6050();
-	calculate_null();
-
-	Serial.println("set controller to automatic");
-	get_mode();
-	while(!automatic) get_mode();
-	
-	while(automatic){
-		read_FIFO();
-		
-		update_steering();
-		steering.writeMicroseconds(steer_us);
-		
-		if((millis()-time)>200){
-			Serial.print("angle: ");
-			Serial.print(angle,5);
-			Serial.print("\tsteering ms: ");
-			Serial.println(steer_us);
-			time = millis();
-		}
-		get_mode();
-	}
-
-	steering.detach();
-
-	return ;
-}
-
-void click_calibration(){
-	Serial.println();
-	click_calibration_counter = 0;
-	pinMode(InterruptPin, INPUT);
-	attachInterrupt(0, click_calibration_increment, CHANGE);	//interrupt 0 is on digital pin 2
-	get_mode();
-	while(manual){
-		if((millis()-time)>1000){
-			Serial.println(click_calibration_counter);
-			time = millis();
-		}
-		get_mode();
-	}
-	
-	detachInterrupt(0);
-	Serial.println();
-	Serial.print("Total clicks: ");
-	Serial.println(click_calibration_counter);
-	Serial.println();
-	return ;
-}
-
-void click_calibration_increment(){
-    click_calibration_counter++;
-	return ;
 }
 
 void menu_choices(){

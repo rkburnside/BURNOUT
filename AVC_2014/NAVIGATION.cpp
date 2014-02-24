@@ -6,15 +6,15 @@
 
 
 //INTERNAL VARIABLES
-double x_wp = 0, y_wp = 0;
-static int steer_limm = 300;
 int steer_us;
-static double cross_product=0;
+double x_wp = 0, y_wp = 0;
 double target_x=0, target_y=0;
-static double angle_diff;
 double angle_last, angle_target, x=0, y=0;
+static int steer_limm = 300;
+static double cross_product=0;
+static double angle_diff;
 static long speed_cur=0, speed_new=0, speed_old=0;
-static long count, proximity, previous_proximity=50;
+static long proximity, previous_proximity=50;
 
 
 //EXTERNAL VARIABLES
@@ -140,13 +140,5 @@ void calculate_speed(){
 	
 	return ;
 }
-
-
-
-
-
-
-
-
 
 
