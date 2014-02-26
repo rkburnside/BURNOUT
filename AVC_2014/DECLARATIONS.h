@@ -30,6 +30,7 @@ void speed();
 void cal_steer_lim();
 void update_position();
 void update_waypoint();
+void print_coordinates();
 
 
 //CALIBRATION FUNCTIONS
@@ -40,6 +41,10 @@ void click_calibration_increment();
 
 //STATE STATUS FUNCTIONS
 void get_mode();
+
+
+//MENU
+void main_menu();
 
 
 #endif

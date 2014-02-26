@@ -4,7 +4,6 @@
 #include "DECLARATIONS.h"
 
 
-
 //INTERNAL VARIABLES
 int steer_us;
 double x_wp = 0, y_wp = 0;
@@ -141,4 +140,14 @@ void calculate_speed(){
 	return ;
 }
 
+void print_coordinates(){ //print target, location, etc.
+	Serial.print("(x,y): ");
+	Serial.print(x*CLICK_INCHES);
+	Serial.print(" , ");
+	Serial.print(y*CLICK_INCHES);	Serial.print("   trgt: ");
+	Serial.print(x_wp*CLICK_INCHES);
+	Serial.print(" , ");
+	Serial.println(y_wp*CLICK_INCHES);
 
+	return ;
+}

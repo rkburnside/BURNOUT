@@ -28,14 +28,6 @@ STEERING AUTONOMOUS MODE - MOVE THROLLER INPUT TO 4 AND THROTTLE OUTPUT TO 4
 
 */
 
-/*to do
-x1. move the gyro to another file, make all values local, then static, then global
-x2. move the navigation to another file
-3. move the servo functions to another file
-4. move the menu to another file
-5. move all the calibration functions to another file
-*/
-
 
 //#INCLUDE FILES
 /* the arduino ide is honky...
@@ -73,7 +65,6 @@ extern position_structure waypoint;
 //OBJECT DECLARATIONS
 Servo steering, esc;
 
-
 //PROGRAM FUNCTIONS
 void encoder_interrupt(){
     clicks++;
@@ -91,18 +82,6 @@ void navigate(){
 	if(automatic) steering.writeMicroseconds(steer_us);
 	if(automatic) speed();
 	
-	return ;
-}
-
-void print_coordinates(){ //print target, location, etc.
-	Serial.print("(x,y): ");
-	Serial.print(x*CLICK_INCHES);
-	Serial.print(" , ");
-	Serial.print(y*CLICK_INCHES);	Serial.print("   trgt: ");
-	Serial.print(x_wp*CLICK_INCHES);
-	Serial.print(" , ");
-	Serial.println(y_wp*CLICK_INCHES);
-
 	return ;
 }
 
@@ -124,92 +103,6 @@ void get_mode(){
     }
 
 	return ;	
-}
-
-void menu_choices(){
-	Serial.println();
-	Serial.println("Main Menu");
-	Serial.println("----------");
-	Serial.println("a = watch angle");
-	Serial.println("d = display waypoints");
-	Serial.println("e = edit waypoint");
-	Serial.println("f = click calibration");
-	Serial.println("i = import header waypoint values");
-	Serial.println("l = gyro calibration");
-	Serial.println("m = free memory");
-	Serial.println("s = steering calibration");
-	Serial.println("w = watch gyro");
-	Serial.println("x = exit. start setup routine for the race");
-	Serial.println();
-	return ;
-}
-
-void main_menu(){
-	int loop = 1;
-	menu_choices();
-	Serial.flush();
-	get_mode();
-	while((loop) && (manual)){
-		get_mode();
-		if(Serial.available() > 0){
-	 		switch(Serial.read()){
-				case 'a':
-					watch_angle();
-					menu_choices();
-					break;
-				case 'd':
-					display_waypoints();
-					menu_choices();
-					break;
-				case 'e':
-					edit_waypoint();
-					menu_choices();
-					break;
-				case 'f':
-					click_calibration();
-					menu_choices();
-					break;
-				case 'i':
-					import_waypoints();
-					menu_choices();
-					break;
-				case 'l':
-					gyro_calibration();
-					menu_choices();
-					break;
-				case 'm':
-					Serial.println();
-					Serial.println();
-					Serial.print("available memory: ");
-					//Serial.println(freeMemory());
-					Serial.println();
-					Serial.println();
-					menu_choices();
-					break;
-				case 's':
-					steering_calibration();
-					menu_choices();
-					break;
-				case 'w':
-					watch_gyro();
-					menu_choices();
-					break;
-				case 'x':
-					Serial.println();
-					Serial.println();
-					Serial.println("Setting up for the race");
-					loop = 0;
-					break;
-				default:
-					Serial.println("invalid entry. try again.");
-					menu_choices();
-					break;
-			}
-		delay(500);
-		get_mode();
-		}
-	}
-	return ;
 }
 
 void setup(){
