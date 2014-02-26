@@ -55,7 +55,6 @@ const byte InterruptPin = 2 ;		//interrupt on digital pin 2
 extern byte wpr_count;
 extern int steer_us;
 extern long accum; //this is ONLY used to reset the 0 the gyro angle for real (setting angle to 0 does nothing!!! (never forget last year's debacle))
-extern double angle;
 extern double x_wp, y_wp;
 extern double target_x, target_y;
 extern double angle_target, x, y;
@@ -190,7 +189,7 @@ void setup(){
 
 	x=0;
 	y=0;
-	angle=0;
+	accum=0;
 	clicks = 0;
 	first = true;
 	target_x = x_wp;
@@ -216,7 +215,7 @@ void loop(){
 			running = true;
 		}
 		if(first){
-			angle = 0;
+			accum = 0;
 			first = false;
 		}
 	}
