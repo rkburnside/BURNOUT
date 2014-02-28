@@ -1,9 +1,9 @@
 //Header file variable
-#define MM
+#define RR
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-int excel_waypoints[19][2] = {{17,932}, {-2194,1000}, {-2190,-119}, {-75,-250}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
+int excel_waypoints[19][2] = {{17,200}, {-200,200}, {17,200}, {0,50}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
@@ -42,14 +42,15 @@ int excel_waypoints[19][2] = {{17,932}, {-2194,1000}, {-2190,-119}, {-75,-250}, 
 #define WP_SIZE 20 			//number of bytes for each waypoint
 #endif
 
+
 #ifdef RR
 //WAYPOINT AND SPEED PARAMETERS
 #define WAYPOINT_ACCEPT 53	//waypoint acceptance radius in inches
 #define S1 1500				//stationary speed
 #define S2 1600				//1650 is a creeping speed
-#define S3 1700				//This is the speed for negotiating wp's 
-#define S4 1700				//1800 is pretty ridiculously fast. Don't use for general use.
-#define SB 1700				//breaking. adjust this parameter to allow creeping up on waypoints
+#define S3 1600				//This is the speed for negotiating wp's 
+#define S4 1600				//1800 is pretty ridiculously fast. Don't use for general use.
+#define SB 1600				//breaking. adjust this parameter to allow creeping up on waypoints
 #define P1 100				//proximity to allow car to align with next waypoint in inches
 #define P2 100				//close proximity to waypoint in inches
 #define P3 200				//far proximity to waypoint in inches
