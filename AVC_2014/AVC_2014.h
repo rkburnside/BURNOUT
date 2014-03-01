@@ -1,4 +1,4 @@
-//Header file variable
+//AVC SETTINGS
 #define RR
 
 #define WAYPOINT_COUNT 19

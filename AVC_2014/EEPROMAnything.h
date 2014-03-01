@@ -1,3 +1,5 @@
+//EEPROM FUNCTIONS
+
 #include <EEPROM.h>
 #include <Arduino.h>  // for type definitions
 

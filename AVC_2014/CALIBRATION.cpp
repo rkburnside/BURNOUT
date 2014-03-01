@@ -1,4 +1,4 @@
-//AVC_2014 multi-file branch, calibaration functions
+//CALIBRATION FUNCTIONS
 
 //#INCLUDE FILES
 #include "DECLARATIONS.h"

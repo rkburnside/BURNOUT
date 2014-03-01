@@ -1,4 +1,4 @@
-//AVC_2014 multi-file branch, gyro code
+//GYRO FUNCTIONS
 
 //#INCLUDE FILES
 #include "DECLARATIONS.h"

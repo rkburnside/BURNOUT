@@ -1,4 +1,4 @@
-//AVC_2014 multi-file branch, waypoint functions
+//WAYPOINT FUNCTIONS
 
 //#INCLUDE FILES
 #include "DECLARATIONS.h"

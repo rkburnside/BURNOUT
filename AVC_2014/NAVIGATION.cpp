@@ -1,4 +1,4 @@
-//AVC_2014 multi-file branch, navigation code
+//NAVIGATION FUNCTIONS
 
 //#INCLUDE FILES
 #include "DECLARATIONS.h"

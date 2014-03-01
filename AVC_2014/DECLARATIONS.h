@@ -1,4 +1,4 @@
-// functions declaration file. FUNCTIONS.cpp
+//FUNCTIONS DECLARATIONS
 
 #ifndef __FUNCTION_DECLARATIONS__
 #define __FUNCTION_DECLARATIONS__

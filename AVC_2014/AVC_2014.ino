@@ -1,4 +1,4 @@
-/* Minuteman / Roadrunner competition code - creation of the multi-file branch
+/* MINUTEMAN / ROADRUNNER COMPETITION CODE
 
 Pin Assignments:
 
