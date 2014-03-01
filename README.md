@@ -1,22 +1,20 @@
 #Minuteman and Roadrunner
 *This is this repo for the Minuteman and Roadrunner AVC code.*
 
-##To Do
-###Software
-4. create a new branch to start the migration to the teensy 3.1
-5. change all types to match standard c++
-6. change all types to be better used (i.e. byte to int or even long)
-7. confirm that each of the libraries is functioning correctly
-8. 
+We are a group of 2~4 people that are developing code and hardware for the Sparkfun Autonomous Vehicle Compeition. 2014 will be our 4th year competing. Our competition record is as follows:
 
+__2011__
+Minuteman -> 2nd overall
+<br>Roadrunner -> 4th overall
 
-~~change the code to 0 out the accumulator to ensure that the angle is 0 at the start of the run~~
-<br>~~verify that the code runs correctly on the car (verify my multi-file modifications)~~
-<br>~~issue a pull request and merge the multi-file branch code into the main branch~~
+__2012__
+Minuteman -> 2nd overall
+<br>Roadrunner -> did not place
 
+__2013__
+Minuteman -> 2nd in Peleton Class
+<br>Roadrunner -> 1st in Micro Class
 
-###Hardware
-1. fix the losi xxx bumper
-2. map out the teensy pins for each function
-3. attach the magnets and hall effect sensor in the appropriate locations
-4. 
+__2014__
+Minuteman -> TBD
+<br>Roadrunner -> TBD
