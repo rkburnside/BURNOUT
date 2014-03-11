@@ -29,15 +29,19 @@ void setup(){
 
 	state(SWITCH_STATE_MANUAL);
 	visual_status(SWITCH_STATE_MANUAL);
-
 }
 
 void loop(){
-
 	pulse_length = pulseIn(ch_3_in, HIGH, 50000);
-	switch_position
+	switch_position(pulse_length);
+	set_state(
+}
+
+int switch_position(int pulse){
+	if 
 
 }
+
 
 void state(int switch_status){
 	switch (switch_status){
@@ -78,9 +82,3 @@ void visual_status(int ){
 	digitalWrite(ledPin, LOW);    // sets the LED off
 	delay(1000);                  // waits for a second
 }
-
-int channel_3_state(int ch_3_time){
-	if(pulse_length < 1000) 
-}
-
-
