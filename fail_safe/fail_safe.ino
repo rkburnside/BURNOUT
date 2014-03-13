@@ -1,33 +1,28 @@
 /*fail_safe.ino
 This file is intended for the arduino pro-mini to monitor channel 3 from the radio and will toggle the muxer and communicate the channel 3 position to the main MCU board (i.e. teensy 3.1).
-This code is based on the arduipilot fail safe developed by Chris Anderon, Jordi Munoz, Nathan (SparkFun).
-*/
 
-/* required functions
+This code concept is based on the arduipilot fail safe developed by Chris Anderon, Jordi Munoz, Nathan (SparkFun).
 
-1. function that times how quickly channel three is toggled from low to high back to low. When it has reached three times, it will hard reset the MCU
-
-x2. function that will flash the LED in 1 of 4 ways:
+Description and Functionality
+1. if the switch is toggled from high to low and back 3 times in less than 1 second, a hard reset will be performed on the main MCU board.
+2. the LED on the arduino will flash as follows, depending on the controlling state:
 	manual = 0
 	state 1 = quick flashing
 	state 2 = slow flashing
 	automatic = constant LED
 
-x3. function that will determine the state of channel 3. servo pulse range = 1mSec ~ 2mSec. 1mSec would cause the shaft to revolve fully left. A 2mSec positive pulse width would cause the drive shaft to revolve fully right. 1.5mSec pulse width would cause the shaft to turn to the middle of the revolution area.
-	
-	manual -> manual <1250ms
-	state 1 -> 1250ms <= state 1 < 1500ms
-	state 2 -> 1500ms <= state 2 < 1750ms
-	automatic -> 1750ms <= automatic
-
+3. a servo pulse range is 1000us ~ 2000us. the channel 3 switch positions should be configured as follows to ensure the proper state is detected and enabled:
+	manual -> manual (set to ~1000us) <1250us
+	state 1 -> 1250us <= state 1 (set to ~1375) < 1500us
+	state 2 -> 1500us <= state 2 (set to ~1625) < 1750us
+	automatic -> 1750us <= automatic (set to ~2000us)
 */
-
 
 #define SWITCH_POSITION_MANUAL 0		//full manual control of the car
 #define SWITCH_POSITION_1 1			//switch state 1
 #define SWITCH_POSITION_2 2			//switch state 2
 #define SWITCH_POSITION_AUTOMATIC 3	//full autonomous mode
-#define TIME_TO_FLIP_SWITCH 1000000	//time to flip the switch 3 times
+#define TIME_TO_FLIP_SWITCH 1000000	//time in us to flip the switch 3 times
 #define RESET_SWITCH_COUNTER 3	//number to reset the main MCU
 
 int rest_pin = 1;		//used to reset the external MCU
