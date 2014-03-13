@@ -27,6 +27,7 @@ x3. function that will determine the state of channel 3. servo pulse range = 1mS
 #define SWITCH_POSITION_1 1			//switch state 1
 #define SWITCH_POSITION_2 2			//switch state 2
 #define SWITCH_POSITION_AUTOMATIC 3	//full autonomous mode
+#define TIME_TO_FLIP_SWITCH 1000000	//time to flip the switch 3 times
 
 int rest_pin = 1;		//used to reset the external MCU
 int ch_3_in = 2;		//pin to monitor radio channel 3
@@ -61,7 +62,16 @@ void loop(){
 }
 
 void check_if_reset_requested(){
-
+	static int led_time_old = 0;
+	static int switch_flip_counter = 0;
+	
+	if((pulse_length >= 1500) && ((millis() - led_time_old) < 1000)){
+		switch_flip_counter++;
+			
+	
+	}
+	
+//the signal will jump from 200 to 0 then to 200 then to 0 then to 200 then to 0
 	return;
 }
 
