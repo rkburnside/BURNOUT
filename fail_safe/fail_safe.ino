@@ -28,11 +28,11 @@ Description and Functionality
 #define RESET_SWITCH_COUNTER 3		//number to reset the main MCU
 #define SWITCH_POSITION_MANUAL 0	//full manual control of the car
 #define SWITCH_POSITION_1 1			//switch state 1
-#define SWITCH_POSITION_2 2			//switch state 2
-#define SWITCH_POSITION_AUTOMATIC 3	//full autonomous mode
+#define SWITCH_POSITION_AUTOMATIC 2	//switch state 2
+#define SWITCH_POSITION_RESET 3		//full autonomous mode
 
 
-int hard_reset_pin = 12;		//used to reset the external MCU
+int hard_reset_pin = 12;	//used to reset the external MCU
 int mode_1 = 11;			//output line 1 to external MCU
 int mode_2 = 10;			//output line 2 to external MCU
 int multiplexor = 9;		//multiplexor toggle
@@ -107,7 +107,9 @@ void check_if_reset_requested(){
 		low_position_counter = 0;
 	}
 	else if((high_position_counter > RESET_SWITCH_COUNTER) && (low_position_counter > RESET_SWITCH_COUNTER)){
-
+		switch_position = SWITCH_POSITION_RESET;
+		set_vehile_state();
+		flash_led();
 		//DO NOT USE THIS CODE UNLESS YOU READ AND UNDERSTAND THE FOLLOWING!!!
 		//The code below will toggle the RESET pin on the main MCU board. However, the teensy 3.1 reset pin is ***NOT*** 5V tolerant. Do ***NOT*** use this unless you drop to the correct voltage.
 		// {
@@ -115,17 +117,6 @@ void check_if_reset_requested(){
 			// delay(250);
 			// digitalWrite(hard_reset_pin, HIGH);
 		// }
-			
-		for(int i = 0; i<3; i++){	//flashes the LED several times over ~5 seconds to indicate reset
-			delay(500);
-			digitalWrite(state_led, !digitalRead(state_led));
-			delay(250);
-			digitalWrite(state_led, !digitalRead(state_led));
-			delay(250);
-			digitalWrite(state_led, !digitalRead(state_led));
-			delay(500);
-			digitalWrite(state_led, !digitalRead(state_led));
-		}
 	}
 	
 	return;
@@ -134,7 +125,6 @@ void check_if_reset_requested(){
 void determine_switch_position(){
 	if(pulse_in_length < 1250) switch_position = SWITCH_POSITION_MANUAL;
 	else if((pulse_in_length >= 1250) && (pulse_in_length < 1500)) switch_position = SWITCH_POSITION_1;
-	else if((pulse_in_length >= 1500) && (pulse_in_length < 1750)) switch_position = SWITCH_POSITION_2;
 	else switch_position = SWITCH_POSITION_AUTOMATIC;
 	
 	return;
@@ -143,20 +133,20 @@ void determine_switch_position(){
 void set_vehile_state(){
 	switch(switch_position){
 		case SWITCH_POSITION_1:
-			digitalWrite(multiplexor, HIGH);
-			digitalWrite(mode_1, LOW);
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH makes puts car in MANUAL mode
+			digitalWrite(mode_1, LOW);			//set the pins state
 			digitalWrite(mode_2, LOW);
-			digitalWrite(multiplexor, LOW);
+			digitalWrite(multiplexor, LOW);		//now enable the main MCU control
 			break;
 
-		case SWITCH_POSITION_2:
+		case SWITCH_POSITION_AUTOMATIC:
 			digitalWrite(multiplexor, HIGH);
 			digitalWrite(mode_1, LOW);
 			digitalWrite(mode_2, HIGH);
 			digitalWrite(multiplexor, LOW);
 			break;
 		
-		case SWITCH_POSITION_AUTOMATIC:
+		case SWITCH_POSITION_RESET:
 			digitalWrite(multiplexor, HIGH);
 			digitalWrite(mode_1, HIGH);
 			digitalWrite(mode_2, LOW);
@@ -184,10 +174,16 @@ void flash_led(){
 			}
 			break;
 
-		case SWITCH_POSITION_2:
-			if((millis() - led_time_old) > 1000){
+		case SWITCH_POSITION_RESET:
+			for(int i = 0; i<3; i++){	//flashes the LED several times over ~5 seconds to indicate reset
+				delay(500);
 				digitalWrite(state_led, !digitalRead(state_led));
-				led_time_old = millis();
+				delay(250);
+				digitalWrite(state_led, !digitalRead(state_led));
+				delay(250);
+				digitalWrite(state_led, !digitalRead(state_led));
+				delay(500);
+				digitalWrite(state_led, !digitalRead(state_led));
 			}
 			break;
 
