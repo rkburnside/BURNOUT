@@ -10,7 +10,7 @@ static byte wpw_count=1;
 
 
 //EXTERNAL VARIABLES
-extern bool aux;
+extern int mode;
 extern double x, y;
 
 
@@ -31,7 +31,7 @@ void set_waypoint(){ //CLEAR
 	Serial.print(" , ");
 	Serial.println(waypoint.y*CLICK_INCHES);
 	wpw_count++;
-	while(aux) get_mode();
+	while(mode == WP_MODE) get_mode();
 
 	return ;
 }    

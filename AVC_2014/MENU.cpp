@@ -8,7 +8,7 @@
 
 
 //EXTERNAL VARIABLES
-extern bool manual;
+extern int mode;
 
 
 //OBJECT DECLARATIONS
@@ -38,7 +38,7 @@ void main_menu(){
 	menu_choices();
 	Serial.flush();
 	get_mode();
-	while((loop) && (manual)){
+	while((loop) && (mode == MANUAL)){
 		get_mode();
 		if(Serial.available() > 0){
 	 		switch(Serial.read()){

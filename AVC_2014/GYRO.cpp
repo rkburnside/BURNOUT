@@ -13,7 +13,7 @@ static bool cal_flag = false;
 
 //EXTERNAL VARIABLES
 extern long time;
-extern bool manual;
+extern int mode;
 
 
 //OBJECT DECLARATIONS
@@ -168,7 +168,7 @@ void gyro_calibration(){
 			time = millis();
 		}
 		get_mode();
-	} while(manual);
+	} while(mode == MANUAL);
 	
 	cal_flag = false;
 	Serial.println();
@@ -191,7 +191,7 @@ void watch_angle(){
 			time = millis();
 		}
 		get_mode();
-	} while(manual);		//keep summing unitil we turn the mode switch off.
+	} while(mode == MANUAL);		//keep summing unitil we turn the mode switch off.
 
 	return ;
 }
@@ -210,7 +210,7 @@ void watch_gyro(){
 			time = millis();
 		}
 		get_mode();
-	} while(manual);		//keep summing unitil we turn the mode switch off.
+	} while(mode == MANUAL);		//keep summing unitil we turn the mode switch off.
 
 	return ;
 }

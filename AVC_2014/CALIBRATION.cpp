@@ -7,15 +7,14 @@
 //INTERNAL VARIABLES
 unsigned int click_calibration_counter = 0;
 const byte InterruptPin = 2 ;		//interrupt on digital pin 2
-
+long time = 0;
 
 //EXTERNAL VARIABLES
 extern double angle_target, x, y;
-extern bool manual, automatic, aux, running, first;
-extern long time;
+extern bool running, first;
 extern int steer_us;
 extern double angle;
-
+extern int mode;
 
 //OBJECT DECLARATIONS
 extern Servo steering;
@@ -28,8 +27,8 @@ void click_calibration(){
 	pinMode(InterruptPin, INPUT);
 	attachInterrupt(0, click_calibration_increment, CHANGE);	//interrupt 0 is on digital pin 2
 	get_mode();
-	while(manual){
-		if((millis()-time)>1000){
+	while(mode == MANUAL){
+		if((millis() - time) > 1000){
 			Serial.println(click_calibration_counter);
 			time = millis();
 		}
@@ -61,15 +60,15 @@ void steering_calibration(){
 
 	Serial.println("set controller to automatic");
 	get_mode();
-	while(!automatic) get_mode();
+	while(mode != AUTOMATIC) get_mode();
 	
-	while(automatic){
+	while(mode == AUTOMATIC){
 		read_FIFO();
 		
 		update_steering();
 		steering.writeMicroseconds(steer_us);
 		
-		if((millis()-time)>200){
+		if((millis() - time) > 200){
 			Serial.print("angle: ");
 			Serial.print(angle,5);
 			Serial.print("\tsteering ms: ");
@@ -83,10 +82,3 @@ void steering_calibration(){
 
 	return ;
 }
-
-
-
-
-
-
-

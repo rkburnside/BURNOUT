@@ -14,21 +14,19 @@ Description and Functionality
 
 3. a servo pulse range is 1000us ~ 2000us. the channel 3 switch positions should be configured as follows to ensure the proper state is detected and enabled:
 	manual -> manual (set to ~1000us) <1250us
-	state 1 -> 1250us <= state 1 (set to ~1330) < 1500us
-	state 2 -> 1500us <= state 2 (set to ~1660) < 1750us
-	automatic -> 1750us <= automatic (set to ~2000us)
+	automatic -> 1250us <= automatic (set to ~1330) < 1500us
+	set waypoint -> 1500us <= set waypoint (set to ~2000us)
 	
 4. multiplexor selection:
 	channel A = MCU = A/B select LOW
 	channel B = RX = A/B select HIGH
-
 */
 
 #define TIME_TO_FLIP_SWITCH 1000	//time in us to flip the switch 3 times
 #define RESET_SWITCH_COUNTER 3		//number to reset the main MCU
 #define SWITCH_POSITION_MANUAL 0	//full manual control of the car
-#define SWITCH_POSITION_1 1			//switch state 1
-#define SWITCH_POSITION_AUTOMATIC 2	//switch state 2
+#define SWITCH_POSITION_AUTOMATIC 1	//switch state 2
+#define SWITCH_POSITION_WAYPOINT 2			//switch state 1
 #define SWITCH_POSITION_RESET 3		//full autonomous mode
 
 
@@ -124,15 +122,15 @@ void check_if_reset_requested(){
 
 void determine_switch_position(){
 	if(pulse_in_length < 1250) switch_position = SWITCH_POSITION_MANUAL;
-	else if((pulse_in_length >= 1250) && (pulse_in_length < 1500)) switch_position = SWITCH_POSITION_1;
-	else switch_position = SWITCH_POSITION_AUTOMATIC;
+	else if((pulse_in_length >= 1250) && (pulse_in_length < 1500)) switch_position = SWITCH_POSITION_AUTOMATIC;
+	else switch_position = SWITCH_POSITION_WAYPOINT;
 	
 	return;
 }
 
 void set_vehile_state(){
 	switch(switch_position){
-		case SWITCH_POSITION_1:
+		case SWITCH_POSITION_WAYPOINT:
 			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH makes puts car in MANUAL mode
 			digitalWrite(mode_1, LOW);			//set the pins state
 			digitalWrite(mode_2, LOW);
@@ -167,7 +165,7 @@ void flash_led(){
 	static long led_time_old = 0;
 	
 	switch(switch_position){
-		case SWITCH_POSITION_1:
+		case SWITCH_POSITION_WAYPOINT:
 			if((millis() - led_time_old) > 250){
 				digitalWrite(state_led, !digitalRead(state_led));
 				led_time_old = millis();

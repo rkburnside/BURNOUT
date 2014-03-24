@@ -26,22 +26,33 @@ int excel_waypoints[19][2] = {{17,200}, {-200,200}, {17,200}, {0,50}, {0,0}, {0,
 
 //SENSOR PARAMETERS
 //#define GYRO_CAL 470868410	//this has to be measured by rotating the gyro 360 deg. and reading the output
-#define GYRO_CAL 235434205	//this has to be measured by rotating the gyro 360 deg. and reading the output
-#define STEER_ADJUST 1425	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 3500		// proportional gain, default it 4.0
-#define CP_GAIN 0		//cross product gain. if steering is 
-#define CLICK_INCHES 0.852	//used to determine the number of inches per click
+#define GYRO_CAL 235434205		//this has to be measured by rotating the gyro 360 deg. and reading the output
+#define STEER_ADJUST 1425		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
+#define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
+#define STEER_GAIN 3500			//proportional gain, default it 4.0
+#define CP_GAIN 0				//cross product gain. if steering is 
+#define CLICK_INCHES 0.852		//used to determine the number of inches per click
 
 //FIXED PARAMETERS
 #define CAR_NAME "***MINUTEMAN***" //car name
-#define MODE 5				//digital pin for mode select, default 5
-#define TMISO 4				//digital pin for autopilot enable/disable, default 4
-#define TOGGLE 6			//digital pin for autopilot switch
 #define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 #define WP_SIZE 20 			//number of bytes for each waypoint
-#endif
 
+//Teensy Pin Assignments:
+//Optional manual throttle, autonomouse steering - connect ESC signal pin to receiver CH2
+#define MODE_LINE_1 5
+#define MODE_LINE_2 6
+#define THROTTLE 20
+#define STEERING 21
+#define HALL_EFFECT_SENSOR 22
+#define TOGGLE 23
+
+//CH3 settings
+#define MANUAL 0
+#define AUTOMATIC 1
+#define WP_MODE 2
+#define RESET 3
+#endif
 
 #ifdef RR
 //WAYPOINT AND SPEED PARAMETERS
@@ -63,20 +74,34 @@ int excel_waypoints[19][2] = {{17,200}, {-200,200}, {17,200}, {0,50}, {0,0}, {0,
 
 //SENSOR PARAMETERS
 //#define GYRO_CAL 466186233	//this has to be measured by rotating the gyro 360 deg. and reading the output
-#define GYRO_CAL 233093117	//234044150
-#define STEER_ADJUST 1480	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 4000		//proportional gain, if navigation gets unstable, reduce.
-#define CP_GAIN 0		//cross product gain. if steering is 
+#define GYRO_CAL 233093117		//234044150
+#define STEER_ADJUST 1480		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
+#define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
+#define STEER_GAIN 4000			//proportional gain, if navigation gets unstable, reduce.
+#define CP_GAIN 0				//cross product gain. if steering is 
 #define CLICK_INCHES 2.09380	//85 clicks in 25 feet (300 inches)
 
 //FIXED PARAMETERS
 #define CAR_NAME "***ROADRUNNER***" //car name
-#define MODE 5				//digital pin for mode select, default 5
-#define TMISO 4				//digital pin for autopilot enable/disable, default 4
-#define TOGGLE 6			//digital pin for autopilot switch
 #define CLICK_MAX 1			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 #define WP_SIZE 20 			//number of bytes for each waypoint
+
+//Teensy Pin Assignments:
+//Optional manual throttle, autonomouse steering - connect ESC signal pin to receiver CH2
+//Teensy Pin Assignments:
+//Optional manual throttle, autonomouse steering - connect ESC signal pin to receiver CH2
+#define MODE_LINE_1 5
+#define MODE_LINE_2 6
+#define THROTTLE 20
+#define STEERING 21
+#define HALL_EFFECT_SENSOR 22
+#define TOGGLE 23
+
+//CH3 settings
+#define MANUAL 0
+#define AUTOMATIC 1
+#define WP_MODE 2
+#define RESET 3
 #endif
 
 /* ROADRUNNER
