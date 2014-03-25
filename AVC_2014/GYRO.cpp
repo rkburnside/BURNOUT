@@ -22,35 +22,35 @@ MPU6050 accelgyro;
 
 //PROGRAM FUNCTIONS
 void setup_mpu6050(){
-    // initialize device
-    Serial.println("Initializing I2C devices...");
-    accelgyro.initialize();
+	// initialize device
+	Serial.println("Initializing I2C devices...");
+	accelgyro.initialize();
 
-    // verify connection
-    Serial.println("Testing device connections...");
-    Serial.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
+	// verify connection
+	Serial.println("Testing device connections...");
+	Serial.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
 	
-    // reset device
-    Serial.println(F("\nResetting MPU6050..."));
-    accelgyro.reset();
-    delay(30); // wait after reset
+	// reset device
+	Serial.println(F("\nResetting MPU6050..."));
+	accelgyro.reset();
+	delay(30); // wait after reset
 
 
-    // disable sleep mode
-    Serial.println(F("Disabling sleep mode..."));
-    accelgyro.setSleepEnabled(false);
+	// disable sleep mode
+	Serial.println(F("Disabling sleep mode..."));
+	accelgyro.setSleepEnabled(false);
 
-    // get X/Y/Z gyro offsets
-    Serial.println(F("Reading gyro offset values..."));
-    int8_t xgOffset = accelgyro.getXGyroOffset();
-    int8_t ygOffset = accelgyro.getYGyroOffset();
-    int8_t zgOffset = accelgyro.getZGyroOffset();
-    Serial.print(F("X gyro offset = "));
-    Serial.println(xgOffset);
-    Serial.print(F("Y gyro offset = "));
-    Serial.println(ygOffset);
-    Serial.print(F("Z gyro offset = "));
-    Serial.println(zgOffset);
+	// get X/Y/Z gyro offsets
+	Serial.println(F("Reading gyro offset values..."));
+	int8_t xgOffset = accelgyro.getXGyroOffset();
+	int8_t ygOffset = accelgyro.getYGyroOffset();
+	int8_t zgOffset = accelgyro.getZGyroOffset();
+	Serial.print(F("X gyro offset = "));
+	Serial.println(xgOffset);
+	Serial.print(F("Y gyro offset = "));
+	Serial.println(ygOffset);
+	Serial.print(F("Z gyro offset = "));
+	Serial.println(zgOffset);
 
 	Serial.println(F("Setting clock source to Z Gyro..."));
 	accelgyro.setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
@@ -80,7 +80,7 @@ void setup_mpu6050(){
 	// accelgyro.setYGyroOffsetUser(0);
 	//accelgyro.setZGyroOffsetUser(0);
 	//Serial.print(F("Z gyro offset = "));
-    //Serial.println(accelgyro.getZGyroOffset());
+	//Serial.println(accelgyro.getZGyroOffset());
 
 	// Serial.println(F("Setting motion detection threshold to 2..."));
 	// accelgyro.setMotionDetectionThreshold(2);

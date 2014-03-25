@@ -11,7 +11,6 @@ long time = 0;
 
 //EXTERNAL VARIABLES
 extern double angle_target, x, y;
-extern bool running, first;
 extern int steer_us;
 extern double angle;
 extern int mode;
@@ -44,7 +43,7 @@ void click_calibration(){
 }
 
 void click_calibration_increment(){
-    click_calibration_counter++;
+	click_calibration_counter++;
 	return ;
 }
 

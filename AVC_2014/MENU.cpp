@@ -35,9 +35,9 @@ void menu_choices(){
 
 void main_menu(){
 	int loop = 1;
+	get_mode();
 	menu_choices();
 	Serial.flush();
-	get_mode();
 	while((loop) && (mode == MANUAL)){
 		get_mode();
 		if(Serial.available() > 0){

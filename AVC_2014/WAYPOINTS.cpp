@@ -34,7 +34,7 @@ void set_waypoint(){ //CLEAR
 	while(mode == WP_MODE) get_mode();
 
 	return ;
-}    
+}
 
 void read_waypoint(){ //CLEAR
 	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
@@ -57,7 +57,7 @@ void import_waypoints(){
 	eeprom_clear();
 	
 	wpw_count = 1;	//resets the counter to import correctly
-	WAYPOINTS_STRING    //edit this in header file to change waypoints
+	WAYPOINTS_STRING	//edit this in header file to change waypoints
 	
 	for(int i=0; i < WAYPOINT_COUNT; i++){
 		waypoint.x = float(excel_waypoints[i][0])/CLICK_INCHES;

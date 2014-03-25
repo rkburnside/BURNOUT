@@ -14,11 +14,14 @@ The sketch is parsed for include files. The sketch, all included header files, a
 #include <I2Cdev.h>
 #include <MPU6050.h>
 
+//the following are for reseting the teensy. see this link for more details: http://goo.gl/nV8kMs
+#define RESTART_ADDR       0xE000ED0C
+#define READ_RESTART()     (*(volatile uint32_t *)RESTART_ADDR)
+#define WRITE_RESTART(val) ((*(volatile uint32_t *)RESTART_ADDR) = (val))
 
 //INTERNAL VARIABLES
-//these are used for setting and clearing bits in special control registers on ATmega
 bool running = false, first = true;
-volatile byte clicks = 0;
+volatile int clicks = 0;
 int mode = MANUAL;
 
 //EXTERNAL VARIABLES
@@ -36,7 +39,7 @@ Servo steering, esc;
 
 //PROGRAM FUNCTIONS
 void encoder_interrupt(){
-    clicks++;
+	clicks++;
 	return ;
 }
 
@@ -56,27 +59,27 @@ void navigate(){
 }
 
 void get_mode(){
-	static int mode_1 = 0;
-	static int mode_2 = 0;
+	int mode_1 = 0, mode_2 = 0;
 
 	mode_1 = digitalRead(MODE_LINE_1);
 	mode_2 = digitalRead(MODE_LINE_2);
 	
-	if((mode_1 == 0) && (mode_2 == 0)) mode = MANUAL;
-	else if((mode_1 == 0) && (mode_2 == 1)) mode = AUTOMATIC;
-	else if((mode_1 == 1) && (mode_2 == 0)) mode = WP_MODE;
-	else if((mode_1 == 1) && (mode_2 == 1)) mode = RESET;
+	if((mode_1 == HIGH) && (mode_2 == HIGH)) mode = MANUAL;
+	else if((mode_1 == LOW) && (mode_2 == HIGH)) mode = AUTOMATIC;
+	else if((mode_1 == LOW) && (mode_2 == LOW)) mode = WP_MODE;
+	else if((mode_1 == HIGH) && (mode_2 == LOW)) mode = RESET;
 
+	if(mode == RESET){	//performs a software reset on the M4. see this post: http://goo.gl/nV8kMs
+		// 0000101111110100000000000000100
+		// Assert [2]SYSRESETREQ
+		delay(1000);
+		WRITE_RESTART(0x5FA0004);
+	}
+	
 	return ;	
 }
 
-void setup(){				//WORK REQUIRED!!! TMISO, MODE, ETC
-	//Pin assignments:
-	pinMode(MODE_LINE_1, INPUT);
-	pinMode(MODE_LINE_2, INPUT);
-	pinMode(TOGGLE, INPUT);
-	digitalWrite(TOGGLE, HIGH);
-
+void setup(){
 	Wire.begin();
 
 	Serial.begin(115200);
@@ -88,8 +91,13 @@ void setup(){				//WORK REQUIRED!!! TMISO, MODE, ETC
 	Serial1.setTimeout(100000);
 	Serial1.println(CAR_NAME);
 	Serial1.println();
-	
-	get_mode();
+
+   	//Pin assignments:
+	pinMode(MODE_LINE_1, INPUT);
+	pinMode(MODE_LINE_2, INPUT);
+	pinMode(TOGGLE, INPUT);
+	digitalWrite(TOGGLE, HIGH);
+
 	main_menu();
 	delay(500);
 	
@@ -97,7 +105,7 @@ void setup(){				//WORK REQUIRED!!! TMISO, MODE, ETC
 	calculate_null();
 
 	pinMode(HALL_EFFECT_SENSOR, INPUT);	 
-	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, CHANGE);	//interrupt 0 is on digital pin 2
+	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, CHANGE);	//according to the teensy documentation, all pins can be interrupts
 
 	steering.attach(STEERING);
 	steering.writeMicroseconds(STEER_ADJUST);

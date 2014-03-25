@@ -126,16 +126,16 @@ void update_cross_product(){
 	return ;
 }
 
-void end_run() {    // go straight forward, slowly at last waypoint
+void end_run() {	// go straight forward, slowly at last waypoint
 	esc.writeMicroseconds(S2); //reduce speed
 	steer_us = STEER_ADJUST;  // go straight
 	while(true); //loop endlessly
 }
 
 void calculate_speed(){
-    speed_new = micros();
-    speed_cur = speed_new - speed_old;
-    speed_old = speed_new;
+	speed_new = micros();
+	speed_cur = speed_new - speed_old;
+	speed_old = speed_new;
 	
 	return ;
 }
