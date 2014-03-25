@@ -12,7 +12,6 @@ static bool cal_flag = false;
 
 
 //EXTERNAL VARIABLES
-extern long time;
 extern int mode;
 
 
@@ -78,9 +77,9 @@ void setup_mpu6050(){
 	// Serial.println(F("Setting X/Y/Z gyro user offsets to zero..."));
 	// accelgyro.setXGyroOffsetUser(0);
 	// accelgyro.setYGyroOffsetUser(0);
-	//accelgyro.setZGyroOffsetUser(0);
-	//Serial.print(F("Z gyro offset = "));
-	//Serial.println(accelgyro.getZGyroOffset());
+	// accelgyro.setZGyroOffsetUser(0);
+	// Serial.print(F("Z gyro offset = "));
+	// Serial.println(accelgyro.getZGyroOffset());
 
 	// Serial.println(F("Setting motion detection threshold to 2..."));
 	// accelgyro.setMotionDetectionThreshold(2);
@@ -154,6 +153,7 @@ void calculate_null(){
 }
 
 void gyro_calibration(){
+	static long time = millis();
 	Serial.println();
 	setup_mpu6050();
 	calculate_null();
@@ -163,7 +163,7 @@ void gyro_calibration(){
 	do{
 		read_FIFO();
 		
-		if((millis()-time)> 250){
+		if((millis() - time) > 250){
 			Serial.println(accum);
 			time = millis();
 		}
@@ -176,6 +176,7 @@ void gyro_calibration(){
 }
 
 void watch_angle(){
+	static long time = millis();
 	Serial.println();
 	setup_mpu6050();
 	calculate_null();
@@ -184,7 +185,7 @@ void watch_angle(){
 	do {
 		read_FIFO();
 
-		if((millis()-time)> 250){
+		if((millis() - time) > 250){
 			//Serial.println(angle);
 			Serial.println(angle*180.0/3.14159,5);
 			//Serial.println(accum);
@@ -197,6 +198,7 @@ void watch_angle(){
 }
 
 void watch_gyro(){
+	static long time = millis();
 	Serial.println();
 	setup_mpu6050();
 	calculate_null();
@@ -205,7 +207,7 @@ void watch_gyro(){
 	do {
 		read_FIFO();
 
-		if((millis()-time)> 250){
+		if((millis() - time) > 250){
 			Serial.println(accum);
 			time = millis();
 		}
@@ -214,5 +216,3 @@ void watch_gyro(){
 
 	return ;
 }
-
-

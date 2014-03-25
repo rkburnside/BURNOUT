@@ -19,10 +19,12 @@ The sketch is parsed for include files. The sketch, all included header files, a
 #define READ_RESTART()     (*(volatile uint32_t *)RESTART_ADDR)
 #define WRITE_RESTART(val) ((*(volatile uint32_t *)RESTART_ADDR) = (val))
 
+
 //INTERNAL VARIABLES
 bool running = false, first = true;
 volatile int clicks = 0;
 int mode = MANUAL;
+
 
 //EXTERNAL VARIABLES
 extern byte wpr_count;
@@ -36,6 +38,7 @@ extern position_structure waypoint;
 
 //OBJECT DECLARATIONS
 Servo steering, esc;
+
 
 //PROGRAM FUNCTIONS
 void encoder_interrupt(){
