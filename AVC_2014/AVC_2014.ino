@@ -32,7 +32,7 @@ extern int steer_us;
 extern long accum; //this is ONLY used to reset the 0 the gyro angle for real (setting angle to 0 does nothing!!! (never forget last year's debacle))
 extern double x_wp, y_wp;
 extern double target_x, target_y;
-extern double angle_target, x, y;
+extern double x, y;
 extern position_structure waypoint;
 
 
@@ -120,10 +120,8 @@ void setup(){
 }
 
 void loop(){
-	//watch_angle();
-	read_FIFO();
-	//watch_gyro();
 	/* in the main loop here, we should wait for thing to happen, then act on them. Watch clicks and wait for it to reach CLICK_MAX, then calculate position and such.*/
+	read_FIFO();
 	get_mode();
 
 	if(clicks >= CLICK_MAX){
@@ -133,7 +131,7 @@ void loop(){
 
 	if(mode == AUTOMATIC){	//this function get the car started moving and then clicks will take over
 		if(!running){
-			esc.write(S2);	//i don't understand this function...help...i changed this to S1 so the car is stationary?
+			esc.write(S2);	//i don't understand this function...help...i changed this to S1 so the car is stationary? does this just kick start the car???
 			running = true;
 		}
 		if(first){
@@ -142,7 +140,7 @@ void loop(){
 		}
 	}
 	
-	if(mode == MANUAL){	//this function makes the car be stationary when in manual waypoint setting mode
+	if(mode == MANUAL){		//this function makes the car be stationary when in manual waypoint setting mode
 		if(running){
 			esc.write(S1);	//i changed this to S1 so the car is stationary?
 			running = false;

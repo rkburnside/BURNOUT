@@ -9,6 +9,9 @@ unsigned int click_calibration_counter = 0;
 const byte InterruptPin = 2 ;		//interrupt on digital pin 2
 long time = 0;
 
+pinMode(HALL_EFFECT_SENSOR, INPUT);	 
+attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, CHANGE);	//according to the teensy documentation, all pins can be interrupts
+
 //EXTERNAL VARIABLES
 extern double angle_target, x, y;
 extern int steer_us;
