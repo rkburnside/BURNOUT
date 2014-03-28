@@ -93,7 +93,7 @@ void set_vehile_state(){
 			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
 			digitalWrite(mode_1, LOW);			//set the pins states
 			digitalWrite(mode_2, LOW);
-			digitalWrite(multiplexor, LOW);		//now enable the main MCU control
+			digitalWrite(multiplexor, HIGH);	//keep the multiplexor HIGH (i.e. MANUAL control) to ensure the car is staitonsary while setting the waypoint
 			break;
 
 		case SWITCH_POSITION_AUTOMATIC:
@@ -114,7 +114,7 @@ void set_vehile_state(){
 			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
 			digitalWrite(mode_1, HIGH);			//set the pins states
 			digitalWrite(mode_2, HIGH);
-			digitalWrite(multiplexor, HIGH);		//now enable the main MCU control
+			digitalWrite(multiplexor, HIGH);	//now enable the main MCU control
 	}
 	
 	return;
