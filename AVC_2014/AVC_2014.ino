@@ -85,15 +85,10 @@ void get_mode(){
 void setup(){
 	Wire.begin();
 
-	Serial.begin(115200);
-	Serial.setTimeout(100000);
-	Serial.println(CAR_NAME);
-	Serial.println();
-
-	Serial1.begin(115200);
-	Serial1.setTimeout(100000);
-	Serial1.println(CAR_NAME);
-	Serial1.println();
+	Serial2.begin(115200);
+	Serial2.setTimeout(100000);
+	Serial2.println(CAR_NAME);
+	Serial2.println();
 
    	//Pin assignments:
 	pinMode(MODE_LINE_1, INPUT);
@@ -116,7 +111,6 @@ void setup(){
 	esc.writeMicroseconds(S1);
 
 	race_startup_routine();
-	
 }
 
 void loop(){
@@ -130,27 +124,24 @@ void loop(){
 	}
 
 	if(mode == AUTOMATIC){	//this function get the car started moving and then clicks will take over
-		if(!running){
-			esc.write(S2);	//i don't understand this function...help...i changed this to S1 so the car is stationary? does this just kick start the car???
-			running = true;
-		}
 		if(first){
 			accum = 0;		//zeros out the accumulator which zeros out the angle
 			first = false;
 		}
-	}
-	
-	if(mode == MANUAL){		//this function makes the car be stationary when in manual waypoint setting mode
-		if(running){
-			esc.write(S1);	//i changed this to S1 so the car is stationary?
-			running = false;
+
+		if(!running){	//this will kick start the car/get it moving when it first starts the race
+			esc.write(S2);
+			running = true;
 		}
 	}
-
-	if(wpr_count >= WAYPOINT_COUNT){	//this locks the car into this loop and makes it stationary WHEN the course is completed
-		esc.writeMicroseconds(S1);
-		while(true);
-	}
+	
+//this function is no longer needed. the multiplexer will now disable the MCU when setting the waypoint
+	// if(mode == MANUAL){		//this function makes the car be stationary when in manual waypoint setting mode
+		// if(running){
+			// esc.write(S1);	//i changed this to S1 so the car is stationary?
+			// running = false;
+		// }
+	// }
 	
 	if(mode == WP_MODE){
 		long temp = millis();
@@ -162,6 +153,11 @@ void loop(){
 		if((millis() - temp) > 500) set_waypoint();
 	}
 	
+	if(wpr_count >= WAYPOINT_COUNT){	//this locks the car into this loop and makes it stationary WHEN the course is completed
+		esc.writeMicroseconds(S1);
+		while(true);
+	}
+
 	static long time = 0;
 	if((millis() - time) > 500){
 		print_coordinates();
@@ -170,12 +166,13 @@ void loop(){
 }
 
 void race_startup_routine(){
+	Serial2.println();
 	//verify that car is in automatic mode
 	get_mode();
 	if(mode == MANUAL){
-		Serial.println();
-		Serial.println("1. SET CAR TO MODE 1 / AUTOMATIC / PRESS CH3 TO CONTINUE");
-		Serial.println();
+		Serial2.println();
+		Serial2.println("1. SET CAR TO MODE 1 / AUTOMATIC / PRESS CH3 TO CONTINUE");
+		Serial2.println();
 	}
 	while(mode == MANUAL){
 		get_mode();		//waits until radio is set to automatic
@@ -183,13 +180,13 @@ void race_startup_routine(){
 	}
 
 	//by turning off the radio, the automatic mode is locked in
-	Serial.println("2. TURN OFF THE RADIO!");
-	Serial.println();
+	Serial2.println("2. TURN OFF THE RADIO!");
+	Serial2.println();
 	delay(2500);
 
-	Serial.println("***READY TO RUN***");
-	Serial.println("3. FLIP THE SWITCH TO START THE RACE!");
-	Serial.println();
+	Serial2.println("***READY TO RUN***");
+	Serial2.println("3. FLIP THE SWITCH TO START THE RACE!");
+	Serial2.println();
 
 	//determines the current state and waits for it to change to start the race
 	int toggle_state = digitalRead(TOGGLE);

@@ -16,20 +16,21 @@ extern int mode;
 
 //PROGRAM FUNCTIONS
 void menu_choices(){
-	Serial.println();
-	Serial.println("Main Menu");
-	Serial.println("----------");
-	Serial.println("a = watch angle");
-	Serial.println("d = display waypoints");
-	Serial.println("e = edit waypoint");
-	Serial.println("f = click calibration");
-	Serial.println("i = import header waypoint values");
-	Serial.println("l = gyro calibration");
-	Serial.println("m = free memory");
-	Serial.println("s = steering calibration");
-	Serial.println("w = watch gyro");
-	Serial.println("x = exit. start setup routine for the race");
-	Serial.println();
+	Serial2.println();
+	Serial2.println("Main Menu");
+	Serial2.println("----------");
+	Serial2.println("a = watch angle");
+	Serial2.println("d = display waypoints");
+	Serial2.println("e = edit waypoint");
+	Serial2.println("f = click calibration");
+	Serial2.println("i = import header waypoint values");
+	Serial2.println("l = gyro calibration");
+	Serial2.println("m = free memory");
+	Serial2.println("s = steering calibration");
+	Serial2.println("v = servo test");
+	Serial2.println("w = watch gyro");
+	Serial2.println("x = exit. start setup routine for the race");
+	Serial2.println();
 	return ;
 }
 
@@ -37,11 +38,11 @@ void main_menu(){
 	int loop = 1;
 	get_mode();
 	menu_choices();
-	Serial.flush();
+	Serial2.flush();
 	while((loop) && (mode == MANUAL)){
 		get_mode();
-		if(Serial.available() > 0){
-	 		switch(Serial.read()){
+		if(Serial2.available() > 0){
+	 		switch(Serial2.read()){
 				case 'a':
 					watch_angle();
 					menu_choices();
@@ -67,16 +68,20 @@ void main_menu(){
 					menu_choices();
 					break;
 				case 'm':
-					Serial.println();
-					Serial.println();
-					Serial.print("available memory: ");
-					//Serial.println(freeMemory());
-					Serial.println();
-					Serial.println();
+					Serial2.println();
+					Serial2.println();
+					Serial2.print("available memory: ");
+					//Serial2.println(freeMemory());
+					Serial2.println();
+					Serial2.println();
 					menu_choices();
 					break;
 				case 's':
 					steering_calibration();
+					menu_choices();
+					break;
+				case 'v':
+					servo_test();
 					menu_choices();
 					break;
 				case 'w':
@@ -84,13 +89,13 @@ void main_menu(){
 					menu_choices();
 					break;
 				case 'x':
-					Serial.println();
-					Serial.println();
-					Serial.println("Setting up for the race");
+					Serial2.println();
+					Serial2.println();
+					Serial2.println("Setting up for the race");
 					loop = 0;
 					break;
 				default:
-					Serial.println("invalid entry. try again.");
+					Serial2.println("invalid entry. try again.");
 					menu_choices();
 					break;
 			}

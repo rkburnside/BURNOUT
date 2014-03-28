@@ -37,6 +37,7 @@ void print_coordinates();
 void steering_calibration();
 void click_calibration();
 void click_calibration_increment();
+void servo_test();
 
 
 //STATE STATUS FUNCTIONS
