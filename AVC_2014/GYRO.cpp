@@ -182,7 +182,8 @@ void watch_angle(){
 	calculate_null();
 
 	Serial2.println("watch angle");
-	do {
+
+	do{
 		read_FIFO();
 
 		if((millis() - time) > 250){
@@ -202,7 +203,7 @@ void watch_gyro(){
 	calculate_null();
 
 	Serial2.println("watch gyro");
-	do {
+	do{
 		read_FIFO();
 
 		if((millis() - time) > 250){
@@ -210,7 +211,7 @@ void watch_gyro(){
 			time = millis();
 		}
 		get_mode();
-	} while(mode == MANUAL);		//keep summing unitil we turn the mode switch off.
+	} while(mode == MANUAL);		//keep summing until we turn the mode switch off.
 
 	return ;
 }

@@ -11,6 +11,7 @@ The sketch is parsed for include files. The sketch, all included header files, a
 #include <Servo.h>
 #include <EEPROM.h>
 #include <Wire.h>
+//#include <i2c_t3.h>
 #include <I2Cdev.h>
 #include <MPU6050.h>
 
@@ -134,14 +135,6 @@ void loop(){
 			running = true;
 		}
 	}
-	
-//this function is no longer needed. the multiplexer will now disable the MCU when setting the waypoint
-	// if(mode == MANUAL){		//this function makes the car be stationary when in manual waypoint setting mode
-		// if(running){
-			// esc.write(S1);	//i changed this to S1 so the car is stationary?
-			// running = false;
-		// }
-	// }
 	
 	if(mode == WP_MODE){
 		long temp = millis();
