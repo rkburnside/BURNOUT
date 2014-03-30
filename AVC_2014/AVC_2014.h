@@ -42,6 +42,7 @@ int excel_waypoints[19][2] = {{0,100}, {-100,100}, {100,100}, {0,100}, {0,0}, {0
 //Optional manual throttle, autonomouse steering - connect ESC signal pin to receiver CH2
 #define MODE_LINE_1 5
 #define MODE_LINE_2 6
+#define RESET_PIN 7
 #define THROTTLE 20
 #define STEERING 21
 #define HALL_EFFECT_SENSOR 22
@@ -51,7 +52,8 @@ int excel_waypoints[19][2] = {{0,100}, {-100,100}, {100,100}, {0,100}, {0,0}, {0
 #define MANUAL 0
 #define AUTOMATIC 1
 #define WP_MODE 2
-#define RESET 3
+#define AUX 3
+#define RESET 4
 #endif
 
 #ifdef RR
@@ -92,6 +94,7 @@ int excel_waypoints[19][2] = {{0,100}, {-100,100}, {100,100}, {0,100}, {0,0}, {0
 //Optional manual throttle, autonomouse steering - connect ESC signal pin to receiver CH2
 #define MODE_LINE_1 5
 #define MODE_LINE_2 6
+#define RESET_PIN 7
 #define THROTTLE 20
 #define STEERING 21
 #define HALL_EFFECT_SENSOR 22
@@ -101,7 +104,8 @@ int excel_waypoints[19][2] = {{0,100}, {-100,100}, {100,100}, {0,100}, {0,0}, {0
 #define MANUAL 0
 #define AUTOMATIC 1
 #define WP_MODE 2
-#define RESET 3
+#define AUX 3
+#define RESET 4
 #endif
 
 /* ROADRUNNER

@@ -47,6 +47,16 @@ void encoder_interrupt(){
 	return ;
 }
 
+void reset_requested_interrupt(){
+	//performs a software reset on the M4. see this post: http://goo.gl/nV8kMs
+	// 0000101111110100000000000000100
+	// Assert [2]SYSRESETREQ
+	delay(1000);
+	WRITE_RESTART(0x5FA0004);
+	
+	return;
+}
+
 void navigate(){
 	calculate_speed();
 	cal_steer_lim();
@@ -71,15 +81,8 @@ void get_mode(){
 	if((mode_1 == HIGH) && (mode_2 == HIGH)) mode = MANUAL;
 	else if((mode_1 == LOW) && (mode_2 == HIGH)) mode = AUTOMATIC;
 	else if((mode_1 == LOW) && (mode_2 == LOW)) mode = WP_MODE;
-	else if((mode_1 == HIGH) && (mode_2 == LOW)) mode = RESET;
+	else if((mode_1 == HIGH) && (mode_2 == LOW)) mode = AUX;
 
-	if(mode == RESET){	//performs a software reset on the M4. see this post: http://goo.gl/nV8kMs
-		// 0000101111110100000000000000100
-		// Assert [2]SYSRESETREQ
-		delay(1000);
-		WRITE_RESTART(0x5FA0004);
-	}
-	
 	return ;	
 }
 
@@ -94,8 +97,11 @@ void setup(){
    	//Pin assignments:
 	pinMode(MODE_LINE_1, INPUT);
 	pinMode(MODE_LINE_2, INPUT);
-	pinMode(TOGGLE, INPUT);
+	pinMode(TOGGLE, INPUT);			//this is the switch that needs to be toggled to start teh race
 	digitalWrite(TOGGLE, HIGH);
+
+	pinMode(RESET_PIN, INPUT);
+	attachInterrupt(RESET_PIN, reset_requested_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
 
 	main_menu();
 	delay(500);
