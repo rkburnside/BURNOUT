@@ -10,6 +10,7 @@ Description and Functionality
 	manual = 0
 	automatic = constant LED
 	set waypoint = fast flashing
+	aux = slow flashing
 	reset = fast slow flashing
 
 3. a servo pulse range is 1000us ~ 2000us. the channel 3 switch positions should be configured as follows to ensure the proper state is detected and enabled:
@@ -27,8 +28,10 @@ Description and Functionality
 #define SWITCH_POSITION_MANUAL 0	//manual control of the car
 #define SWITCH_POSITION_AUTOMATIC 1 //automatic control of the car
 #define SWITCH_POSITION_WAYPOINT 2	//set waypoint
-#define SWITCH_POSITION_RESET 3		//reset the main MCU
+#define SWITCH_POSITION_AUX 3		//reset the main MCU
+#define SWITCH_POSITION_RESET 4		//reset the main MCU
 #define PULSE_LENGTH_LOW 1250
+#define PULSE_LENGTH_MEDIUM 1500
 #define PULSE_LENGTH_HIGH 1750
 
 
@@ -81,7 +84,8 @@ void get_pulse_length(){
 
 void determine_switch_position(){
 	if(pulse_in_length < PULSE_LENGTH_LOW) switch_position = SWITCH_POSITION_MANUAL;
-	else if((pulse_in_length >= PULSE_LENGTH_LOW) && (pulse_in_length < PULSE_LENGTH_HIGH)) switch_position = SWITCH_POSITION_AUTOMATIC;
+	else if((pulse_in_length >= PULSE_LENGTH_LOW) && (pulse_in_length < PULSE_LENGTH_MEDIUM)) switch_position = SWITCH_POSITION_AUTOMATIC;
+	else if((pulse_in_length >= PULSE_LENGTH_MEDIUM) && (pulse_in_length < PULSE_LENGTH_HIGH)) switch_position = SWITCH_POSITION_AUX;
 	else switch_position = SWITCH_POSITION_WAYPOINT;
 	
 	return;
@@ -94,27 +98,39 @@ void set_vehile_state(){
 			digitalWrite(mode_1, LOW);			//set the pins states
 			digitalWrite(mode_2, LOW);
 			digitalWrite(multiplexor, HIGH);	//keep the multiplexor HIGH (i.e. MANUAL control) to ensure the car is staitonsary while setting the waypoint
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
 			break;
 
+		case SWITCH_POSITION_AUX:
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, HIGH);			//set the pins states
+			digitalWrite(mode_2, LOW);
+			digitalWrite(multiplexor, LOW);		//now enable the main MCU control
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
+			break;
+
+		case SWITCH_POSITION_RESET:
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, HIGH);			//set the pins states
+			digitalWrite(mode_2, HIGH);
+			digitalWrite(multiplexor, HIGH);	//now enable the main MCU control
+			digitalWrite(hard_reset_pin, HIGH);	//send reset signal to main MCU
+			break;
+		
 		case SWITCH_POSITION_AUTOMATIC:
 			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
 			digitalWrite(mode_1, LOW);			//set the pins states
 			digitalWrite(mode_2, HIGH);
 			digitalWrite(multiplexor, LOW);		//now enable the main MCU control
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
 			break;
-		
-		case SWITCH_POSITION_RESET:
-			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
-			digitalWrite(mode_1, HIGH);			//set the pins states
-			digitalWrite(mode_2, LOW);
-			digitalWrite(multiplexor, LOW);		//now enable the main MCU control
-			break;
-		
+
 		default:	//default state is SWITCH_POSITION_MANUAL
 			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
 			digitalWrite(mode_1, HIGH);			//set the pins states
 			digitalWrite(mode_2, HIGH);
 			digitalWrite(multiplexor, HIGH);	//now enable the main MCU control
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
 	}
 	
 	return;
@@ -126,6 +142,13 @@ void flash_led(){
 	switch(switch_position){
 		case SWITCH_POSITION_WAYPOINT:
 			if((millis() - led_time_old) > 250){
+				digitalWrite(state_led, !digitalRead(state_led));
+				led_time_old = millis();
+			}
+			break;
+
+		case SWITCH_POSITION_AUX:
+			if((millis() - led_time_old) > 750){
 				digitalWrite(state_led, !digitalRead(state_led));
 				led_time_old = millis();
 			}
@@ -186,12 +209,12 @@ void check_if_reset_requested(){
 	else if((high_position_counter > RESET_SWITCH_COUNTER) && (low_position_counter > RESET_SWITCH_COUNTER)){
 		switch_position = SWITCH_POSITION_RESET;
 		set_vehile_state();
-		delay(1000);	//reset state will be held for ~2s (that should be enough time for the teensy to receive the command and reset itself...hopefully not before it is ready to receice another command to reset itself
+		delay(250);	//reset state will be held for ~.25s (that should be enough time for the teensy to receive the command and reset itself...hopefully not before it is ready to receive another command to reset itself (but that's OK)
 		switch_position = SWITCH_POSITION_MANUAL;
 		set_vehile_state();
 
 		switch_position = SWITCH_POSITION_RESET;	//these 2 lines are only to display that RESET was actally sent
-		flash_led();		
+		flash_led();
 
 		switch_position = SWITCH_POSITION_MANUAL;
 		flash_led();
