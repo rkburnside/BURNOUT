@@ -36,12 +36,12 @@ void update_waypoint(){
 		x_wp = waypoint.x;
 		y_wp = waypoint.y;
 		if (((int)x_wp == 0) && ((int)y_wp == 0)) end_run(); // 0,0 is interpreted as the final waypoint. end run.
-		Serial.print("read WP #");
-		Serial.print(wpr_count);
-		Serial.print(": ");
-		Serial.print(x_wp*CLICK_INCHES);
-		Serial.print(" , ");
-		Serial.println(y_wp*CLICK_INCHES);
+		Serial2.print("read WP #");
+		Serial2.print(wpr_count);
+		Serial2.print(": ");
+		Serial2.print(x_wp*CLICK_INCHES);
+		Serial2.print(" , ");
+		Serial2.println(y_wp*CLICK_INCHES);
 		double temp = pow((x_wp-x),2);
 		temp += pow((y_wp-y),2);
 		proximity = sqrt(temp);
@@ -126,28 +126,28 @@ void update_cross_product(){
 	return ;
 }
 
-void end_run() {    // go straight forward, slowly at last waypoint
+void end_run() {	// go straight forward, slowly at last waypoint
 	esc.writeMicroseconds(S2); //reduce speed
 	steer_us = STEER_ADJUST;  // go straight
 	while(true); //loop endlessly
 }
 
 void calculate_speed(){
-    speed_new = micros();
-    speed_cur = speed_new - speed_old;
-    speed_old = speed_new;
+	speed_new = micros();
+	speed_cur = speed_new - speed_old;
+	speed_old = speed_new;
 	
 	return ;
 }
 
 void print_coordinates(){ //print target, location, etc.
-	Serial.print("(x,y): ");
-	Serial.print(x*CLICK_INCHES);
-	Serial.print(" , ");
-	Serial.print(y*CLICK_INCHES);	Serial.print("   trgt: ");
-	Serial.print(x_wp*CLICK_INCHES);
-	Serial.print(" , ");
-	Serial.println(y_wp*CLICK_INCHES);
+	Serial2.print("(x,y): ");
+	Serial2.print(x*CLICK_INCHES);
+	Serial2.print(" , ");
+	Serial2.print(y*CLICK_INCHES);	Serial2.print("   trgt: ");
+	Serial2.print(x_wp*CLICK_INCHES);
+	Serial2.print(" , ");
+	Serial2.println(y_wp*CLICK_INCHES);
 
 	return ;
 }

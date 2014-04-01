@@ -37,6 +37,7 @@ void print_coordinates();
 void steering_calibration();
 void click_calibration();
 void click_calibration_increment();
+void servo_test();
 
 
 //STATE STATUS FUNCTIONS
@@ -86,9 +87,9 @@ swap the pointers instead of copying entire structure from one to the other. Acc
 data in the structures as follows: old_pos->x or new_pos->time, etc. this is equivalent
 to (*old_pos).x.*/
 
-    double x;
-    double y;
-    //boolean last;
+	double x;
+	double y;
+	//boolean last;
 };
 
 #endif
