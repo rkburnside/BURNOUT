@@ -22,7 +22,7 @@ int excel_waypoints[19][2] = {{0,100}, {-100,100}, {100,100}, {0,100}, {0,0}, {0
 #define L2 20000
 #define L3 200
 #define L4 350
-#define NULL_FF -30
+#define NULL_FF -22
 
 //SENSOR PARAMETERS
 //#define GYRO_CAL 470868410	//this has to be measured by rotating the gyro 360 deg. and reading the output
@@ -42,7 +42,7 @@ int excel_waypoints[19][2] = {{0,100}, {-100,100}, {100,100}, {0,100}, {0,0}, {0
 //Optional manual throttle, autonomouse steering - connect ESC signal pin to receiver CH2
 #define MODE_LINE_1 5
 #define MODE_LINE_2 6
-#define RESET_PIN 7
+#define RESET_PIN 2
 #define THROTTLE 20
 #define STEERING 21
 #define HALL_EFFECT_SENSOR 22
@@ -72,7 +72,7 @@ int excel_waypoints[19][2] = {{0,100}, {-100,100}, {100,100}, {0,100}, {0,0}, {0
 #define L2 20000
 #define L3 200
 #define L4 350
-#define NULL_FF 48
+#define NULL_FF 43
 
 //SENSOR PARAMETERS
 //#define GYRO_CAL 466186233	//this has to be measured by rotating the gyro 360 deg. and reading the output
@@ -94,7 +94,7 @@ int excel_waypoints[19][2] = {{0,100}, {-100,100}, {100,100}, {0,100}, {0,0}, {0
 //Optional manual throttle, autonomouse steering - connect ESC signal pin to receiver CH2
 #define MODE_LINE_1 5
 #define MODE_LINE_2 6
-#define RESET_PIN 7
+#define RESET_PIN 2
 #define THROTTLE 20
 #define STEERING 21
 #define HALL_EFFECT_SENSOR 22

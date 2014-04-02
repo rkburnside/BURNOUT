@@ -97,7 +97,7 @@ void setup(){
    	//Pin assignments:
 	pinMode(MODE_LINE_1, INPUT);
 	pinMode(MODE_LINE_2, INPUT);
-	pinMode(TOGGLE, INPUT);			//this is the switch that needs to be toggled to start teh race
+	pinMode(TOGGLE, INPUT_PULLUP);			//this is the switch that needs to be toggled to start teh race
 	digitalWrite(TOGGLE, HIGH);
 
 	pinMode(RESET_PIN, INPUT);

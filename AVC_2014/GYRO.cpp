@@ -38,6 +38,7 @@ void setup_mpu6050(){
 	// disable sleep mode
 	Serial2.println(F("Disabling sleep mode..."));
 	accelgyro.setSleepEnabled(false);
+    accelgyro.setZGyroOffset(NULL_FF);
 
 	// get X/Y/Z gyro offsets
 	Serial2.println(F("Reading gyro offset values..."));
@@ -105,7 +106,7 @@ void setup_mpu6050(){
 
 void read_FIFO(){
 	uint8_t buffer[2];
-	long temp = 0;
+	int16_t temp = 0;
 	int samplz = 0;
 
 	samplz = accelgyro.getFIFOCount() >> 1;
@@ -140,7 +141,7 @@ void calculate_null(){
 		//Serial2.println(gyro_count);
 	}
 
-	gyro_null = accum/gyro_count + NULL_FF;	//calculate the null. the -30 is a fudge factor for 5000 pts.
+	gyro_null = accum/gyro_count;	//calculate the null. the -30 is a fudge factor for 5000 pts.
 	cal_flag = false;		//stop calibration
 	accum = 0;
 	
