@@ -38,6 +38,9 @@ void steering_calibration();
 void click_calibration();
 void click_calibration_increment();
 void servo_test();
+void mode_test();
+void toggle_test();
+void mode_and_toggle_test();
 
 
 //STATE STATUS FUNCTIONS
@@ -46,7 +49,6 @@ void get_mode();
 
 //MENU
 void main_menu();
-
 
 #endif
 
@@ -58,7 +60,6 @@ void main_menu();
 #include <Servo.h>
 #include <I2Cdev.h> //declared 2x (1 here and 1 in the .ino)(shouldn't be, but arduino is dumb...see note below)
 #include <MPU6050.h> //declared 2x (1 here and 1 in the .ino)(shouldn't be, but arduino is dumb...see note below)
-//#include <MemoryFree.h>
 
 // I2Cdev and MPU6050 must be installed as libraries, or else the .cpp/.h files
 // for both classes must be in the include path of your project

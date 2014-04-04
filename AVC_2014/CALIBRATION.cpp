@@ -6,7 +6,6 @@
 
 //INTERNAL VARIABLES
 unsigned long click_calibration_counter = 0;
-const byte InterruptPin = 2 ;		//interrupt on digital pin 2
 long time = 0;
 
 
@@ -112,5 +111,78 @@ void servo_test(){
 
 	steering.detach();
 	
+	return;
+}
+
+void mode_test(){
+	Serial2.println("toggle mode (i.e. TX ch3) and this function will print its current state");
+	Serial2.println("perform hard reset to exit function");
+
+	while(1){
+		void get_mode();
+		switch(mode){
+		case '0':
+			Serial2.println("MANUAL");
+			break;
+		case '1':
+			Serial2.println("AUTOMATIC");
+			break;
+		case '2':
+			Serial2.println("AUX");
+			break;
+		case '3':
+			Serial2.println("SET WAYPOINT");
+			break;
+		}
+
+		delay(250);
+	}
+	
+	return ;	
+}
+
+void toggle_test(){
+	Serial2.println("toggle the switch and this function will print its current state");
+	Serial2.println("toggle ch3 to exit routine");
+
+	Serial2.println();
+	get_mode();
+	if(mode != MANUAL) Serial2.println("set CH3 to manual");
+	while(mode != MANUAL) get_mode();
+
+	get_mode();
+	while(mode == MANUAL){
+		get_mode();
+		if(digitalRead(TOGGLE) == HIGH) Serial2.println("state: HIGH");
+		else if(digitalRead(TOGGLE) == LOW) Serial2.println("state: LOW");
+		else Serial2.println("bad reading");
+		
+		delay(250);
+	}
+	
+	Serial2.println();Serial2.println();Serial2.println();
+	return;
+}
+
+void mode_and_toggle_test(){
+	Serial2.println("this function will determine the switch and toggle positions");
+	Serial2.println("perform hard reset to exit function");
+
+	//determines the current state and waits for it to change to start the race
+	int toggle_state = digitalRead(TOGGLE);
+	int mode_state = mode;
+
+	Serial2.println("switch state = ");
+	Serial2.println(toggle_state);
+	Serial2.println("mode state = ");
+	Serial2.println(mode_state);
+	
+	while(1){
+		if((toggle_state == digitalRead(TOGGLE)) && (mode == mode_state)) Serial2.println("something changed");
+		else Serial2.println("switch or mode has not changed");
+		get_mode();		//waits until the switch is flipped to start the race
+		delay(250);
+	}
+
 	return;
 }

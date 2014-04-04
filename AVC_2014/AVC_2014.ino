@@ -86,6 +86,59 @@ void get_mode(){
 	return ;	
 }
 
+void race_startup_routine(){
+	Serial2.println();
+	//verify that car is in automatic mode
+	get_mode();
+	if(mode == MANUAL){
+		Serial2.println();
+		Serial2.println("1. SET CAR TO MODE 1 / AUTOMATIC / PRESS CH3 TO CONTINUE");
+		Serial2.println();
+	}
+	while(mode == MANUAL){
+		get_mode();		//waits until radio is set to automatic
+		read_FIFO();
+	}
+
+	//by turning off the radio, the automatic mode is locked in
+	Serial2.println("2. TURN OFF THE RADIO!");
+	Serial2.println();
+	delay(2500);
+
+	Serial2.println("***READY TO RUN***");
+	Serial2.println("3. FLIP THE SWITCH TO START THE RACE!");
+	Serial2.println();
+
+	//determines the current state and waits for it to change to start the race
+	int toggle_state = digitalRead(TOGGLE);
+	int mode_state = mode;
+	while((toggle_state == digitalRead(TOGGLE)) && (mode == mode_state)){	//waits for the switch to be flipped OR for the mode to change
+		get_mode();		//waits until the switch is flipped to start the race
+		read_FIFO();
+	}
+
+	for(int i=0; i<100; i++){	//clears the FIFO buffer and waits 1 sec to start
+		delay(1);
+		read_FIFO();
+	}
+
+	//the following zeros out everything and sets the waypoint and counter
+	wpr_count = 1;		//set waypoint read counter to first waypoint
+	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
+	x_wp = waypoint.x;
+	y_wp = waypoint.y;
+
+	x=0;
+	y=0;
+	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
+	clicks = 0;
+	first = true;
+	target_x = x_wp;
+	target_y = y_wp;
+
+	return;
+}
+
 void setup(){
 	Wire.begin();
 
@@ -98,7 +151,7 @@ void setup(){
 	pinMode(MODE_LINE_1, INPUT);
 	pinMode(MODE_LINE_2, INPUT);
 	pinMode(TOGGLE, INPUT_PULLUP);			//this is the switch that needs to be toggled to start teh race
-	digitalWrite(TOGGLE, HIGH);
+//	digitalWrite(TOGGLE, HIGH);
 
 	pinMode(RESET_PIN, INPUT);
 	attachInterrupt(RESET_PIN, reset_requested_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
@@ -162,57 +215,4 @@ void loop(){
 		print_coordinates();
 		time = millis();
 	}
-}
-
-void race_startup_routine(){
-	Serial2.println();
-	//verify that car is in automatic mode
-	get_mode();
-	if(mode == MANUAL){
-		Serial2.println();
-		Serial2.println("1. SET CAR TO MODE 1 / AUTOMATIC / PRESS CH3 TO CONTINUE");
-		Serial2.println();
-	}
-	while(mode == MANUAL){
-		get_mode();		//waits until radio is set to automatic
-		read_FIFO();
-	}
-
-	//by turning off the radio, the automatic mode is locked in
-	Serial2.println("2. TURN OFF THE RADIO!");
-	Serial2.println();
-	delay(2500);
-
-	Serial2.println("***READY TO RUN***");
-	Serial2.println("3. FLIP THE SWITCH TO START THE RACE!");
-	Serial2.println();
-
-	//determines the current state and waits for it to change to start the race
-	int toggle_state = digitalRead(TOGGLE);
-	int mode_state = mode;
-	while((toggle_state == digitalRead(TOGGLE)) && (mode == mode_state)){	//waits for the switch to be flipped OR for the mode to change
-		get_mode();		//waits until the switch is flipped to start the race
-		read_FIFO();
-	}
-
-	for(int i=0; i<100; i++){	//clears the FIFO buffer and waits 1 sec to start
-		delay(1);
-		read_FIFO();
-	}
-
-	//the following zeros out everything and sets the waypoint and counter
-	wpr_count = 1;		//set waypoint read counter to first waypoint
-	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
-	x_wp = waypoint.x;
-	y_wp = waypoint.y;
-
-	x=0;
-	y=0;
-	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
-	clicks = 0;
-	first = true;
-	target_x = x_wp;
-	target_y = y_wp;
-
-	return;
 }
