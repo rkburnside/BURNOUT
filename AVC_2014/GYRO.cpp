@@ -216,3 +216,8 @@ void watch_gyro(){
 
 	return ;
 }
+
+void reset_FIFO(){
+	accelgyro.resetFIFO();
+	return;
+}
