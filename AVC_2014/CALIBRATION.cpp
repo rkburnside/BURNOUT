@@ -91,7 +91,7 @@ void servo_test(){
 
 	Serial2.println();
 	Serial2.println();
-	Serial2.println("set CH3 to automatic");
+	Serial2.println("set CH3 to AUTOMATIC");
 
 	while(mode != AUTOMATIC) get_mode();
 	while(mode == AUTOMATIC){
@@ -115,7 +115,7 @@ void servo_test(){
 }
 
 void mode_test(){
-	Serial2.println("toggle mode (i.e. TX ch3) and this function will print its current state");
+	Serial2.println("toggle mode (i.e. TX CH3) and this function will print its current state");
 	Serial2.println("perform hard reset to exit function");
 
 	while(1){
@@ -143,21 +143,19 @@ void mode_test(){
 
 void toggle_test(){
 	Serial2.println("toggle the switch and this function will print its current state");
-	Serial2.println("toggle ch3 to exit routine");
+	Serial2.println("toggle CH3 to exit routine");
 
 	Serial2.println();
 	get_mode();
-	if(mode != MANUAL) Serial2.println("set CH3 to manual");
+	if(mode != MANUAL) Serial2.println("set CH3 to MANUAL");
 	while(mode != MANUAL) get_mode();
-
-	get_mode();
 	while(mode == MANUAL){
-		get_mode();
 		if(digitalRead(TOGGLE) == HIGH) Serial2.println("state: HIGH");
 		else if(digitalRead(TOGGLE) == LOW) Serial2.println("state: LOW");
 		else Serial2.println("bad reading");
 		
 		delay(250);
+		get_mode();
 	}
 	
 	Serial2.println();Serial2.println();Serial2.println();
@@ -184,5 +182,23 @@ void mode_and_toggle_test(){
 		delay(250);
 	}
 
+	return;
+}
+
+
+void activate_the_frickin_laser(){
+	Serial2.println("toggle the AUX to activate the FRICKIN LASER");
+	Serial2.println("toggle CH3 to exit routine");
+
+	get_mode();
+	if(mode != AUX) Serial2.println("set CH3 to AUX");
+	while(mode != AUX) get_mode();
+	while(mode == AUX){
+		digitalWrite(FRICKIN_LASER, HIGH);
+		get_mode();
+	}
+
+	digitalWrite(FRICKIN_LASER, HIGH);
+	
 	return;
 }

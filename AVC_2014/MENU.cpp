@@ -34,6 +34,7 @@ void menu_choices(){
 	Serial2.println("MISCELLANEOUS FUNCTIONS");
 	Serial2.println("----------");
 	Serial2.println("c = click calibration");
+	Serial2.println("l = activate the FRICKIN LASER");
 	Serial2.println("m = combined mode and toggle state test");
 	Serial2.println("o = mode state test");
 	Serial2.println("t = switch state toggle test");
@@ -83,6 +84,10 @@ void main_menu(){
 
 				case 'c':
 					click_calibration();
+					menu_choices();
+					break;
+				case 'l':
+					activate_the_frickin_laser();
 					menu_choices();
 					break;
 				case 'm':

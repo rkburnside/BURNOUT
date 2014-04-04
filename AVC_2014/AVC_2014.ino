@@ -152,12 +152,18 @@ void setup(){
 	pinMode(MODE_LINE_2, INPUT);
 	pinMode(TOGGLE, INPUT_PULLUP);			//this is the switch that needs to be toggled to start teh race
 //	digitalWrite(TOGGLE, HIGH);
+	pinMode(FRICKIN_LASER, OUTPUT);
+	digitalWrite(FRICKIN_LASER, LOW);
 
 	pinMode(RESET_PIN, INPUT);
 	attachInterrupt(RESET_PIN, reset_requested_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
 
 	main_menu();
 	delay(500);
+
+	Serial2.println();
+	Serial2.println("Perform car alignment with the laser");
+	activate_the_frickin_laser();
 	
 	setup_mpu6050();
 	calculate_null();
