@@ -35,7 +35,6 @@ Description and Functionality
 #define PULSE_LENGTH_HIGH 1750
 
 
-int state_led = 13;			//MCU state led
 int hard_reset_pin = 12;	//used to reset the external MCU
 int mode_1 = 11;			//output line 1 to external MCU
 int mode_2 = 10;			//output line 2 to external MCU
@@ -46,7 +45,7 @@ int switch_position = SWITCH_POSITION_MANUAL;	//the initial position will be MAN
 
 
 void setup(){
-	pinMode(state_led, OUTPUT);
+	pinMode(LED_BUILTIN, OUTPUT);
 	pinMode(hard_reset_pin, OUTPUT);
 	pinMode(mode_1, OUTPUT);
 	pinMode(mode_2, OUTPUT);
@@ -57,7 +56,7 @@ void setup(){
 	digitalWrite(mode_1, LOW);
 	digitalWrite(mode_2, LOW);
 	digitalWrite(multiplexor, LOW);
-	digitalWrite(state_led, LOW);
+	digitalWrite(LED_BUILTIN, LOW);
 
 	set_vehile_state();
 	flash_led();
@@ -142,14 +141,14 @@ void flash_led(){
 	switch(switch_position){
 		case SWITCH_POSITION_WAYPOINT:
 			if((millis() - led_time_old) > 250){
-				digitalWrite(state_led, !digitalRead(state_led));
+				digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 				led_time_old = millis();
 			}
 			break;
 
 		case SWITCH_POSITION_AUX:
 			if((millis() - led_time_old) > 750){
-				digitalWrite(state_led, !digitalRead(state_led));
+				digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 				led_time_old = millis();
 			}
 			break;
@@ -157,22 +156,22 @@ void flash_led(){
 		case SWITCH_POSITION_RESET:
 			for(int i = 0; i<3; i++){	//flashes the LED several times over ~5 seconds to indicate reset
 				delay(250);
-				digitalWrite(state_led, !digitalRead(state_led));
+				digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 				delay(125);
-				digitalWrite(state_led, !digitalRead(state_led));
+				digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 				delay(125);
-				digitalWrite(state_led, !digitalRead(state_led));
+				digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 				delay(250);
-				digitalWrite(state_led, !digitalRead(state_led));
+				digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 			}
 			break;
 
 		case SWITCH_POSITION_AUTOMATIC:
-			digitalWrite(state_led, HIGH);
+			digitalWrite(LED_BUILTIN, HIGH);
 			break;
 
 		default:
-			digitalWrite(state_led, LOW);   //default position of switch is MANUAL
+			digitalWrite(LED_BUILTIN, LOW);   //default position of switch is MANUAL
 			break;
 	}
 	

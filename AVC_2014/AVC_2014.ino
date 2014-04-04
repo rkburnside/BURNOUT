@@ -87,6 +87,12 @@ void get_mode(){
 }
 
 void setup(){
+	pinMode(LED_BUILTIN, OUTPUT);
+	for(int i = 0; i<8; i++){
+		digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+		delay(500);
+	}
+	
 	Wire.begin();
 
 	Serial2.begin(115200);
@@ -97,7 +103,7 @@ void setup(){
    	//Pin assignments:
 	pinMode(MODE_LINE_1, INPUT);
 	pinMode(MODE_LINE_2, INPUT);
-	pinMode(TOGGLE, INPUT_PULLUP);			//this is the switch that needs to be toggled to start teh race
+	pinMode(TOGGLE, INPUT_PULLUP);			//this is the switch that needs to be toggled to start the race
 	digitalWrite(TOGGLE, HIGH);
 
 	pinMode(RESET_PIN, INPUT);
@@ -133,6 +139,7 @@ void loop(){
 	if(mode == AUTOMATIC){	//this function get the car started moving and then clicks will take over
 		if(first){
 			accum = 0;		//zeros out the accumulator which zeros out the angle
+			reset_FIFO();
 			first = false;
 		}
 
@@ -209,6 +216,7 @@ void race_startup_routine(){
 	x=0;
 	y=0;
 	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
+	reset_FIFO();
 	clicks = 0;
 	first = true;
 	target_x = x_wp;
