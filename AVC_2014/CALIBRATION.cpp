@@ -119,22 +119,12 @@ void mode_test(){
 	Serial2.println("perform hard reset to exit function");
 
 	while(1){
-		void get_mode();
-		switch(mode){
-		case '0':
-			Serial2.println("MANUAL");
-			break;
-		case '1':
-			Serial2.println("AUTOMATIC");
-			break;
-		case '2':
-			Serial2.println("AUX");
-			break;
-		case '3':
-			Serial2.println("SET WAYPOINT");
-			break;
-		}
-
+		get_mode();
+		if(mode == MANUAL) Serial2.println("MANUAL");
+		else if(mode == AUTOMATIC) Serial2.println("AUTOMATIC");
+		else if(mode == AUX) Serial2.println("AUX");
+		else if(mode == WP_MODE) Serial2.println("WP_MODE");
+		else Serial2.println("nothing valid detected");
 		delay(250);
 	}
 	
@@ -176,15 +166,14 @@ void mode_and_toggle_test(){
 	Serial2.println(mode_state);
 	
 	while(1){
-		if((toggle_state == digitalRead(TOGGLE)) && (mode == mode_state)) Serial2.println("something changed");
-		else Serial2.println("switch or mode has not changed");
+		if((toggle_state == digitalRead(TOGGLE)) && (mode == mode_state)) Serial2.println("switch or mode has not changed");
+		else Serial2.println("something changed");
 		get_mode();		//waits until the switch is flipped to start the race
 		delay(250);
 	}
 
 	return;
 }
-
 
 void activate_the_frickin_laser(){
 	Serial2.println("toggle the AUX to activate the FRICKIN LASER");

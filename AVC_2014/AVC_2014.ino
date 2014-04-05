@@ -110,6 +110,7 @@ void race_startup_routine(){
 	Serial2.println();
 
 	//determines the current state and waits for it to change to start the race
+	get_mode();
 	int toggle_state = digitalRead(TOGGLE);
 	int mode_state = mode;
 	while((toggle_state == digitalRead(TOGGLE)) && (mode == mode_state)){	//waits for the switch to be flipped OR for the mode to change
@@ -130,6 +131,7 @@ void race_startup_routine(){
 
 	x=0;
 	y=0;
+	reset_FIFO();
 	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
 	clicks = 0;
 	first = true;
