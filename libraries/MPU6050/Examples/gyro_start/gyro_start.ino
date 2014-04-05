@@ -183,7 +183,11 @@ void setup_mpu6050(){
 }
 
 void setup() {
-	delay(3000);
+	pinMode(LED_BUILTIN, OUTPUT);
+	for(int i = 0; i<8; i++){
+		digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+		delay(500);
+	}
 	Wire.begin(); 
 	Serial.begin(115200);
 	setup_mpu6050();

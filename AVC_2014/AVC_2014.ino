@@ -169,8 +169,6 @@ void setup(){
 	main_menu();
 	delay(500);
 
-	Serial2.println();
-	Serial2.println("Perform car alignment with the laser");
 	activate_the_frickin_laser();
 	
 	setup_mpu6050();

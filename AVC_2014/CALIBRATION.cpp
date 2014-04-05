@@ -115,6 +115,8 @@ void servo_test(){
 }
 
 void mode_test(){
+	Serial2.println();
+	Serial2.println();
 	Serial2.println("toggle mode (i.e. TX CH3) and this function will print its current state");
 	Serial2.println("perform hard reset to exit function");
 
@@ -132,6 +134,8 @@ void mode_test(){
 }
 
 void toggle_test(){
+	Serial2.println();
+	Serial2.println();
 	Serial2.println("toggle the switch and this function will print its current state");
 	Serial2.println("toggle CH3 to exit routine");
 
@@ -153,6 +157,8 @@ void toggle_test(){
 }
 
 void mode_and_toggle_test(){
+	Serial2.println();
+	Serial2.println();
 	Serial2.println("this function will determine the switch and toggle positions");
 	Serial2.println("perform hard reset to exit function");
 
@@ -176,18 +182,18 @@ void mode_and_toggle_test(){
 }
 
 void activate_the_frickin_laser(){
-	Serial2.println("toggle the AUX to activate the FRICKIN LASER");
-	Serial2.println("toggle CH3 to exit routine");
-
+	Serial2.println();
+	Serial2.println();
+	Serial2.println("set CH3 to AUX to activate the FRICKIN LASER");
+	Serial2.println("\(toggle CH3 to exit the routine\)");
 	get_mode();
-	if(mode != AUX) Serial2.println("set CH3 to AUX");
 	while(mode != AUX) get_mode();
 	while(mode == AUX){
 		digitalWrite(FRICKIN_LASER, HIGH);
 		get_mode();
 	}
 
-	digitalWrite(FRICKIN_LASER, HIGH);
+	digitalWrite(FRICKIN_LASER, LOW);
 	
 	return;
 }
