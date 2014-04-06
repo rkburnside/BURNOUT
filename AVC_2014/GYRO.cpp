@@ -21,6 +21,13 @@ MPU6050 accelgyro;
 
 //PROGRAM FUNCTIONS
 void setup_mpu6050(){
+	// join I2C bus (I2Cdev library doesn't do this automatically)
+	#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+		Wire.begin();
+	#elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
+		Fastwire::setup(400, true);
+	#endif
+
 	// initialize device
 	Serial2.println("Initializing I2C devices...");
 	accelgyro.initialize();
@@ -28,71 +35,44 @@ void setup_mpu6050(){
 	// verify connection
 	Serial2.println("Testing device connections...");
 	Serial2.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
+
+	// use the code below to change accel/gyro offset values
+	accelgyro.setXGyroOffset(85);  //85
+	accelgyro.setYGyroOffset(-70);  //-70
+	accelgyro.setZGyroOffset(46);  //-22
+	Serial2.print(accelgyro.getXAccelOffset()); Serial2.print("\t"); // 
+	Serial2.print(accelgyro.getYAccelOffset()); Serial2.print("\t"); // 
+	Serial2.print(accelgyro.getZAccelOffset()); Serial2.print("\t"); // 
+	Serial2.print(accelgyro.getXGyroOffset()); Serial2.print("\t"); // 
+	Serial2.print(accelgyro.getYGyroOffset()); Serial2.print("\t"); // 
+	Serial2.print(accelgyro.getZGyroOffset()); Serial2.print("\t"); // 
+	Serial2.print("\n");
 	
-	// reset device
-	Serial2.println(F("\nResetting MPU6050..."));
-	accelgyro.reset();
-	delay(30); // wait after reset
-
-
-	// disable sleep mode
-	Serial2.println(F("Disabling sleep mode..."));
-	accelgyro.setSleepEnabled(false);
-    accelgyro.setZGyroOffset(NULL_FF);
-
-	// get X/Y/Z gyro offsets
-	Serial2.println(F("Reading gyro offset values..."));
-	int8_t xgOffset = accelgyro.getXGyroOffset();
-	int8_t ygOffset = accelgyro.getYGyroOffset();
-	int8_t zgOffset = accelgyro.getZGyroOffset();
-	Serial2.print(F("X gyro offset = "));
-	Serial2.println(xgOffset);
-	Serial2.print(F("Y gyro offset = "));
-	Serial2.println(ygOffset);
-	Serial2.print(F("Z gyro offset = "));
-	Serial2.println(zgOffset);
-
 	Serial2.println(F("Setting clock source to Z Gyro..."));
 	accelgyro.setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
+	//Serial2.println(accelgyro.getClockSource(MPU6050_CLOCK_PLL_ZGYRO);
 
-	// Serial2.println(F("Setting DMP and FIFO_OFLOW interrupts enabled..."));
-	// accelgyro.setIntEnabled(0x12);
+	Serial2.println(F("Setting sample rate to 200Hz..."));
+	accelgyro.setRate(0); // 1khz / (1 + 4) = 200 Hz
 
-	 Serial2.println(F("Setting sample rate to 200Hz..."));
-	 accelgyro.setRate(0); // 1khz / (1 + 4) = 200 Hz
+// *          |   ACCELEROMETER    |           GYROSCOPE
+// * DLPF_CFG | Bandwidth | Delay  | Bandwidth | Delay  | Sample Rate
+// * ---------+-----------+--------+-----------+--------+-------------
+// * 0        | 260Hz     | 0ms    | 256Hz     | 0.98ms | 8kHz
+// * 1        | 184Hz     | 2.0ms  | 188Hz     | 1.9ms  | 1kHz
+// * 2        | 94Hz      | 3.0ms  | 98Hz      | 2.8ms  | 1kHz
+// * 3        | 44Hz      | 4.9ms  | 42Hz      | 4.8ms  | 1kHz
+// * 4        | 21Hz      | 8.5ms  | 20Hz      | 8.3ms  | 1kHz
+// * 5        | 10Hz      | 13.8ms | 10Hz      | 13.4ms | 1kHz
+// * 6        | 5Hz       | 19.0ms | 5Hz       | 18.6ms | 1kHz
+// * 7        |   -- Reserved --   |   -- Reserved --   | Reserved
 
-	// Serial2.println(F("Setting external frame sync to TEMP_OUT_L[0]..."));
-	// accelgyro.setExternalFrameSync(MPU6050_EXT_SYNC_TEMP_OUT_L);
-
-	Serial2.println(F("Setting DLPF bandwidth to 42Hz..."));
+	Serial2.println(F("Setting DLPF bandwidth"));
 	accelgyro.setDLPFMode(MPU6050_DLPF_BW_42);
 
 	Serial2.println(F("Setting gyro sensitivity to +/- 250 deg/sec..."));
 	accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
-
-	// Serial2.println(F("Setting X/Y/Z gyro offsets to previous values..."));
-	// accelgyro.setXGyroOffset(xgOffset);
-	// accelgyro.setYGyroOffset(ygOffset);
-	// accelgyro.setZGyroOffset(61);
-
-	// Serial2.println(F("Setting X/Y/Z gyro user offsets to zero..."));
-	// accelgyro.setXGyroOffsetUser(0);
-	// accelgyro.setYGyroOffsetUser(0);
-	// accelgyro.setZGyroOffsetUser(0);
-	// Serial2.print(F("Z gyro offset = "));
-	// Serial2.println(accelgyro.getZGyroOffset());
-
-	// Serial2.println(F("Setting motion detection threshold to 2..."));
-	// accelgyro.setMotionDetectionThreshold(2);
-
-	// Serial2.println(F("Setting zero-motion detection threshold to 156..."));
-	// accelgyro.setZeroMotionDetectionThreshold(156);
-
-	// Serial2.println(F("Setting motion detection duration to 80..."));
-	// accelgyro.setMotionDetectionDuration(80);
-
-	// Serial2.println(F("Setting zero-motion detection duration to 0..."));
-	// accelgyro.setZeroMotionDetectionDuration(0);
+	//accelgyro.setFullScaleGyroRange(0);  // 0=250, 1=500, 2=1000, 3=2000 deg/sec
 
 	Serial2.println(F("Resetting FIFO..."));
 	accelgyro.resetFIFO();
@@ -100,7 +80,14 @@ void setup_mpu6050(){
 	Serial2.println(F("Enabling FIFO..."));
 	accelgyro.setFIFOEnabled(true);
 	accelgyro.setZGyroFIFOEnabled(true);
-	
+	accelgyro.setXGyroFIFOEnabled(false);
+	accelgyro.setYGyroFIFOEnabled(false);
+	accelgyro.setAccelFIFOEnabled(false);
+	Serial2.print("Z axis enabled?\t"); Serial2.println(accelgyro.getZGyroFIFOEnabled());
+	Serial2.print("x axis enabled?\t"); Serial2.println(accelgyro.getXGyroFIFOEnabled());
+	Serial2.print("y axis enabled?\t"); Serial2.println(accelgyro.getYGyroFIFOEnabled());
+	Serial2.print("accel enabled?\t"); Serial2.println(accelgyro.getAccelFIFOEnabled());
+	accelgyro.resetFIFO();
 	return ;
 }
 
@@ -108,29 +95,28 @@ void read_FIFO(){
 	uint8_t buffer[2];
 	int16_t temp = 0;
 	int samplz = 0;
-
-	samplz = accelgyro.getFIFOCount() >> 1;
+	samplz = accelgyro.getFIFOCount() / 2;
 	//Serial2.println("FIFO_COUNTH : ");
 	//Serial2.println(samplz,DEC);
 	for(int i=0; i < samplz; i++){
 		accelgyro.getFIFOBytes(buffer, 2);
 		temp = ((((int16_t)buffer[0]) << 8) | buffer[1]);
-		accum -= (temp * 10) + gyro_null;
+		accum += temp*10 - gyro_null;    
+		//accum = temp;    
 		gyro_count++;
 		
 		if((accum > GYRO_CAL) && (!cal_flag)) accum -= GYRO_CAL*2; //if we are calculating null, don't roll-over
 		if((accum < -GYRO_CAL) && (!cal_flag)) accum += GYRO_CAL*2;
 	}
-
-	angle = (float)accum/(float)GYRO_CAL * 3.14159;
+	//angle = (float)accum/(float)GYRO_CAL * -3.14159;   //change sign of PI for flipped gyro
+	angle = (float)accum/GYRO_CAL * -180;   //using degrees *10, negative for flipped gyro.
 
 	return ;
 }
 
 void calculate_null(){
 	Serial2.println("CALCULATING NULL");
-
-	cal_flag = true;		//tell ADC ISR that we are calibrating,
+	cal_flag = true;		//calibrating,
 	accum = 0;				//reset the angle. angle will act as accumulator for null calculation
 	gyro_null = 0;			//make sure to not subract any nulls here
 	gyro_count = 0;
@@ -140,8 +126,7 @@ void calculate_null(){
 		//delay(10);
 		//Serial2.println(gyro_count);
 	}
-
-	gyro_null = accum/gyro_count - 1;	//calculate the null. the -30 is a fudge factor for 5000 pts.
+	gyro_null = accum/gyro_count -1;	//calculate the null. the -30 is a fudge factor for 5000 pts.
 	cal_flag = false;		//stop calibration
 	accum = 0;
 	
@@ -188,7 +173,7 @@ void watch_angle(){
 		read_FIFO();
 
 		if((millis() - time) > 250){
-			Serial2.println(angle*180.0/3.14159,5);	//angle;
+			Serial2.println(angle);	//angle;
 			time = millis();
 		}
 		get_mode();
@@ -221,3 +206,27 @@ void reset_FIFO(){
 	accelgyro.resetFIFO();
 	return;
 }
+
+
+
+
+	// This setup routine should/will ensure the i2c connection is working
+	// Wire.begin();
+	// test the connection to the I2C bus, sometimes it doesn't connect
+	// keep trying to connect to I2C bus if we get an error
+	// boolean error = true;
+	// while (error){
+		// Serial2.println("begin transmission with gyro");
+		// Wire.beginTransmission(MPU6050_ADDRESS_AD0_LOW);
+		// Serial2.println("ending transmission with gryo");
+		// error = Wire.endTransmission();			// if error = 0, we are properly connected
+		// Serial2.println("transmission ended");
+		// if(error){								// if we aren't properly connected, try connecting again and loop
+			// Serial2.println();
+			// Serial2.println("Not properly connected to I2C, trying again");
+			// Serial2.println();
+			// Wire.begin();
+			// TWBR = 24; // 400kHz I2C clock
+		// }
+	// }
+	// Serial2.println("Properly connected to I2C");

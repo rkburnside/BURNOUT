@@ -153,28 +153,6 @@ void setup(){
 	Serial2.println(CAR_NAME);
 	Serial2.println();
 
-	//This setup routine should/will ensure the i2c connection is working
-	Wire.begin();
-	// test the connection to the I2C bus, sometimes it doesn't connect
-	// keep trying to connect to I2C bus if we get an error
-	boolean error = true;
-	while (error){
-		Serial.println("begin transmission with gyro");
-		Wire.beginTransmission(MPU6050_ADDRESS_AD0_LOW);
-		Serial.println("ending transmission with gryo");
-		error = Wire.endTransmission();			// if error = 0, we are properly connected
-		Serial.println("transmission ended");
-		if(error){								// if we aren't properly connected, try connecting again and loop
-			Serial.println();
-			Serial.println("Not properly connected to I2C, trying again");
-			Serial.println();
-			Wire.begin();
-			TWBR = 24; // 400kHz I2C clock
-		}
-	}
-	Serial.println("Properly connected to I2C");
-
-
    	//Pin assignments:
 	pinMode(MODE_LINE_1, INPUT);
 	pinMode(MODE_LINE_2, INPUT);
