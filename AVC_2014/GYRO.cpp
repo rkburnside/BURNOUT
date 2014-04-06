@@ -37,9 +37,9 @@ void setup_mpu6050(){
 	Serial2.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
 
 	// use the code below to change accel/gyro offset values
-	accelgyro.setXGyroOffset(85);  //85
-	accelgyro.setYGyroOffset(-70);  //-70
-	accelgyro.setZGyroOffset(46);  //-22
+	accelgyro.setXGyroOffset(XGYROOFFSET);  //85
+	accelgyro.setYGyroOffset(YGYROOFFSET);  //-70
+	accelgyro.setZGyroOffset(ZGYROOFFSET);  //-22
 	Serial2.print(accelgyro.getXAccelOffset()); Serial2.print("\t"); // 
 	Serial2.print(accelgyro.getYAccelOffset()); Serial2.print("\t"); // 
 	Serial2.print(accelgyro.getZAccelOffset()); Serial2.print("\t"); // 
@@ -118,7 +118,7 @@ void calculate_null(){
 	Serial2.println("CALCULATING NULL");
 	cal_flag = true;		//calibrating,
 	accum = 0;				//reset the angle. angle will act as accumulator for null calculation
-	gyro_null = 0;			//make sure to not subract any nulls here
+	gyro_null = 0;			//make sure to not subtract any nulls here
 	gyro_count = 0;
 
 	while(gyro_count < 5000){
@@ -177,7 +177,7 @@ void watch_angle(){
 			time = millis();
 		}
 		get_mode();
-	} while(mode == MANUAL);		//keep summing unitil we turn the mode switch off.
+	} while(mode == MANUAL);		//keep summing until we turn the mode switch off.
 
 	return ;
 }
@@ -218,7 +218,7 @@ void reset_FIFO(){
 	// while (error){
 		// Serial2.println("begin transmission with gyro");
 		// Wire.beginTransmission(MPU6050_ADDRESS_AD0_LOW);
-		// Serial2.println("ending transmission with gryo");
+		// Serial2.println("ending transmission with gyro");
 		// error = Wire.endTransmission();			// if error = 0, we are properly connected
 		// Serial2.println("transmission ended");
 		// if(error){								// if we aren't properly connected, try connecting again and loop
