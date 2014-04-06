@@ -141,7 +141,7 @@ void calculate_null(){
 		//Serial2.println(gyro_count);
 	}
 
-	gyro_null = accum/gyro_count;	//calculate the null. the -30 is a fudge factor for 5000 pts.
+	gyro_null = accum/gyro_count - 1;	//calculate the null. the -30 is a fudge factor for 5000 pts.
 	cal_flag = false;		//stop calibration
 	accum = 0;
 	
