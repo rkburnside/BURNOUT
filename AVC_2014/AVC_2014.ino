@@ -87,6 +87,14 @@ void get_mode(){
 }
 
 void race_startup_routine(){
+	activate_the_frickin_laser();
+	
+	setup_mpu6050();
+	calculate_null();
+
+	SERIAL_OUT.println("determine if the car is glitching at all for 15 seconds. the ESC and servo have already been attached and set.");
+	delay(15000);
+	
 	SERIAL_OUT.println();
 	//verify that car is in automatic mode
 	get_mode();
@@ -100,13 +108,16 @@ void race_startup_routine(){
 		read_FIFO();
 	}
 
+	SERIAL_OUT.println("determine if the car is glitching at all for 15 seconds. the ESC and servo have already been attached and set.");
+	delay(15000);
+	
 	//by turning off the radio, the automatic mode is locked in
-	SERIAL_OUT.println("2. TURN OFF THE RADIO!");
+	SERIAL_OUT.println("2. TURN OFF THE RADIO & FLIP THE SWITCH TO START THE RACE!");
 	SERIAL_OUT.println();
-	delay(2500);
+	delay(1250);
 
-	SERIAL_OUT.println("***READY TO RUN***");
-	SERIAL_OUT.println("3. FLIP THE SWITCH TO START THE RACE!");
+	SERIAL_OUT.println("3. ***READY TO RUN***");
+	SERIAL_OUT.println(");
 	SERIAL_OUT.println();
 
 	//determines the current state and waits for it to change to start the race
@@ -163,14 +174,6 @@ void setup(){
 	pinMode(RESET_PIN, INPUT);
 	attachInterrupt(RESET_PIN, reset_requested_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
 
-	main_menu();
-	delay(500);
-
-	activate_the_frickin_laser();
-	
-	setup_mpu6050();
-	calculate_null();
-
 	pinMode(HALL_EFFECT_SENSOR, INPUT);	 
 	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, CHANGE);	//according to the teensy documentation, all pins can be interrupts
 
@@ -178,6 +181,9 @@ void setup(){
 	steering.writeMicroseconds(STEER_ADJUST);
 	esc.attach(THROTTLE);
 	esc.writeMicroseconds(S1);
+
+	main_menu();
+	delay(500);
 
 	race_startup_routine();
 }
