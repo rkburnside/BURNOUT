@@ -29,30 +29,30 @@ void setup_mpu6050(){
 	#endif
 
 	// initialize device
-	Serial2.println("Initializing I2C devices...");
+	SERIAL_OUT.println("Initializing I2C devices...");
 	accelgyro.initialize();
 
 	// verify connection
-	Serial2.println("Testing device connections...");
-	Serial2.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
+	SERIAL_OUT.println("Testing device connections...");
+	SERIAL_OUT.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
 
 	// use the code below to change accel/gyro offset values
 	accelgyro.setXGyroOffset(XGYROOFFSET);  //85
 	accelgyro.setYGyroOffset(YGYROOFFSET);  //-70
 	accelgyro.setZGyroOffset(ZGYROOFFSET);  //-22
-	Serial2.print(accelgyro.getXAccelOffset()); Serial2.print("\t"); // 
-	Serial2.print(accelgyro.getYAccelOffset()); Serial2.print("\t"); // 
-	Serial2.print(accelgyro.getZAccelOffset()); Serial2.print("\t"); // 
-	Serial2.print(accelgyro.getXGyroOffset()); Serial2.print("\t"); // 
-	Serial2.print(accelgyro.getYGyroOffset()); Serial2.print("\t"); // 
-	Serial2.print(accelgyro.getZGyroOffset()); Serial2.print("\t"); // 
-	Serial2.print("\n");
+	SERIAL_OUT.print(accelgyro.getXAccelOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getYAccelOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getZAccelOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getXGyroOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getYGyroOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getZGyroOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print("\n");
 	
-	Serial2.println(F("Setting clock source to Z Gyro..."));
+	SERIAL_OUT.println(F("Setting clock source to Z Gyro..."));
 	accelgyro.setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
-	//Serial2.println(accelgyro.getClockSource(MPU6050_CLOCK_PLL_ZGYRO);
+	//SERIAL_OUT.println(accelgyro.getClockSource(MPU6050_CLOCK_PLL_ZGYRO);
 
-	Serial2.println(F("Setting sample rate to 200Hz..."));
+	SERIAL_OUT.println(F("Setting sample rate to 200Hz..."));
 	accelgyro.setRate(0); // 1khz / (1 + 4) = 200 Hz
 
 // *          |   ACCELEROMETER    |           GYROSCOPE
@@ -67,26 +67,26 @@ void setup_mpu6050(){
 // * 6        | 5Hz       | 19.0ms | 5Hz       | 18.6ms | 1kHz
 // * 7        |   -- Reserved --   |   -- Reserved --   | Reserved
 
-	Serial2.println(F("Setting DLPF bandwidth"));
+	SERIAL_OUT.println(F("Setting DLPF bandwidth"));
 	accelgyro.setDLPFMode(MPU6050_DLPF_BW_42);
 
-	Serial2.println(F("Setting gyro sensitivity to +/- 250 deg/sec..."));
+	SERIAL_OUT.println(F("Setting gyro sensitivity to +/- 250 deg/sec..."));
 	accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
 	//accelgyro.setFullScaleGyroRange(0);  // 0=250, 1=500, 2=1000, 3=2000 deg/sec
 
-	Serial2.println(F("Resetting FIFO..."));
+	SERIAL_OUT.println(F("Resetting FIFO..."));
 	accelgyro.resetFIFO();
 
-	Serial2.println(F("Enabling FIFO..."));
+	SERIAL_OUT.println(F("Enabling FIFO..."));
 	accelgyro.setFIFOEnabled(true);
 	accelgyro.setZGyroFIFOEnabled(true);
 	accelgyro.setXGyroFIFOEnabled(false);
 	accelgyro.setYGyroFIFOEnabled(false);
 	accelgyro.setAccelFIFOEnabled(false);
-	Serial2.print("Z axis enabled?\t"); Serial2.println(accelgyro.getZGyroFIFOEnabled());
-	Serial2.print("x axis enabled?\t"); Serial2.println(accelgyro.getXGyroFIFOEnabled());
-	Serial2.print("y axis enabled?\t"); Serial2.println(accelgyro.getYGyroFIFOEnabled());
-	Serial2.print("accel enabled?\t"); Serial2.println(accelgyro.getAccelFIFOEnabled());
+	SERIAL_OUT.print("Z axis enabled?\t"); SERIAL_OUT.println(accelgyro.getZGyroFIFOEnabled());
+	SERIAL_OUT.print("x axis enabled?\t"); SERIAL_OUT.println(accelgyro.getXGyroFIFOEnabled());
+	SERIAL_OUT.print("y axis enabled?\t"); SERIAL_OUT.println(accelgyro.getYGyroFIFOEnabled());
+	SERIAL_OUT.print("accel enabled?\t"); SERIAL_OUT.println(accelgyro.getAccelFIFOEnabled());
 	accelgyro.resetFIFO();
 	return ;
 }
@@ -96,8 +96,8 @@ void read_FIFO(){
 	int16_t temp = 0;
 	int samplz = 0;
 	samplz = accelgyro.getFIFOCount() / 2;
-	//Serial2.println("FIFO_COUNTH : ");
-	//Serial2.println(samplz,DEC);
+	//SERIAL_OUT.println("FIFO_COUNTH : ");
+	//SERIAL_OUT.println(samplz,DEC);
 	for(int i=0; i < samplz; i++){
 		accelgyro.getFIFOBytes(buffer, 2);
 		temp = ((((int16_t)buffer[0]) << 8) | buffer[1]);
@@ -115,7 +115,7 @@ void read_FIFO(){
 }
 
 void calculate_null(){
-	Serial2.println("CALCULATING NULL");
+	SERIAL_OUT.println("CALCULATING NULL");
 	cal_flag = true;		//calibrating,
 	accum = 0;				//reset the angle. angle will act as accumulator for null calculation
 	gyro_null = 0;			//make sure to not subtract any nulls here
@@ -124,7 +124,7 @@ void calculate_null(){
 	while(gyro_count < 5000){
 		read_FIFO();
 		//delay(10);
-		//Serial2.println(gyro_count);
+		//SERIAL_OUT.println(gyro_count);
 	}
 	gyro_null = accum/gyro_count -1;	//calculate the null. the -30 is a fudge factor for 5000 pts.
 	cal_flag = false;		//stop calibration
@@ -132,48 +132,48 @@ void calculate_null(){
 	
 
 	//should print null here
-	Serial2.print("Null: ");
-	Serial2.println(gyro_null);
+	SERIAL_OUT.print("Null: ");
+	SERIAL_OUT.println(gyro_null);
 	
 	return ;
 }
 
 void gyro_calibration(){
 	static long time = millis();
-	Serial2.println();
+	SERIAL_OUT.println();
 	setup_mpu6050();
 	calculate_null();
 	cal_flag = true;
 
-	Serial2.println("calibrate gyro");
+	SERIAL_OUT.println("calibrate gyro");
 	do{
 		read_FIFO();
 		
 		if((millis() - time) > 250){
-			Serial2.println(accum);
+			SERIAL_OUT.println(accum);
 			time = millis();
 		}
 		get_mode();
 	} while(mode == MANUAL);
 	
 	cal_flag = false;
-	Serial2.println();
+	SERIAL_OUT.println();
 	return ;
 }
 
 void watch_angle(){
 	static long time = millis();
-	Serial2.println();
+	SERIAL_OUT.println();
 	setup_mpu6050();
 	calculate_null();
 
-	Serial2.println("watch angle");
+	SERIAL_OUT.println("watch angle");
 
 	do{
 		read_FIFO();
 
 		if((millis() - time) > 250){
-			Serial2.println(angle);	//angle;
+			SERIAL_OUT.println(angle);	//angle;
 			time = millis();
 		}
 		get_mode();
@@ -184,16 +184,16 @@ void watch_angle(){
 
 void watch_gyro(){
 	static long time = millis();
-	Serial2.println();
+	SERIAL_OUT.println();
 	setup_mpu6050();
 	calculate_null();
 
-	Serial2.println("watch gyro");
+	SERIAL_OUT.println("watch gyro");
 	do{
 		read_FIFO();
 
 		if((millis() - time) > 250){
-			Serial2.println(accum);
+			SERIAL_OUT.println(accum);
 			time = millis();
 		}
 		get_mode();
@@ -216,17 +216,17 @@ void reset_FIFO(){
 	// keep trying to connect to I2C bus if we get an error
 	// boolean error = true;
 	// while (error){
-		// Serial2.println("begin transmission with gyro");
+		// SERIAL_OUT.println("begin transmission with gyro");
 		// Wire.beginTransmission(MPU6050_ADDRESS_AD0_LOW);
-		// Serial2.println("ending transmission with gyro");
+		// SERIAL_OUT.println("ending transmission with gyro");
 		// error = Wire.endTransmission();			// if error = 0, we are properly connected
-		// Serial2.println("transmission ended");
+		// SERIAL_OUT.println("transmission ended");
 		// if(error){								// if we aren't properly connected, try connecting again and loop
-			// Serial2.println();
-			// Serial2.println("Not properly connected to I2C, trying again");
-			// Serial2.println();
+			// SERIAL_OUT.println();
+			// SERIAL_OUT.println("Not properly connected to I2C, trying again");
+			// SERIAL_OUT.println();
 			// Wire.begin();
 			// TWBR = 24; // 400kHz I2C clock
 		// }
 	// }
-	// Serial2.println("Properly connected to I2C");
+	// SERIAL_OUT.println("Properly connected to I2C");

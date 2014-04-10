@@ -1,5 +1,6 @@
 //AVC SETTINGS
-#define RR
+#define RR			//use either MM (minuteman) or RR (roadrunner)
+#define USB	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
@@ -113,6 +114,17 @@ int excel_waypoints[19][2] = {{0,250}, {-100,100}, {100,100}, {-100,100}, {0,100
 #define AUX 3
 #define RESET 4
 #endif
+
+
+#ifdef BLUETOOTH
+#define SERIAL_OUT Serial2
+#endif
+
+#ifdef USB
+#define SERIAL_OUT Serial	
+#endif
+
+
 
 /* ROADRUNNER
 1500 - stop

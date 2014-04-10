@@ -15,35 +15,35 @@ extern int mode;
 
 //PROGRAM FUNCTIONS
 void menu_choices(){
-	Serial2.println();
-	Serial2.println("Main Menu");
-	Serial2.println("----------");
-	Serial2.println();
-	Serial2.println("WAYPOINT FUNCTIONS");
-	Serial2.println("----------");
-	Serial2.println("d = display waypoints");
-	Serial2.println("e = edit waypoint");
-	Serial2.println("i = import header waypoint values");
-	Serial2.println();
-	Serial2.println("GYRO FUNCTIONS");
-	Serial2.println("----------");
-	Serial2.println("a = watch angle");
-	Serial2.println("g = gyro calibration");
-	Serial2.println("w = watch gyro");
-	Serial2.println();
-	Serial2.println("MISCELLANEOUS FUNCTIONS");
-	Serial2.println("----------");
-	Serial2.println("c = click calibration");
-	Serial2.println("l = activate the FRICKIN LASER");
-	Serial2.println("m = combined mode and toggle state test");
-	Serial2.println("o = mode state test");
-	Serial2.println("t = switch state toggle test");
-	Serial2.println("s = steering calibration");
-	Serial2.println("v = servo test");
-	Serial2.println();
-	Serial2.println();
-	Serial2.println("x = exit. start setup routine for the race");
-	Serial2.println();
+	SERIAL_OUT.println();
+	SERIAL_OUT.println("Main Menu");
+	SERIAL_OUT.println("----------");
+	SERIAL_OUT.println();
+	SERIAL_OUT.println("WAYPOINT FUNCTIONS");
+	SERIAL_OUT.println("----------");
+	SERIAL_OUT.println("d = display waypoints");
+	SERIAL_OUT.println("e = edit waypoint");
+	SERIAL_OUT.println("i = import header waypoint values");
+	SERIAL_OUT.println();
+	SERIAL_OUT.println("GYRO FUNCTIONS");
+	SERIAL_OUT.println("----------");
+	SERIAL_OUT.println("a = watch angle");
+	SERIAL_OUT.println("g = gyro calibration");
+	SERIAL_OUT.println("w = watch gyro");
+	SERIAL_OUT.println();
+	SERIAL_OUT.println("MISCELLANEOUS FUNCTIONS");
+	SERIAL_OUT.println("----------");
+	SERIAL_OUT.println("c = click calibration");
+	SERIAL_OUT.println("l = activate the FRICKIN LASER");
+	SERIAL_OUT.println("m = combined mode and toggle state test");
+	SERIAL_OUT.println("o = mode state test");
+	SERIAL_OUT.println("t = switch state toggle test");
+	SERIAL_OUT.println("s = steering calibration");
+	SERIAL_OUT.println("v = servo test");
+	SERIAL_OUT.println();
+	SERIAL_OUT.println();
+	SERIAL_OUT.println("x = exit. start setup routine for the race");
+	SERIAL_OUT.println();
 	return ;
 }
 
@@ -51,11 +51,11 @@ void main_menu(){
 	int loop = 1;
 	get_mode();
 	menu_choices();
-	Serial2.flush();
+	SERIAL_OUT.flush();
 	while((loop) && (mode == MANUAL)){
 		get_mode();
-		if(Serial2.available() > 0){
-	 		switch(Serial2.read()){
+		if(SERIAL_OUT.available() > 0){
+	 		switch(SERIAL_OUT.read()){
 				case 'd':
 					display_waypoints();
 					menu_choices();
@@ -112,13 +112,13 @@ void main_menu(){
 					break;
 
 				case 'x':
-					Serial2.println();
-					Serial2.println();
-					Serial2.println("Setting up for the race");
+					SERIAL_OUT.println();
+					SERIAL_OUT.println();
+					SERIAL_OUT.println("Setting up for the race");
 					loop = 0;
 					break;
 				default:
-					Serial2.println("invalid entry. try again.");
+					SERIAL_OUT.println("invalid entry. try again.");
 					menu_choices();
 					break;
 			}

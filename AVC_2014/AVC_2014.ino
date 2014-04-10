@@ -87,13 +87,13 @@ void get_mode(){
 }
 
 void race_startup_routine(){
-	Serial2.println();
+	SERIAL_OUT.println();
 	//verify that car is in automatic mode
 	get_mode();
 	if(mode == MANUAL){
-		Serial2.println();
-		Serial2.println("1. SET CAR TO MODE 1 / AUTOMATIC / PRESS CH3 TO CONTINUE");
-		Serial2.println();
+		SERIAL_OUT.println();
+		SERIAL_OUT.println("1. SET CAR TO MODE 1 / AUTOMATIC / PRESS CH3 TO CONTINUE");
+		SERIAL_OUT.println();
 	}
 	while(mode == MANUAL){
 		get_mode();		//waits until radio is set to automatic
@@ -101,13 +101,13 @@ void race_startup_routine(){
 	}
 
 	//by turning off the radio, the automatic mode is locked in
-	Serial2.println("2. TURN OFF THE RADIO!");
-	Serial2.println();
+	SERIAL_OUT.println("2. TURN OFF THE RADIO!");
+	SERIAL_OUT.println();
 	delay(2500);
 
-	Serial2.println("***READY TO RUN***");
-	Serial2.println("3. FLIP THE SWITCH TO START THE RACE!");
-	Serial2.println();
+	SERIAL_OUT.println("***READY TO RUN***");
+	SERIAL_OUT.println("3. FLIP THE SWITCH TO START THE RACE!");
+	SERIAL_OUT.println();
 
 	//determines the current state and waits for it to change to start the race
 	get_mode();
@@ -148,10 +148,10 @@ void setup(){
 		delay(500);
 	}
 
-	Serial2.begin(115200);
-	Serial2.setTimeout(100000);
-	Serial2.println(CAR_NAME);
-	Serial2.println();
+	SERIAL_OUT.begin(115200);
+	SERIAL_OUT.setTimeout(100000);
+	SERIAL_OUT.println(CAR_NAME);
+	SERIAL_OUT.println();
 
    	//Pin assignments:
 	pinMode(MODE_LINE_1, INPUT);
@@ -223,12 +223,12 @@ void loop(){
 	static long time = 0;
 	if((millis() - time) > 500){
 		print_coordinates();
-		Serial2.print("mode: ");
-		Serial2.print(mode);
-		Serial2.print("\t\tfirst?: ");
-		Serial2.print(first);
-		Serial2.print("\t\tclicks: ");
-		Serial2.println(clicks);
+		SERIAL_OUT.print("mode: ");
+		SERIAL_OUT.print(mode);
+		SERIAL_OUT.print("\t\tfirst?: ");
+		SERIAL_OUT.print(first);
+		SERIAL_OUT.print("\t\tclicks: ");
+		SERIAL_OUT.println(clicks);
 		time = millis();
 	}
 }
