@@ -200,7 +200,7 @@ void loop(){
 		}
 
 		if(!running){	//this will kick start the car/get it moving when it first starts the race
-			esc.write(S2);
+			esc.writeMicroseconds(S2);
 			running = true;
 		}
 	}
@@ -223,6 +223,12 @@ void loop(){
 	static long time = 0;
 	if((millis() - time) > 500){
 		print_coordinates();
+		Serial2.print("mode: ");
+		Serial2.print(mode);
+		Serial2.print("\t\tfirst?: ");
+		Serial2.print(first);
+		Serial2.print("\t\tclicks: ");
+		Serial2.println(clicks);
 		time = millis();
 	}
 }

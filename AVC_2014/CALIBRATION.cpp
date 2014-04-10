@@ -95,6 +95,7 @@ void servo_test(){
 
 	while(mode != AUTOMATIC) get_mode();
 	while(mode == AUTOMATIC){
+		Serial2.println("normal angle output");
 		for(int pos = 30; pos < 150; pos += 1){	//goes from 0 degrees to 180 degrees in steps of 1 degree
 			steering.write(pos);					//tell servo to go to position in variable 'pos'
 			Serial2.println(pos);
@@ -106,9 +107,24 @@ void servo_test(){
 			Serial2.println(pos);
 			delay(15);							//waits 15ms for the servo to reach the position
 		}
+
+		Serial2.println("microsecond angle output");
+		for(int pos = 1250; pos < 1750; pos += 1){	//goes from 0 degrees to 180 degrees in steps of 1 degree
+			steering.writeMicroseconds(pos);					//tell servo to go to position in variable 'pos'
+			Serial2.println(pos);
+			delay(5);							//waits 15ms for the servo to reach the position
+		}
+
+		for(int pos = 1750; pos >= 1250; pos -= 1){		//goes from 180 degrees to 0 degrees
+			steering.writeMicroseconds(pos);					//tell servo to go to position in variable 'pos'
+			Serial2.println(pos);
+			delay(5);							//waits 15ms for the servo to reach the position
+		}
+
 		get_mode();
 	}
 
+	
 	steering.detach();
 	
 	return;

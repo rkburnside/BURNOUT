@@ -108,8 +108,8 @@ void read_FIFO(){
 		if((accum > GYRO_CAL) && (!cal_flag)) accum -= GYRO_CAL*2; //if we are calculating null, don't roll-over
 		if((accum < -GYRO_CAL) && (!cal_flag)) accum += GYRO_CAL*2;
 	}
-	//angle = (float)accum/(float)GYRO_CAL * -3.14159;   //change sign of PI for flipped gyro
-	angle = (float)accum/GYRO_CAL * -180;   //using degrees *10, negative for flipped gyro.
+	angle = (float)accum/(float)GYRO_CAL * -3.14159;   //change sign of PI for flipped gyro
+	//angle = (float)accum/GYRO_CAL * -180;   //using degrees *10, negative for flipped gyro.
 
 	return ;
 }
