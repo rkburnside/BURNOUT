@@ -91,9 +91,6 @@ void race_startup_routine(){
 	
 	setup_mpu6050();
 	calculate_null();
-
-	SERIAL_OUT.println("determine if the car is glitching at all for 15 seconds. the ESC and servo have already been attached and set.");
-	delay(15000);
 	
 	SERIAL_OUT.println();
 	//verify that car is in automatic mode
@@ -108,9 +105,6 @@ void race_startup_routine(){
 		read_FIFO();
 	}
 
-	SERIAL_OUT.println("determine if the car is glitching at all for 15 seconds. the ESC and servo have already been attached and set.");
-	delay(15000);
-	
 	//by turning off the radio, the automatic mode is locked in
 	SERIAL_OUT.println("2. TURN OFF THE RADIO AND FLIP THE SWITCH TO START THE RACE!");
 	SERIAL_OUT.println();
