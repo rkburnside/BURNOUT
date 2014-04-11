@@ -17,7 +17,7 @@ extern int mode;
 extern long accum;
 
 //OBJECT DECLARATIONS
-extern Servo steering;
+extern Servo steering, esc;
 
 
 //PROGRAM FUNCTIONS
@@ -89,6 +89,9 @@ void servo_test(){
 	steering.attach(STEERING);
 	steering.writeMicroseconds(STEER_ADJUST);
 
+	esc.attach(THROTTLE);
+	esc.write(90);
+
 	SERIAL_OUT.println();
 	SERIAL_OUT.println();
 	SERIAL_OUT.println("set CH3 to AUTOMATIC");
@@ -124,7 +127,7 @@ void servo_test(){
 		get_mode();
 	}
 
-	
+	esc.detach();
 	steering.detach();
 	
 	return;
