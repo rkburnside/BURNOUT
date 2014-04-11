@@ -112,12 +112,12 @@ void race_startup_routine(){
 	delay(15000);
 	
 	//by turning off the radio, the automatic mode is locked in
-	SERIAL_OUT.println("2. TURN OFF THE RADIO & FLIP THE SWITCH TO START THE RACE!");
+	SERIAL_OUT.println("2. TURN OFF THE RADIO AND FLIP THE SWITCH TO START THE RACE!");
 	SERIAL_OUT.println();
 	delay(1250);
 
 	SERIAL_OUT.println("3. ***READY TO RUN***");
-	SERIAL_OUT.println(");
+	SERIAL_OUT.println();
 	SERIAL_OUT.println();
 
 	//determines the current state and waits for it to change to start the race
