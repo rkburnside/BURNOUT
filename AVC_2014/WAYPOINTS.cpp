@@ -77,6 +77,7 @@ void import_waypoints(){
 
 void display_waypoints(){
 	SERIAL_OUT.println();
+	
 	for(int i=1; i <= WAYPOINT_COUNT; i++){
 		EEPROM_readAnything(i*WP_SIZE, waypoint);
 

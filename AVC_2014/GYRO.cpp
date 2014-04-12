@@ -173,7 +173,7 @@ void watch_angle(){
 		read_FIFO();
 
 		if((millis() - time) > 250){
-			SERIAL_OUT.println(angle);	//angle;
+			SERIAL_OUT.println(angle*180.0/3.14159);	//angle;
 			time = millis();
 		}
 		get_mode();

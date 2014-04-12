@@ -79,6 +79,11 @@ long sum = 0;
 long avg = 0;
 
 void setup() {
+	pinMode(LED_BUILTIN, OUTPUT);
+	for(int i = 0; i<8; i++){
+		digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+		delay(500);
+	}
 	// join I2C bus (I2Cdev library doesn't do this automatically)
 	#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
 	Wire.begin();
