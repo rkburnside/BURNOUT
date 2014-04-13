@@ -4,7 +4,7 @@
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-int excel_waypoints[19][2] = {{0,250}, {-100,100}, {100,100}, {-100,100}, {0,100}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
+int excel_waypoints[19][2] = {{0,500}, {-200,500}, {-200,-200}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
@@ -62,7 +62,7 @@ int excel_waypoints[19][2] = {{0,250}, {-100,100}, {100,100}, {-100,100}, {0,100
 
 #ifdef RR
 //WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 30	//waypoint acceptance radius in inches
+#define WAYPOINT_ACCEPT 50	//waypoint acceptance radius in inches
 #define S1 1500				//stationary speed
 #define S2 1600				//1650 is a creeping speed
 #define S3 1600				//This is the speed for negotiating wp's 
