@@ -87,7 +87,8 @@ void get_mode(){
 }
 
 void race_startup_routine(){
-	activate_the_frickin_laser();
+//	activate_the_frickin_laser();
+	SERIAL_OUT.println("RACE SETUP ROUTINE!!!");
 	
 	setup_mpu6050();
 	calculate_null();
@@ -97,10 +98,15 @@ void race_startup_routine(){
 	get_mode();
 	if(mode == MANUAL){
 		SERIAL_OUT.println();
-		SERIAL_OUT.println("1. SET CAR TO MODE 1 / AUTOMATIC / PRESS CH3 TO CONTINUE");
+		SERIAL_OUT.println("1. SET CAR TO AUTOMATIC");
 		SERIAL_OUT.println();
 	}
-	while(mode == MANUAL){
+	while(mode != AUTOMATIC){
+		static long time = millis();
+		if((millis() - time) > 250){
+			digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+			time = millis();
+		}
 		get_mode();		//waits until radio is set to automatic
 		read_FIFO();
 	}
@@ -114,6 +120,8 @@ void race_startup_routine(){
 	SERIAL_OUT.println();
 	SERIAL_OUT.println();
 
+	digitalWrite(LED_BUILTIN, HIGH);	//this is used to indicate that the car is ready to run
+
 	//determines the current state and waits for it to change to start the race
 	get_mode();
 	int toggle_state = digitalRead(TOGGLE);
@@ -122,6 +130,61 @@ void race_startup_routine(){
 		get_mode();		//waits until the switch is flipped to start the race
 		read_FIFO();
 	}
+
+	digitalWrite(LED_BUILTIN, LOW);		//this is used to indicate that the car is ready to run
+
+	for(int i=0; i<100; i++){	//clears the FIFO buffer and waits 1 sec to start
+		delay(1);
+		read_FIFO();
+	}
+
+	//the following zeros out everything and sets the waypoint and counter
+	wpr_count = 1;		//set waypoint read counter to first waypoint
+	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
+	x_wp = waypoint.x;
+	y_wp = waypoint.y;
+
+	x=0;
+	y=0;
+	reset_FIFO();
+	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
+	clicks = 0;
+	first = true;
+	target_x = x_wp;
+	target_y = y_wp;
+
+	return;
+}
+
+void wp_setup_routine(){
+	SERIAL_OUT.println("WP SETUP ROUTINE!!!");
+
+	setup_mpu6050();
+	calculate_null();
+	
+	SERIAL_OUT.println();
+	//verify that car is in automatic mode
+	get_mode();
+	if(mode != MANUAL){
+		SERIAL_OUT.println();
+		SERIAL_OUT.println("SET CAR TO MANUAL MODE");
+		SERIAL_OUT.println();
+	}
+	while(mode != MANUAL){
+		static long time = millis();
+		if((millis() - time) > 250){
+			digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+			time = millis();
+		}
+		get_mode();		//waits until radio is set to automatic
+		read_FIFO();
+	}
+
+	SERIAL_OUT.println("***READY TO SET WAYPOINTS***");
+	SERIAL_OUT.println();
+	SERIAL_OUT.println();
+
+	digitalWrite(LED_BUILTIN, HIGH);	//this is used to indicate that the car is ready to run
 
 	for(int i=0; i<100; i++){	//clears the FIFO buffer and waits 1 sec to start
 		delay(1);
@@ -177,9 +240,10 @@ void setup(){
 	esc.writeMicroseconds(S1);
 
 	main_menu();
-	delay(500);
 
-	race_startup_routine();
+	get_mode();
+	if(mode != AUTOMATIC) wp_setup_routine();
+	else race_startup_routine();
 }
 
 void loop(){
@@ -223,12 +287,6 @@ void loop(){
 	static long time = 0;
 	if((millis() - time) > 500){
 		print_coordinates();
-		SERIAL_OUT.print("mode: ");
-		SERIAL_OUT.print(mode);
-		SERIAL_OUT.print("\t\tfirst?: ");
-		SERIAL_OUT.print(first);
-		SERIAL_OUT.print("\t\tclicks: ");
-		SERIAL_OUT.println(clicks);
 		time = millis();
 	}
 }
