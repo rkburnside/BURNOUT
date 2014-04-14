@@ -242,6 +242,7 @@ void setup(){
 	main_menu();
 
 	get_mode();
+	SERIAL_OUT.println(mode);
 	if(mode != AUTOMATIC) wp_setup_routine();
 	else race_startup_routine();
 }

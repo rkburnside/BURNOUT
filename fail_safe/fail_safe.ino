@@ -42,9 +42,11 @@ int multiplexor = 9;		//multiplexor toggle
 int ch_3_in = 8;			//pin to monitor radio channel 3
 int pulse_in_length = 0;	//pulse in from the RX
 int switch_position = SWITCH_POSITION_MANUAL;	//the initial position will be MANUAL
-
+bool stable_state = false;
 
 void setup(){
+	Serial.begin(115200);
+
 	pinMode(LED_BUILTIN, OUTPUT);
 	pinMode(hard_reset_pin, OUTPUT);
 	pinMode(mode_1, OUTPUT);
@@ -52,20 +54,29 @@ void setup(){
 	pinMode(multiplexor, OUTPUT);
 	pinMode(ch_3_in, INPUT);
 
-	digitalWrite(hard_reset_pin, LOW);
-	digitalWrite(mode_1, LOW);
-	digitalWrite(mode_2, LOW);
-	digitalWrite(multiplexor, LOW);
-	digitalWrite(LED_BUILTIN, LOW);
-
+	switch_position = SWITCH_POSITION_MANUAL;
 	set_vehile_state();
 	flash_led();
+
+	while(true){
+		get_pulse_length();
+		determine_switch_position();
+		determine_if_switch_position_is_stable();
+		if(stable_state) if(switch_position == SWITCH_POSITION_MANUAL) break;
+	}
 }
 
 void loop(){
 	get_pulse_length();
 	determine_switch_position();
-	set_vehile_state();
+	determine_if_switch_position_is_stable();
+
+	static bool previously_stable_state = stable_state;
+	if(previously_stable_state != stable_state){
+		set_vehile_state();
+		previously_stable_state = stable_state;
+	}
+
 	flash_led();
 	check_if_reset_requested();
 }
@@ -90,54 +101,71 @@ void determine_switch_position(){
 	return;
 }
 
-void set_vehile_state(){
-	static int previous_switch_position = SWITCH_POSITION_MANUAL;
+void determine_if_switch_position_is_stable(){
+	static int previous_switch_position = switch_position;
+	static int counter = 0;
 	
-	if(previous_switch_position != switch_position){
-		switch(switch_position){
-			case SWITCH_POSITION_WAYPOINT:
-				digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
-				digitalWrite(mode_1, LOW);			//set the pins states
-				digitalWrite(mode_2, LOW);
-				digitalWrite(multiplexor, HIGH);	//keep the multiplexor HIGH (i.e. MANUAL control) to ensure the car is staitonsary while setting the waypoint
-				digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
-				break;
-
-			case SWITCH_POSITION_AUX:
-				digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
-				digitalWrite(mode_1, HIGH);			//set the pins states
-				digitalWrite(mode_2, LOW);
-				digitalWrite(multiplexor, LOW);		//now enable the main MCU control
-				digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
-				break;
-
-			case SWITCH_POSITION_RESET:
-				digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
-				digitalWrite(mode_1, HIGH);			//set the pins states
-				digitalWrite(mode_2, HIGH);
-				digitalWrite(multiplexor, HIGH);	//now enable the main MCU control
-				digitalWrite(hard_reset_pin, HIGH);	//send reset signal to main MCU
-				break;
-			
-			case SWITCH_POSITION_AUTOMATIC:
-				digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
-				digitalWrite(mode_1, LOW);			//set the pins states
-				digitalWrite(mode_2, HIGH);
-				digitalWrite(multiplexor, LOW);		//now enable the main MCU control
-				digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
-				break;
-
-			default:	//default state is SWITCH_POSITION_MANUAL
-				digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
-				digitalWrite(mode_1, HIGH);			//set the pins states
-				digitalWrite(mode_2, HIGH);
-				digitalWrite(multiplexor, HIGH);	//now enable the main MCU control
-				digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
+	if(previous_switch_position == switch_position){
+		if(counter > 4) stable_state = true;
+		else{
+			counter++;
+			Serial.println(counter);
+			stable_state = false;
 		}
-
+	}
+	else{
 		previous_switch_position = switch_position;
+		counter = 0;
+		Serial.println(counter);
+		stable_state = false;
 	}
 	
+	return;
+}
+
+void set_vehile_state(){
+	Serial.println("state set");
+	switch(switch_position){
+		case SWITCH_POSITION_WAYPOINT:
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, LOW);			//set the pins states
+			digitalWrite(mode_2, LOW);
+			digitalWrite(multiplexor, HIGH);	//keep the multiplexor HIGH (i.e. MANUAL control) to ensure the car is staitonsary while setting the waypoint
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
+			break;
+
+		case SWITCH_POSITION_AUX:
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, HIGH);			//set the pins states
+			digitalWrite(mode_2, LOW);
+			digitalWrite(multiplexor, LOW);		//now enable the main MCU control
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
+			break;
+
+		case SWITCH_POSITION_RESET:
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, HIGH);			//set the pins states
+			digitalWrite(mode_2, HIGH);
+			digitalWrite(multiplexor, HIGH);	//now enable the main MCU control
+			digitalWrite(hard_reset_pin, HIGH);	//send reset signal to main MCU
+			break;
+		
+		case SWITCH_POSITION_AUTOMATIC:
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, LOW);			//set the pins states
+			digitalWrite(mode_2, HIGH);
+			digitalWrite(multiplexor, LOW);		//now enable the main MCU control
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
+			break;
+
+		default:	//default state is SWITCH_POSITION_MANUAL
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, HIGH);			//set the pins states
+			digitalWrite(mode_2, HIGH);
+			digitalWrite(multiplexor, HIGH);	//now enable the main MCU control
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
+	}
+
 	return;
 }
 
