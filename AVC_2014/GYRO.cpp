@@ -71,7 +71,8 @@ void setup_mpu6050(){
 	accelgyro.setDLPFMode(MPU6050_DLPF_BW_42);
 
 	SERIAL_OUT.println(F("Setting gyro sensitivity to +/- 250 deg/sec..."));
-	accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
+	accelgyro.setFullScaleGyroRange(1);
+	//accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
 	//accelgyro.setFullScaleGyroRange(0);  // 0=250, 1=500, 2=1000, 3=2000 deg/sec
 
 	SERIAL_OUT.println(F("Resetting FIFO..."));
