@@ -77,14 +77,21 @@ void import_waypoints(){
 
 void display_waypoints(){
 	SERIAL_OUT.println();
+	
 	for(int i=1; i <= WAYPOINT_COUNT; i++){
 		EEPROM_readAnything(i*WP_SIZE, waypoint);
 
-		SERIAL_OUT.print(i);
-		SERIAL_OUT.print(": ");
-		SERIAL_OUT.print(waypoint.x*CLICK_INCHES);
-		SERIAL_OUT.print(" , ");
-		SERIAL_OUT.println(waypoint.y*CLICK_INCHES);
+		Serial.print(i);
+		Serial.print(": ");
+		Serial.print(waypoint.x*CLICK_INCHES);
+		Serial.print(" , ");
+		Serial.println(waypoint.y*CLICK_INCHES);
+
+		Serial2.print(i);
+		Serial2.print(": ");
+		Serial2.print(waypoint.x*CLICK_INCHES);
+		Serial2.print(" , ");
+		Serial2.println(waypoint.y*CLICK_INCHES);
 	}
 
 	SERIAL_OUT.println();

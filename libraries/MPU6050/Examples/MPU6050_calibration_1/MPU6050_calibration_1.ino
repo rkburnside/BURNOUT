@@ -56,6 +56,11 @@ int ax_offset,ay_offset,az_offset,gx_offset,gy_offset,gz_offset;
 
 ///////////////////////////////////   SETUP   ////////////////////////////////////
 void setup() {
+	pinMode(LED_BUILTIN, OUTPUT);
+	for(int i = 0; i<8; i++){
+		digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+		delay(500);
+	}
 	// join I2C bus (I2Cdev library doesn't do this automatically)
 	Wire.begin();
 	// COMMENT NEXT LINE IF YOU ARE USING ARDUINO DUE

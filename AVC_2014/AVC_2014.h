@@ -4,7 +4,7 @@
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-int excel_waypoints[19][2] = {{0,250}, {-100,100}, {100,100}, {-100,100}, {0,100}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
+int excel_waypoints[19][2] = {{0,500}, {-200,500}, {-200,-200}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
@@ -62,7 +62,7 @@ int excel_waypoints[19][2] = {{0,250}, {-100,100}, {100,100}, {-100,100}, {0,100
 
 #ifdef RR
 //WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 30	//waypoint acceptance radius in inches
+#define WAYPOINT_ACCEPT 50	//waypoint acceptance radius in inches
 #define S1 1500				//stationary speed
 #define S2 1600				//1650 is a creeping speed
 #define S3 1600				//This is the speed for negotiating wp's 
@@ -76,13 +76,13 @@ int excel_waypoints[19][2] = {{0,250}, {-100,100}, {100,100}, {-100,100}, {0,100
 #define L2 20000
 #define L3 200
 #define L4 350
-#define XGYROOFFSET 85
-#define YGYROOFFSET -70
-#define ZGYROOFFSET 46
+#define XGYROOFFSET -861
+#define YGYROOFFSET -9
+#define ZGYROOFFSET 30
+
 
 //SENSOR PARAMETERS
-//#define GYRO_CAL 466186233	//this has to be measured by rotating the gyro 360 deg. and reading the output
-#define GYRO_CAL 235434205		//234044150
+#define GYRO_CAL 233302330		//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
 #define STEER_ADJUST 1480		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 4000			//proportional gain, if navigation gets unstable, reduce.
