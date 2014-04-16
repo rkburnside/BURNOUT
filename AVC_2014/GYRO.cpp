@@ -207,7 +207,28 @@ void reset_FIFO(){
 	return;
 }
 
+void gyro_rate(){
+	int16_t temp = 0, max=0, min = 0;
+	static long time = millis();
+	SERIAL_OUT.println();
+	setup_mpu6050();
 
+	SERIAL_OUT.println("min/max gyro rates:");
+	do{
+		temp = accelgyro.getRotationZ();
+		if (temp > max) max = temp;
+		if (temp < min) min = temp;
+		if((millis() - time) > 250){
+			SERIAL_OUT.print(min);
+			SERIAL_OUT.print('\t');
+			SERIAL_OUT.println(max);
+			time = millis();
+		}
+		delay(2);
+		get_mode();
+	} while(mode == MANUAL);		//keep summing until we turn the mode switch off.
+	return ;
+}	
 
 
 	// This setup routine should/will ensure the i2c connection is working
