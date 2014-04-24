@@ -58,12 +58,22 @@ void setup(){
 	set_vehile_state();
 	flash_led();
 
-	while(true){
-		get_pulse_length();
-		determine_switch_position();
-		determine_if_switch_position_is_stable();
-		if(stable_state) if(switch_position == SWITCH_POSITION_MANUAL) break;
-	}
+/*learn and document excatly how the rx ch3 works with the following conditions:
+	1. turn on rx and tx. what signal is received when the tx is offed? does it change? how quickly?
+	2. turn on rx and tx. set tx to a known channel setting. off the tx. off the rx. on the rx. what is the new signal? did it change or default to something? repeat this for ALL of the ch3 settings.
+	3. add a timer and verify that all the rx outputs are being received by the arduino. this is to learn if all of the signals are being output and if the port is working quickly enough.
+	4. turn on the rx and tx. switch the tx ch3 to other settings. how quickly does the signal change? how many steps are there between 1000us and 2000us? does it differ between with 1000us to 1500us or 1250us?
+	5. use the information above to create/correct the following routines:
+		a. stable signal received
+		b. hold at the beginning of the sketch to ensure that the tx is on manual (or a known state)	
+*/
+
+	// while(true){
+		// get_pulse_length();
+		// determine_switch_position();
+		// determine_if_switch_position_is_stable();
+		// if(stable_state) if(switch_position == SWITCH_POSITION_MANUAL) break;
+	// }
 }
 
 void loop(){

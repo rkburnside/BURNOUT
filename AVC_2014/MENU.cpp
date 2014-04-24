@@ -122,8 +122,8 @@ void main_menu(){
 					menu_choices();
 					break;
 			}
-		delay(500);
-		get_mode();
+		// delay(500);	// i'm unsure why this 500ms delay is here. could this be the reason for the failure to go to the wp_mode?
+		// get_mode(); //why is this 2nd get_mode() here? i don't know if/think it is needed
 		}
 	}
 	return ;
