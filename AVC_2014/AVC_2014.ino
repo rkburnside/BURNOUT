@@ -73,10 +73,10 @@ void navigate(){
 }
 
 void get_mode(){
-	int mode_1 = 0, mode_2 = 0;
+	// int mode_1 = 0, mode_2 = 0;
 
-	mode_1 = digitalRead(MODE_LINE_1);
-	mode_2 = digitalRead(MODE_LINE_2);
+	int mode_1 = digitalRead(MODE_LINE_1);
+	int mode_2 = digitalRead(MODE_LINE_2);
 	
 	if((mode_1 == HIGH) && (mode_2 == HIGH)) mode = MANUAL;
 	else if((mode_1 == LOW) && (mode_2 == HIGH)) mode = AUTOMATIC;
@@ -131,7 +131,7 @@ void race_startup_routine(){
 		read_FIFO();
 	}
 
-	digitalWrite(LED_BUILTIN, LOW);		//this is used to indicate that the car is ready to run
+	digitalWrite(LED_BUILTIN, LOW);		//turn off LED since car is going to run
 
 	for(int i=0; i<100; i++){	//clears the FIFO buffer and waits 1 sec to start
 		delay(1);

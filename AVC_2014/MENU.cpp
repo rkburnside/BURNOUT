@@ -122,7 +122,7 @@ void main_menu(){
 					menu_choices();
 					break;
 			}
-		delay(500);
+		delay(500);	// these lines are required to ensure that the menu is displayed after CH3 has been toggled. if removed, the get_mode() reacts too fast and causes the car to immediately proceed to the startup routine
 		get_mode();
 		}
 	}
