@@ -23,6 +23,15 @@ Description and Functionality
 	channel B = RX = A/B select HIGH
 */
 
+/*How the RX channel 3 reacts to TX signals
+The receiver and pro-mini are working in the following way:
+1. the pulses are being received every 21580us. this is because I set the pulse in time-out to 20000us. since a standard servo duty cycle is 20000us, this causes the pro-mini to miss ~10% of the pulses. this is just fine. the switching functions work just fine and react correctly. i am not concerned with it missing 10% of the pulses.
+2. the pro-mini will NOT set a state now until the signal is stable.
+3. if the rx and tx are on, the rx outputs the tx signal.
+4. if the rx and tx are on, then the tx is offed, the rx will continue to output the last signal from the tx.
+5. if the tx is off and then the rx turned on, it will output 0 for a signal length.
+*/
+
 #define TIME_TO_FLIP_SWITCH 1000	//time in ms to flip the switch 3 times
 #define RESET_SWITCH_COUNTER 3		//number to reset the main MCU
 #define SWITCH_POSITION_MANUAL 0	//manual control of the car
@@ -42,9 +51,11 @@ int multiplexor = 9;		//multiplexor toggle
 int ch_3_in = 8;			//pin to monitor radio channel 3
 int pulse_in_length = 0;	//pulse in from the RX
 int switch_position = SWITCH_POSITION_MANUAL;	//the initial position will be MANUAL
-
+bool stable_state = false;
 
 void setup(){
+	Serial.begin(115200);
+
 	pinMode(LED_BUILTIN, OUTPUT);
 	pinMode(hard_reset_pin, OUTPUT);
 	pinMode(mode_1, OUTPUT);
@@ -52,20 +63,33 @@ void setup(){
 	pinMode(multiplexor, OUTPUT);
 	pinMode(ch_3_in, INPUT);
 
-	digitalWrite(hard_reset_pin, LOW);
-	digitalWrite(mode_1, LOW);
-	digitalWrite(mode_2, LOW);
-	digitalWrite(multiplexor, LOW);
-	digitalWrite(LED_BUILTIN, LOW);
-
+	switch_position = SWITCH_POSITION_MANUAL;
 	set_vehile_state();
 	flash_led();
+
+	// while(true){
+		// get_pulse_length();
+		// determine_switch_position();
+		// determine_if_switch_position_is_stable();
+		// if(stable_state) if(switch_position == SWITCH_POSITION_MANUAL) break;
+	// }
 }
 
 void loop(){
 	get_pulse_length();
 	determine_switch_position();
-	set_vehile_state();
+	determine_if_switch_position_is_stable();
+
+	// the following function checks to see if the mode has changed. if NOT, skip the loop. if YES, muxer is set to manual, pins are changed, and the muxer is set back to the appropriate state. previously, it was constantly switching to MANUAL, setting the pins, and then switching back...that did NOT work.
+
+	static bool previously_set_state = false;
+	if(stable_state){
+		if(!previously_set_state){
+			set_vehile_state();
+		}
+	}
+	previously_set_state = stable_state;
+
 	flash_led();
 	check_if_reset_requested();
 }
@@ -73,11 +97,11 @@ void loop(){
 void get_pulse_length(){
 	static int temp_pulse_length = 0;
 
-	//servos receive a HIGH pulse of 1.0ms~2.0ms (1500us~2000us) at a duty cycle of 40Hz~200Hz (i.e. 5000us~25000us), depending on the RX/TX set up. The max cycle time would be 27000us. The pulse function will time out after 30000us if no pulse is received. pulseIn will return 0 if time out occurs.
-	temp_pulse_length = pulseIn(ch_3_in, HIGH, 30000);
+	//servos receive a HIGH pulse of 1.0ms~2.0ms (1500us~2000us) with a duty cycle of 50Hz (i.e. 20ms). The pulse function will time out after 30000us if no pulse is received. pulseIn will return 0 if time out occurs.
+	temp_pulse_length = pulseIn(ch_3_in, HIGH, 20000);
 
 	if(temp_pulse_length > 500) pulse_in_length = temp_pulse_length;	//if a good pulse is received (i.e. not 0), pulse_in_length is accepted and saved
-
+	Serial.print(pulse_in_length); Serial.print("\t");
 	return;
 }
 
@@ -90,54 +114,71 @@ void determine_switch_position(){
 	return;
 }
 
-void set_vehile_state(){
-	static int previous_switch_position = SWITCH_POSITION_MANUAL;
+void determine_if_switch_position_is_stable(){
+	static int previous_switch_position = switch_position;
+	static int counter = 0;
 	
-	if(previous_switch_position != switch_position){
-		switch(switch_position){
-			case SWITCH_POSITION_WAYPOINT:
-				digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
-				digitalWrite(mode_1, LOW);			//set the pins states
-				digitalWrite(mode_2, LOW);
-				digitalWrite(multiplexor, HIGH);	//keep the multiplexor HIGH (i.e. MANUAL control) to ensure the car is staitonsary while setting the waypoint
-				digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
-				break;
-
-			case SWITCH_POSITION_AUX:
-				digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
-				digitalWrite(mode_1, HIGH);			//set the pins states
-				digitalWrite(mode_2, LOW);
-				digitalWrite(multiplexor, LOW);		//now enable the main MCU control
-				digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
-				break;
-
-			case SWITCH_POSITION_RESET:
-				digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
-				digitalWrite(mode_1, HIGH);			//set the pins states
-				digitalWrite(mode_2, HIGH);
-				digitalWrite(multiplexor, HIGH);	//now enable the main MCU control
-				digitalWrite(hard_reset_pin, HIGH);	//send reset signal to main MCU
-				break;
-			
-			case SWITCH_POSITION_AUTOMATIC:
-				digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
-				digitalWrite(mode_1, LOW);			//set the pins states
-				digitalWrite(mode_2, HIGH);
-				digitalWrite(multiplexor, LOW);		//now enable the main MCU control
-				digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
-				break;
-
-			default:	//default state is SWITCH_POSITION_MANUAL
-				digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
-				digitalWrite(mode_1, HIGH);			//set the pins states
-				digitalWrite(mode_2, HIGH);
-				digitalWrite(multiplexor, HIGH);	//now enable the main MCU control
-				digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
+	if(previous_switch_position == switch_position){
+		if(counter > 2) {stable_state = true; Serial.print("stable\t"); Serial.println(micros());}
+		else{
+			counter++;
+			Serial.print(counter); Serial.print("\t"); Serial.println(micros());
+			stable_state = false;
 		}
-
+	}
+	else{
 		previous_switch_position = switch_position;
+		counter = 0;
+		Serial.print(counter); Serial.print("\t"); Serial.println(micros());
+		stable_state = false;
 	}
 	
+	return;
+}
+
+void set_vehile_state(){
+	Serial.println("-----STATE SET-----");
+	switch(switch_position){
+		case SWITCH_POSITION_WAYPOINT:
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, LOW);			//set the pins states
+			digitalWrite(mode_2, LOW);
+			digitalWrite(multiplexor, HIGH);	//keep the multiplexor HIGH (i.e. MANUAL control) to ensure the car is staitonsary while setting the waypoint
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
+			break;
+
+		case SWITCH_POSITION_AUX:
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, HIGH);			//set the pins states
+			digitalWrite(mode_2, LOW);
+			digitalWrite(multiplexor, LOW);		//now enable the main MCU control
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
+			break;
+
+		case SWITCH_POSITION_RESET:
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, HIGH);			//set the pins states
+			digitalWrite(mode_2, HIGH);
+			digitalWrite(multiplexor, HIGH);	//now enable the main MCU control
+			digitalWrite(hard_reset_pin, HIGH);	//send reset signal to main MCU
+			break;
+		
+		case SWITCH_POSITION_AUTOMATIC:
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, LOW);			//set the pins states
+			digitalWrite(mode_2, HIGH);
+			digitalWrite(multiplexor, LOW);		//now enable the main MCU control
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
+			break;
+
+		default:	//default state is SWITCH_POSITION_MANUAL
+			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
+			digitalWrite(mode_1, HIGH);			//set the pins states
+			digitalWrite(mode_2, HIGH);
+			digitalWrite(multiplexor, HIGH);	//now enable the main MCU control
+			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
+	}
+
 	return;
 }
 
@@ -212,6 +253,7 @@ void check_if_reset_requested(){
 		low_position_counter = 0;
 	}
 	else if((high_position_counter > RESET_SWITCH_COUNTER) && (low_position_counter > RESET_SWITCH_COUNTER)){
+		Serial.println("-----RESET REQUESTED-----");
 		switch_position = SWITCH_POSITION_RESET;
 		set_vehile_state();
 		delay(250);	//reset state will be held for ~.25s (that should be enough time for the teensy to receive the command and reset itself...hopefully not before it is ready to receive another command to reset itself (but that's OK)

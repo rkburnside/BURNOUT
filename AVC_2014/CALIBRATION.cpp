@@ -146,7 +146,7 @@ void mode_test(){
 		else if(mode == AUX) SERIAL_OUT.println("AUX");
 		else if(mode == WP_MODE) SERIAL_OUT.println("WP_MODE");
 		else SERIAL_OUT.println("nothing valid detected");
-		delay(250);
+		delay(25);
 	}
 	
 	return ;	

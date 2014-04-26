@@ -1,10 +1,10 @@
 //AVC SETTINGS
-#define MM			//use either MM (minuteman) or RR (roadrunner)
-#define BLUETOOTH	//use either BLUETOOTH or USB to define the serial port for program output
+#define RR			//use either MM (minuteman) or RR (roadrunner)
+#define USB	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-int excel_waypoints[19][2] = {{0,500}, {-200,500}, {-200,-200}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
+int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
@@ -65,9 +65,9 @@ int excel_waypoints[19][2] = {{0,500}, {-200,500}, {-200,-200}, {0,0}, {0,0}, {0
 #define WAYPOINT_ACCEPT 50	//waypoint acceptance radius in inches
 #define S1 1500				//stationary speed
 #define S2 1600				//1650 is a creeping speed
-#define S3 1600				//This is the speed for negotiating wp's 
-#define S4 1600				//1800 is pretty ridiculously fast. Don't use for general use.
-#define SB 1600				//breaking. adjust this parameter to allow creeping up on waypoints
+#define S3 1650				//This is the speed for negotiating wp's 
+#define S4 1650				//1800 is pretty ridiculously fast. Don't use for general use.
+#define SB 1650				//breaking. adjust this parameter to allow creeping up on waypoints
 #define P1 100				//proximity to allow car to align with next waypoint in inches
 #define P2 100				//close proximity to waypoint in inches
 #define P3 200				//far proximity to waypoint in inches

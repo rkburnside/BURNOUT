@@ -73,10 +73,10 @@ void navigate(){
 }
 
 void get_mode(){
-	int mode_1 = 0, mode_2 = 0;
+	// int mode_1 = 0, mode_2 = 0;
 
-	mode_1 = digitalRead(MODE_LINE_1);
-	mode_2 = digitalRead(MODE_LINE_2);
+	int mode_1 = digitalRead(MODE_LINE_1);
+	int mode_2 = digitalRead(MODE_LINE_2);
 	
 	if((mode_1 == HIGH) && (mode_2 == HIGH)) mode = MANUAL;
 	else if((mode_1 == LOW) && (mode_2 == HIGH)) mode = AUTOMATIC;
@@ -87,7 +87,8 @@ void get_mode(){
 }
 
 void race_startup_routine(){
-	activate_the_frickin_laser();
+//	activate_the_frickin_laser();
+	SERIAL_OUT.println("-----RACE SETUP ROUTINE-----");
 	
 	setup_mpu6050();
 	calculate_null();
@@ -97,10 +98,15 @@ void race_startup_routine(){
 	get_mode();
 	if(mode == MANUAL){
 		SERIAL_OUT.println();
-		SERIAL_OUT.println("1. SET CAR TO MODE 1 / AUTOMATIC / PRESS CH3 TO CONTINUE");
+		SERIAL_OUT.println("1. SET CAR TO AUTOMATIC");
 		SERIAL_OUT.println();
 	}
-	while(mode == MANUAL){
+	while(mode != AUTOMATIC){
+		static long time = millis();
+		if((millis() - time) > 250){
+			digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+			time = millis();
+		}
 		get_mode();		//waits until radio is set to automatic
 		read_FIFO();
 	}
@@ -114,6 +120,8 @@ void race_startup_routine(){
 	SERIAL_OUT.println();
 	SERIAL_OUT.println();
 
+	digitalWrite(LED_BUILTIN, HIGH);	//this is used to indicate that the car is ready to run
+
 	//determines the current state and waits for it to change to start the race
 	get_mode();
 	int toggle_state = digitalRead(TOGGLE);
@@ -122,6 +130,8 @@ void race_startup_routine(){
 		get_mode();		//waits until the switch is flipped to start the race
 		read_FIFO();
 	}
+
+	digitalWrite(LED_BUILTIN, LOW);		//turn off LED since car is going to run
 
 	for(int i=0; i<100; i++){	//clears the FIFO buffer and waits 1 sec to start
 		delay(1);
@@ -146,19 +156,66 @@ void race_startup_routine(){
 	return;
 }
 
-void setup(){
-	pinMode(LED_BUILTIN, OUTPUT);
-	for(int i = 0; i<8; i++){
-		digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-		delay(500);
+void wp_setup_routine(){
+	SERIAL_OUT.println("-----WP SETUP ROUTINE-----");
+
+	setup_mpu6050();
+	calculate_null();
+	
+	SERIAL_OUT.println();
+	//verify that car is in MANUAL mode
+	get_mode();
+	if(mode != MANUAL){
+		SERIAL_OUT.println();
+		SERIAL_OUT.println("SET CAR TO MANUAL MODE");
+		SERIAL_OUT.println();
+	}
+	while(mode != MANUAL){
+		static long time = millis();
+		if((millis() - time) > 250){
+			digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+			time = millis();
+		}
+		get_mode();		//waits until radio is set to automatic
+		read_FIFO();
 	}
 
+	for(int i=0; i<100; i++){	//clears the FIFO buffer and waits 1 sec to start
+		delay(1);
+		read_FIFO();
+	}
+
+	//the following zeros out everything and sets the waypoint and counter
+	wpr_count = 1;		//set waypoint read counter to first waypoint
+	EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
+	x_wp = waypoint.x;
+	y_wp = waypoint.y;
+
+	x=0;
+	y=0;
+	reset_FIFO();
+	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
+	clicks = 0;
+	first = true;
+	target_x = x_wp;
+	target_y = y_wp;
+
+	digitalWrite(LED_BUILTIN, HIGH);	//this is used to indicate that the car is ready to run
+
+	SERIAL_OUT.println("***READY TO SET WAYPOINTS***");
+	SERIAL_OUT.println();
+	SERIAL_OUT.println();
+
+	return;
+}
+
+void setup(){
 	SERIAL_OUT.begin(115200);
 	SERIAL_OUT.setTimeout(100000);
 	SERIAL_OUT.println(CAR_NAME);
 	SERIAL_OUT.println();
 
-   	//Pin assignments:
+	//Pin assignments:
 	pinMode(MODE_LINE_1, INPUT);
 	pinMode(MODE_LINE_2, INPUT);
 	pinMode(TOGGLE, INPUT_PULLUP);			//this is the switch that needs to be toggled to start the race
@@ -173,13 +230,25 @@ void setup(){
 
 	steering.attach(STEERING);
 	steering.writeMicroseconds(STEER_ADJUST);
+
 	esc.attach(THROTTLE);
 	esc.writeMicroseconds(S1);
 
-	main_menu();
-	delay(500);
+	bool bypass_menu = false;
+	pinMode(LED_BUILTIN, OUTPUT);
+	long temp_time = millis();
+	for(int i = 0; i<8; i++){
+		digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+		delay(500);
+		get_mode();
+		if(mode == WP_MODE) bypass_menu = true;
+	}
 
-	race_startup_routine();
+	if(bypass_menu) wp_setup_routine();
+	else{
+		main_menu();
+		race_startup_routine();
+	}
 }
 
 void loop(){
@@ -214,21 +283,15 @@ void loop(){
 
 		if((millis() - temp) > 500) set_waypoint();
 	}
-	
-	if(wpr_count >= WAYPOINT_COUNT){	//this locks the car into this loop and makes it stationary WHEN the course is completed
-		esc.writeMicroseconds(S1);
+
+	if((wpr_count >= WAYPOINT_COUNT) || (((int)x_wp == 0) && ((int)y_wp == 0))){	//this locks the car into this loop and makes it go slow when we've reached the max waypoints OR the waypoints are 0,0
+		esc.writeMicroseconds(S2);
 		while(true);
 	}
-
+	
 	static long time = 0;
 	if((millis() - time) > 500){
 		print_coordinates();
-		SERIAL_OUT.print("mode: ");
-		SERIAL_OUT.print(mode);
-		SERIAL_OUT.print("\t\tfirst?: ");
-		SERIAL_OUT.print(first);
-		SERIAL_OUT.print("\t\tclicks: ");
-		SERIAL_OUT.println(clicks);
 		time = millis();
 	}
 }
