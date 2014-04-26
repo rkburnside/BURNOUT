@@ -73,8 +73,6 @@ void navigate(){
 }
 
 void get_mode(){
-	// int mode_1 = 0, mode_2 = 0;
-
 	int mode_1 = digitalRead(MODE_LINE_1);
 	int mode_2 = digitalRead(MODE_LINE_2);
 	
