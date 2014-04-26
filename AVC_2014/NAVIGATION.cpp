@@ -35,7 +35,6 @@ void update_waypoint(){
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		x_wp = waypoint.x;
 		y_wp = waypoint.y;
-		if (((int)x_wp == 0) && ((int)y_wp == 0)) end_run(); // 0,0 is interpreted as the final waypoint. end run.
 		SERIAL_OUT.print("read WP #");
 		SERIAL_OUT.print(wpr_count);
 		SERIAL_OUT.print(": ");
@@ -124,12 +123,6 @@ void update_cross_product(){
 	cross_product = -(target_x*current_y - current_x*target_y);
 	
 	return ;
-}
-
-void end_run() {	// go straight forward, slowly at last waypoint
-	esc.writeMicroseconds(S2); //reduce speed
-	steer_us = STEER_ADJUST;  // go straight
-	while(true); //loop endlessly
 }
 
 void calculate_speed(){

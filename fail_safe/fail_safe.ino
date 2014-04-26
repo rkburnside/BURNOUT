@@ -119,7 +119,7 @@ void determine_if_switch_position_is_stable(){
 	static int counter = 0;
 	
 	if(previous_switch_position == switch_position){
-		if(counter > 4) {stable_state = true; Serial.print("stable\t"); Serial.println(micros());}
+		if(counter > 2) {stable_state = true; Serial.print("stable\t"); Serial.println(micros());}
 		else{
 			counter++;
 			Serial.print(counter); Serial.print("\t"); Serial.println(micros());
