@@ -23,6 +23,15 @@ Description and Functionality
 	channel B = RX = A/B select HIGH
 */
 
+/*How the RX channel 3 reacts to TX signals
+The receiver and pro-mini are working in the following way:
+1. the pulses are being received every 21580us. this is because I set the pulse in time-out to 20000us. since a standard servo duty cycle is 20000us, this causes the pro-mini to miss ~10% of the pulses. this is just fine. the switching functions work just fine and react correctly. i am not concerned with it missing 10% of the pulses.
+2. the pro-mini will NOT set a state now until the signal is stable.
+3. if the rx and tx are on, the rx outputs the tx signal.
+4. if the rx and tx are on, then the tx is offed, the rx will continue to output the last signal from the tx.
+5. if the tx is off and then the rx turned on, it will output 0 for a signal length.
+*/
+
 #define TIME_TO_FLIP_SWITCH 1000	//time in ms to flip the switch 3 times
 #define RESET_SWITCH_COUNTER 3		//number to reset the main MCU
 #define SWITCH_POSITION_MANUAL 0	//manual control of the car
@@ -58,16 +67,6 @@ void setup(){
 	set_vehile_state();
 	flash_led();
 
-/*learn and document excatly how the rx ch3 works with the following conditions:
-	1. turn on rx and tx. what signal is received when the tx is offed? does it change? how quickly?
-	2. turn on rx and tx. set tx to a known channel setting. off the tx. off the rx. on the rx. what is the new signal? did it change or default to something? repeat this for ALL of the ch3 settings.
-	3. add a timer and verify that all the rx outputs are being received by the arduino. this is to learn if all of the signals are being output and if the port is working quickly enough.
-	4. turn on the rx and tx. switch the tx ch3 to other settings. how quickly does the signal change? how many steps are there between 1000us and 2000us? does it differ between with 1000us to 1500us or 1250us?
-	5. use the information above to create/correct the following routines:
-		a. stable signal received
-		b. hold at the beginning of the sketch to ensure that the tx is on manual (or a known state)	
-*/
-
 	// while(true){
 		// get_pulse_length();
 		// determine_switch_position();
@@ -81,11 +80,15 @@ void loop(){
 	determine_switch_position();
 	determine_if_switch_position_is_stable();
 
-	static bool previously_stable_state = stable_state;
-	if(previously_stable_state != stable_state){
-		set_vehile_state();
-		previously_stable_state = stable_state;
+	// the following function checks to see if the mode has changed. if NOT, skip the loop. if YES, muxer is set to manual, pins are changed, and the muxer is set back to the appropriate state. previously, it was constantly switching to MANUAL, setting the pins, and then switching back...that did NOT work.
+
+	static bool previously_set_state = false;
+	if(stable_state){
+		if(!previously_set_state){
+			set_vehile_state();
+		}
 	}
+	previously_set_state = stable_state;
 
 	flash_led();
 	check_if_reset_requested();
@@ -94,11 +97,11 @@ void loop(){
 void get_pulse_length(){
 	static int temp_pulse_length = 0;
 
-	//servos receive a HIGH pulse of 1.0ms~2.0ms (1500us~2000us) at a duty cycle of 40Hz~200Hz (i.e. 5000us~25000us), depending on the RX/TX set up. The max cycle time would be 27000us. The pulse function will time out after 30000us if no pulse is received. pulseIn will return 0 if time out occurs.
-	temp_pulse_length = pulseIn(ch_3_in, HIGH, 30000);
+	//servos receive a HIGH pulse of 1.0ms~2.0ms (1500us~2000us) with a duty cycle of 50Hz (i.e. 20ms). The pulse function will time out after 30000us if no pulse is received. pulseIn will return 0 if time out occurs.
+	temp_pulse_length = pulseIn(ch_3_in, HIGH, 20000);
 
 	if(temp_pulse_length > 500) pulse_in_length = temp_pulse_length;	//if a good pulse is received (i.e. not 0), pulse_in_length is accepted and saved
-
+	Serial.print(pulse_in_length); Serial.print("\t");
 	return;
 }
 
@@ -116,17 +119,17 @@ void determine_if_switch_position_is_stable(){
 	static int counter = 0;
 	
 	if(previous_switch_position == switch_position){
-		if(counter > 4) stable_state = true;
+		if(counter > 4) {stable_state = true; Serial.print("stable\t"); Serial.println(micros());}
 		else{
 			counter++;
-			Serial.println(counter);
+			Serial.print(counter); Serial.print("\t"); Serial.println(micros());
 			stable_state = false;
 		}
 	}
 	else{
 		previous_switch_position = switch_position;
 		counter = 0;
-		Serial.println(counter);
+		Serial.print(counter); Serial.print("\t"); Serial.println(micros());
 		stable_state = false;
 	}
 	
@@ -134,7 +137,7 @@ void determine_if_switch_position_is_stable(){
 }
 
 void set_vehile_state(){
-	Serial.println("state set");
+	Serial.println("-----STATE SET-----");
 	switch(switch_position){
 		case SWITCH_POSITION_WAYPOINT:
 			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
@@ -250,6 +253,7 @@ void check_if_reset_requested(){
 		low_position_counter = 0;
 	}
 	else if((high_position_counter > RESET_SWITCH_COUNTER) && (low_position_counter > RESET_SWITCH_COUNTER)){
+		Serial.println("-----RESET REQUESTED-----");
 		switch_position = SWITCH_POSITION_RESET;
 		set_vehile_state();
 		delay(250);	//reset state will be held for ~.25s (that should be enough time for the teensy to receive the command and reset itself...hopefully not before it is ready to receive another command to reset itself (but that's OK)
