@@ -92,6 +92,9 @@ void race_startup_routine(){
 	calculate_null();
 	
 	SERIAL_OUT.println();
+
+	esc.detach();	//this is required to ensure that we get NO throttle jump when the muxer switches
+	
 	//verify that car is in automatic mode
 	get_mode();
 	if(mode == MANUAL){
@@ -109,6 +112,11 @@ void race_startup_routine(){
 		read_FIFO();
 	}
 
+	//this block is required so that we get NO throttle jump when the muxer switches
+	delay(3);	//the delay MUST occur just before the attach so that the previous pulse has cleared
+	esc.attach(THROTTLE);
+	esc.writeMicroseconds(S1);
+		
 	//by turning off the radio, the automatic mode is locked in
 	SERIAL_OUT.println("2. TURN OFF THE RADIO AND FLIP THE SWITCH TO START THE RACE!");
 	SERIAL_OUT.println();
@@ -231,7 +239,7 @@ void setup(){
 
 	esc.attach(THROTTLE);
 	esc.writeMicroseconds(S1);
-
+	
 	bool bypass_menu = false;
 	pinMode(LED_BUILTIN, OUTPUT);
 	long temp_time = millis();

@@ -143,7 +143,7 @@ void set_vehile_state(){
 			digitalWrite(multiplexor, HIGH);	//multiplexor HIGH puts car in MANUAL mode
 			digitalWrite(mode_1, LOW);			//set the pins states
 			digitalWrite(mode_2, LOW);
-			digitalWrite(multiplexor, HIGH);	//keep the multiplexor HIGH (i.e. MANUAL control) to ensure the car is staitonsary while setting the waypoint
+			digitalWrite(multiplexor, HIGH);	//keep the multiplexor HIGH (i.e. MANUAL control) to ensure the car is stationary while setting the waypoint
 			digitalWrite(hard_reset_pin, LOW);	//ensure the reset pin is low
 			break;
 
