@@ -1,5 +1,5 @@
 //AVC SETTINGS
-#define RR			//use either MM (minuteman) or RR (roadrunner)
+#define MM			//use either MM (minuteman) or RR (roadrunner)
 #define USB	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
@@ -25,7 +25,7 @@ int excel_waypoints[19][2] = {{0,500}, {-200,500}, {-200,-200}, {0,0}, {0,0}, {0
 #define L4 350
 #define XGYROOFFSET 85
 #define YGYROOFFSET -70
-#define ZGYROOFFSET 46
+#define ZGYROOFFSET -22
 
 //SENSOR PARAMETERS
 //#define GYRO_CAL 470868410	//this has to be measured by rotating the gyro 360 deg. and reading the output

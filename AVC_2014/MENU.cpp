@@ -30,6 +30,7 @@ void menu_choices(){
 	SERIAL_OUT.println("a = watch angle");
 	SERIAL_OUT.println("g = gyro calibration");
 	SERIAL_OUT.println("w = watch gyro");
+	SERIAL_OUT.println("k = gyro max turn rate");	
 	SERIAL_OUT.println();
 	SERIAL_OUT.println("MISCELLANEOUS FUNCTIONS");
 	SERIAL_OUT.println("----------");
@@ -79,6 +80,11 @@ void main_menu(){
 					break;
 				case 'w':
 					watch_gyro();
+					menu_choices();
+					break;
+
+				case 'k':
+					gyro_rate();
 					menu_choices();
 					break;
 
