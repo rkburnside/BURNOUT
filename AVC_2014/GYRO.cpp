@@ -8,7 +8,7 @@
 long accum = 0; //required for main program to reset gyro accum (so that the angle can actually be reset)
 double angle = 0;
 static long gyro_count = 0, gyro_null = 0; //visible only to GYRO.cpp
-static bool cal_flag = false;
+static bool cal_flag = false, gyro_error = false;
 
 
 //EXTERNAL VARIABLES
@@ -71,7 +71,7 @@ void setup_mpu6050(){
 	accelgyro.setDLPFMode(MPU6050_DLPF_BW_42);
 
 	SERIAL_OUT.println(F("Setting gyro sensitivity to +/- 250 deg/sec..."));
-	accelgyro.setFullScaleGyroRange(1);
+	accelgyro.setFullScaleGyroRange(0);
 	//accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
 	//accelgyro.setFullScaleGyroRange(0);  // 0=250, 1=500, 2=1000, 3=2000 deg/sec
 
@@ -102,6 +102,7 @@ void read_FIFO(){
 	for(int i=0; i < samplz; i++){
 		accelgyro.getFIFOBytes(buffer, 2);
 		temp = ((((int16_t)buffer[0]) << 8) | buffer[1]);
+		if (abs(temp) > 32765) gyro_error = true;
 		accum += temp*10 - gyro_null;    
 		//accum = temp;    
 		gyro_count++;
