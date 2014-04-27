@@ -143,7 +143,7 @@ void mode_test(){
 	digitalWrite(THROTTLE, LOW);
 	bool attached = true;
 	long time_temp = 0;
-	
+
 	while(1){
 		get_mode();
 		if(mode == MANUAL){

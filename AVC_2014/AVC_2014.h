@@ -34,11 +34,11 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 3500			//proportional gain, default it 4.0
 #define CP_GAIN 0				//cross product gain. if steering is 
-#define CLICK_INCHES 0.852		//used to determine the number of inches per click
+#define CLICK_INCHES 2.0		//used to determine the number of inches per click
 
 //FIXED PARAMETERS
 #define CAR_NAME "***MINUTEMAN***" //car name
-#define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
+#define CLICK_MAX 1			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 #define WP_SIZE 20 			//number of bytes for each waypoint
 
 //Teensy Pin Assignments:
