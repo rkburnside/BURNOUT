@@ -21,16 +21,13 @@ MPU6050 accelgyro;
 
 //PROGRAM FUNCTIONS
 void setup_mpu6050(){
-	// join I2C bus (I2Cdev library doesn't do this automatically)
-	#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-		Wire.begin();
-	#elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
-		Fastwire::setup(400, true);
-	#endif
-
-	// initialize device
-	SERIAL_OUT.println("Initializing I2C devices...");
-	accelgyro.initialize();
+	Wire.begin();
+	
+	// reset gyro
+	SERIAL_OUT.println("Resetting gyro...");
+	accelgyro.reset();
+	delay(50);
+    accelgyro.setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
 
 	// verify connection
 	SERIAL_OUT.println("Testing device connections...");

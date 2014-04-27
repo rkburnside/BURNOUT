@@ -52,6 +52,8 @@ void reset_requested_interrupt(){
 	// 0000101111110100000000000000100
 	// Assert [2]SYSRESETREQ
 	delay(1000);
+	Wire.endTransmission(false);
+	delay(50);
 	WRITE_RESTART(0x5FA0004);
 	
 	return;
