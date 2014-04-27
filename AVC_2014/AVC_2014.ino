@@ -90,13 +90,13 @@ void race_startup_routine(){
 //	activate_the_frickin_laser();
 	SERIAL_OUT.println("-----RACE SETUP ROUTINE-----");
 	
+	esc.detach();
+
 	setup_mpu6050();
 	calculate_null();
 	
 	SERIAL_OUT.println();
 
-	esc.detach();	//this is required to ensure that we get NO throttle jump when the muxer switches
-	
 	//verify that car is in automatic mode
 	get_mode();
 	if(mode == MANUAL){
@@ -114,11 +114,12 @@ void race_startup_routine(){
 		read_FIFO();
 	}
 
-	//this block is required so that we get NO throttle jump when the muxer switches
-	delay(3);	//the delay MUST occur just before the attach so that the previous pulse has cleared
+	delay(250);
 	esc.attach(THROTTLE);
+	delay(250);
 	esc.writeMicroseconds(S1);
-		
+
+
 	//by turning off the radio, the automatic mode is locked in
 	SERIAL_OUT.println("2. TURN OFF THE RADIO AND FLIP THE SWITCH TO START THE RACE!");
 	SERIAL_OUT.println();
@@ -167,6 +168,8 @@ void race_startup_routine(){
 void wp_setup_routine(){
 	SERIAL_OUT.println("-----WP SETUP ROUTINE-----");
 
+	esc.detach();
+
 	setup_mpu6050();
 	calculate_null();
 	
@@ -187,6 +190,11 @@ void wp_setup_routine(){
 		get_mode();		//waits until radio is set to automatic
 		read_FIFO();
 	}
+
+	delay(250);
+	esc.attach(THROTTLE);
+	delay(250);
+	esc.writeMicroseconds(S1);
 
 	for(int i=0; i<100; i++){	//clears the FIFO buffer and waits 1 sec to start
 		delay(1);
@@ -240,6 +248,7 @@ void setup(){
 	steering.writeMicroseconds(STEER_ADJUST);
 
 	esc.attach(THROTTLE);
+	delay(250);
 	esc.writeMicroseconds(S1);
 	
 	bool bypass_menu = false;

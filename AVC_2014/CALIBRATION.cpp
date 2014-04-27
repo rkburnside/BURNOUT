@@ -138,15 +138,57 @@ void mode_test(){
 	SERIAL_OUT.println();
 	SERIAL_OUT.println("toggle mode (i.e. TX CH3) and this function will print its current state");
 	SERIAL_OUT.println("perform hard reset to exit function");
-
+	esc.detach();
+	pinMode(THROTTLE, OUTPUT);
+	digitalWrite(THROTTLE, LOW);
+	bool attached = true;
+	long time_temp = 0;
+	
 	while(1){
 		get_mode();
-		if(mode == MANUAL) SERIAL_OUT.println("MANUAL");
-		else if(mode == AUTOMATIC) SERIAL_OUT.println("AUTOMATIC");
-		else if(mode == AUX) SERIAL_OUT.println("AUX");
-		else if(mode == WP_MODE) SERIAL_OUT.println("WP_MODE");
+		if(mode == MANUAL){
+			if(attached == true){
+				esc.detach();
+				// pinMode(THROTTLE, OUTPUT);
+				// digitalWrite(THROTTLE, LOW);
+				attached = false;
+			}
+		}
+
+		else if(mode == AUTOMATIC){
+			if(attached == false){
+				delay(250);
+				esc.attach(THROTTLE);
+				delay(250);
+				esc.writeMicroseconds(S1);
+				attached = true;
+			}
+		}
+
+		else if(mode == AUX){
+			if(attached == true){
+				esc.detach();
+				// pinMode(THROTTLE, OUTPUT);
+				// digitalWrite(THROTTLE, LOW);
+				attached = false;
+			}
+		}
+		
+		else if(mode == WP_MODE){
+			if(attached == true){
+				esc.detach();
+				// pinMode(THROTTLE, OUTPUT);
+				// digitalWrite(THROTTLE, LOW);
+				attached = false;
+			}
+		}
+		
 		else SERIAL_OUT.println("nothing valid detected");
-		delay(25);
+		
+		if((millis() - time_temp) > 250){
+			SERIAL_OUT.println(mode);
+			time_temp = millis();
+		}
 	}
 	
 	return ;	
