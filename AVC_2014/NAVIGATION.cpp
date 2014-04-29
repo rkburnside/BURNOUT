@@ -6,11 +6,11 @@
 
 //INTERNAL VARIABLES
 int steer_us;
-double x_wp = 0, y_wp = 0;
+double x_wp = 0, y_wp = 0, x_wp0 = 0, y_wp0 = 0;
 double target_x=0, target_y=0;
-double angle_last, angle_target, x=0, y=0;
+double angle_last, angle_target, angle_vtp, x=0, y=0;
 static int steer_limm = 300;
-static double cross_product=0;
+//static double cross_product=0;
 static double angle_diff;
 static long speed_cur=0, speed_new=0, speed_old=0;
 static long proximity, previous_proximity=50;
@@ -31,6 +31,8 @@ extern position_structure waypoint;
 void update_waypoint(){
 	//waypoint acceptance and move to next waypoint
 	if(proximity < (WAYPOINT_ACCEPT/CLICK_INCHES)){
+		x_wp0 = x_wp;
+		y_wp0 = y_wp;
 		wpr_count++;
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		x_wp = waypoint.x;
@@ -46,10 +48,6 @@ void update_waypoint(){
 		proximity = sqrt(temp);
 		//proximity = sqrt(pow((x_wp - x),2) + pow((y_wp - y),2));	
 		previous_proximity = proximity;
-
-		//sets up the planned cross product target vectors
-		target_x = x_wp - target_x;
-		target_y = y_wp - target_y;
 	}
 	
 	return ;
@@ -91,37 +89,15 @@ void speed(){
 void update_steering(){
 	// calculate and write angles for steering
 	angle_diff = angle_target - angle;
+	if (PATH_FOLLOWING) angle_diff = angle_vtp - angle;
 	if(angle_diff < -3.14159) angle_diff += 3.14159*2;   //if angle is less than 180 deg, then add 360 deg
 	if(angle_diff > 3.14159) angle_diff -= 3.14159*2;	//if angle is greater than 180 deg, then subtract 360
 	// now, we have an angle as -180 < angle_diff < 180.
 	// steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;
-	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN + cross_product*CP_GAIN;	//cross product gain added  here so that the steering is still limited
+	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;	//cross product gain added  here so that the steering is still limited
 	if(steer_us < (0-steer_limm)) steer_us = 0-steer_limm;
 	if(steer_us > steer_limm) steer_us = steer_limm;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
-	return ;
-}
-
-void update_cross_product(){
-	//calculates the car's current vector
-	double current_x = x_wp - x;
-	double current_y = y_wp - y;
-
-	//determines magnitude of each vector
-	double mag_target = sqrt(target_x*target_x + target_y*target_y);
-	if(mag_target == 0.0) mag_target = 0.0001;
-	double mag_current = sqrt(current_x*current_x + current_y*current_y);
-	if(mag_current == 0.0) mag_current = 0.0001;
-	
-	//make the current and target vectors into unit vectors
-	target_x = target_x / mag_target;
-	target_y = target_y / mag_target;
-	current_x = current_x / mag_current;
-	current_y = current_y / mag_current;
-	
-	//the actual cross product calculation
-	cross_product = -(target_x*current_y - current_x*target_y);
-	
 	return ;
 }
 
@@ -129,8 +105,21 @@ void calculate_speed(){
 	speed_new = micros();
 	speed_cur = speed_new - speed_old;
 	speed_old = speed_new;
-	
+	//SERIAL_OUT.println(speed_cur);
 	return ;
+}
+
+void calculate_look_ahead(){
+	//int time = micros();
+	double Ru = sqrt(pow(x - x_wp0,2) + pow(y - y_wp0,2));
+	double theta = atan2(y_wp - y_wp0, x_wp - x_wp0);
+	double theta_u = atan2(y - y_wp0, x - x_wp0);
+	double beta = theta - theta_u;
+	double R = sqrt(pow(Ru,2) - pow(Ru*sin(beta),2));
+	double x_vtp = (R+LOOK_AHEAD)*cos(theta);
+	double y_vtp = (R+LOOK_AHEAD)*sin(theta);
+	double angle_vtp = atan2(y_vtp - y, x_vtp - x);
+	//SERIAL_OUT.println(micros() - time);
 }
 
 void print_coordinates(){ //print target, location, etc.

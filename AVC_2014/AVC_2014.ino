@@ -63,7 +63,7 @@ void navigate(){
 	calculate_speed();
 	cal_steer_lim();
 	update_position();
-	update_cross_product();
+	calculate_look_ahead();
 	update_steering();
 	update_waypoint();
 	get_mode();

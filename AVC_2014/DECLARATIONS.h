@@ -31,6 +31,7 @@ void speed();
 void cal_steer_lim();
 void update_position();
 void update_waypoint();
+void calculate_look_ahead();
 void print_coordinates();
 
 
