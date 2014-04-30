@@ -109,6 +109,19 @@ void calculate_speed(){
 	return ;
 }
 
+// void calculate_look_ahead(){
+	//int time = micros();
+	// double Ru = sqrt(pow(x - x_wp0,2) + pow(y - y_wp0,2));
+	// double theta = atan2(y_wp - y_wp0, x_wp - x_wp0);
+	// double theta_u = atan2(y - y_wp0, x - x_wp0);
+	// double beta = theta - theta_u;
+	// double R = sqrt(pow(Ru,2) - pow(Ru*sin(beta),2));
+	// double x_vtp = (R+LOOK_AHEAD)*cos(theta);
+	// double y_vtp = (R+LOOK_AHEAD)*sin(theta);
+	// double angle_vtp = atan2(y_vtp - y, x_vtp - x);
+	//SERIAL_OUT.println(micros() - time);
+// }
+
 void calculate_look_ahead(){
 	//int time = micros();
 	double Ru = sqrt(pow(x - x_wp0,2) + pow(y - y_wp0,2));
@@ -116,11 +129,24 @@ void calculate_look_ahead(){
 	double theta_u = atan2(y - y_wp0, x - x_wp0);
 	double beta = theta - theta_u;
 	double R = sqrt(pow(Ru,2) - pow(Ru*sin(beta),2));
-	double x_vtp = (R+LOOK_AHEAD)*cos(theta);
-	double y_vtp = (R+LOOK_AHEAD)*sin(theta);
-	double angle_vtp = atan2(y_vtp - y, x_vtp - x);
-	//SERIAL_OUT.println(micros() - time);
+	double x_vtp = (R+LOOK_AHEAD)*cos(theta) +x_wp0;
+	double y_vtp = (R+LOOK_AHEAD)*sin(theta) +y_wp0;
+	angle_vtp = atan2((x_vtp - x), (y_vtp - y));
+	// SERIAL_OUT.print("Ru = ");
+	// SERIAL_OUT.println(Ru);
+	// SERIAL_OUT.print("theta = ");
+	// SERIAL_OUT.println(theta);
+	// SERIAL_OUT.print("R = ");
+	// SERIAL_OUT.println(R);
+	// SERIAL_OUT.print("xvtp = ");
+	// SERIAL_OUT.println(x_vtp);
+	// SERIAL_OUT.print("y_vtp = ");
+	// SERIAL_OUT.println(y_vtp);
+	// SERIAL_OUT.print("angle vtp = ");
+	// SERIAL_OUT.println(angle_vtp);
+	//while (true);
 }
+
 
 void print_coordinates(){ //print target, location, etc.
 	SERIAL_OUT.print("(x,y): ");

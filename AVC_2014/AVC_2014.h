@@ -1,6 +1,6 @@
 //AVC SETTINGS
 #define MM			//use either MM (minuteman) or RR (roadrunner)
-#define USB 	//use either BLUETOOTH or USB to define the serial port for program output
+#define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
@@ -27,7 +27,7 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 #define YGYROOFFSET -70
 #define ZGYROOFFSET -22
 #define PATH_FOLLOWING 1
-#define LOOK_AHEAD 10
+#define LOOK_AHEAD 20
 
 
 //SENSOR PARAMETERS
