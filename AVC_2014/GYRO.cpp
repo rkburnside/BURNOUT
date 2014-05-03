@@ -76,9 +76,9 @@ void setup_mpu6050(){
 
 	SERIAL_OUT.println(F("Enabling FIFO..."));
 	accelgyro.setFIFOEnabled(true);
-	accelgyro.setZGyroFIFOEnabled(false);
+	accelgyro.setZGyroFIFOEnabled(true);
 	accelgyro.setXGyroFIFOEnabled(false);
-	accelgyro.setYGyroFIFOEnabled(true);
+	accelgyro.setYGyroFIFOEnabled(false);
 	accelgyro.setAccelFIFOEnabled(false);
 	SERIAL_OUT.print("Z axis enabled?\t"); SERIAL_OUT.println(accelgyro.getZGyroFIFOEnabled());
 	SERIAL_OUT.print("x axis enabled?\t"); SERIAL_OUT.println(accelgyro.getXGyroFIFOEnabled());
