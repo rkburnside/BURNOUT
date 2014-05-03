@@ -22,29 +22,15 @@ MPU6050 accelgyro;
 void setup_mpu6050(){
 	clear_i2c();
 	Wire.begin();
-	//Wire.endTransmission();
-	SERIAL_OUT.println("Resetting gyro...");
+	SERIAL_OUT.println("Initializing gyro...");
 	accelgyro.initialize();
 	//accelgyro.reset();
-	//delay(200);
     accelgyro.setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
 
 	// verify connection
 	SERIAL_OUT.println("Testing device connections...");
 	SERIAL_OUT.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
 
-	// use the code below to change accel/gyro offset values
-	accelgyro.setXGyroOffset(XGYROOFFSET);
-	accelgyro.setYGyroOffset(YGYROOFFSET);
-	accelgyro.setZGyroOffset(ZGYROOFFSET);
-	SERIAL_OUT.print(accelgyro.getXAccelOffset()); SERIAL_OUT.print("\t"); // 
-	SERIAL_OUT.print(accelgyro.getYAccelOffset()); SERIAL_OUT.print("\t"); // 
-	SERIAL_OUT.print(accelgyro.getZAccelOffset()); SERIAL_OUT.print("\t"); // 
-	SERIAL_OUT.print(accelgyro.getXGyroOffset()); SERIAL_OUT.print("\t"); // 
-	SERIAL_OUT.print(accelgyro.getYGyroOffset()); SERIAL_OUT.print("\t"); // 
-	SERIAL_OUT.print(accelgyro.getZGyroOffset()); SERIAL_OUT.print("\t"); // 
-	SERIAL_OUT.print("\n");
-	
 	SERIAL_OUT.println(F("Setting clock source to Z Gyro..."));
 	accelgyro.setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
 	//SERIAL_OUT.println(accelgyro.getClockSource(MPU6050_CLOCK_PLL_ZGYRO);
@@ -72,9 +58,21 @@ void setup_mpu6050(){
 	//accelgyro.setFullScaleGyroRange(MPU6050_GYRO_FS_250);
 	//accelgyro.setFullScaleGyroRange(0);  // 0=250, 1=500, 2=1000, 3=2000 deg/sec
 
-	SERIAL_OUT.println(F("Resetting FIFO..."));
-	accelgyro.resetFIFO();
+	//SERIAL_OUT.println(F("Resetting FIFO..."));
+	//accelgyro.resetFIFO();
 
+	// use the code below to change accel/gyro offset values
+	accelgyro.setXGyroOffset(XGYROOFFSET);
+	accelgyro.setYGyroOffset(YGYROOFFSET);
+	accelgyro.setZGyroOffset(ZGYROOFFSET);
+	SERIAL_OUT.print(accelgyro.getXAccelOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getYAccelOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getZAccelOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getXGyroOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getYGyroOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getZGyroOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print("\n");
+		
 	SERIAL_OUT.println(F("Enabling FIFO..."));
 	accelgyro.setFIFOEnabled(true);
 	accelgyro.setZGyroFIFOEnabled(true);
@@ -190,7 +188,7 @@ void watch_angle(){
 	SERIAL_OUT.println();
 	setup_mpu6050();
 	calculate_null();
-
+	
 	SERIAL_OUT.println("watch angle");
 
 	do{
@@ -253,25 +251,3 @@ void gyro_rate(){
 	} while(mode == MANUAL);		//keep summing until we turn the mode switch off.
 	return ;
 }	
-
-
-	// This setup routine should/will ensure the i2c connection is working
-	// Wire.begin();
-	// test the connection to the I2C bus, sometimes it doesn't connect
-	// keep trying to connect to I2C bus if we get an error
-	// boolean error = true;
-	// while (error){
-		// SERIAL_OUT.println("begin transmission with gyro");
-		// Wire.beginTransmission(MPU6050_ADDRESS_AD0_LOW);
-		// SERIAL_OUT.println("ending transmission with gyro");
-		// error = Wire.endTransmission();			// if error = 0, we are properly connected
-		// SERIAL_OUT.println("transmission ended");
-		// if(error){								// if we aren't properly connected, try connecting again and loop
-			// SERIAL_OUT.println();
-			// SERIAL_OUT.println("Not properly connected to I2C, trying again");
-			// SERIAL_OUT.println();
-			// Wire.begin();
-			// TWBR = 24; // 400kHz I2C clock
-		// }
-	// }
-	// SERIAL_OUT.println("Properly connected to I2C");
