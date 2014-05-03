@@ -23,9 +23,9 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 #define L2 20000
 #define L3 200
 #define L4 350
-#define XGYROOFFSET 130	//85
-#define YGYROOFFSET -35	//-70
-#define ZGYROOFFSET -60	//-22
+#define XGYROOFFSET 88	//85
+#define YGYROOFFSET -72	//-70
+#define ZGYROOFFSET -24	//-22
 #define PATH_FOLLOWING 1
 #define LOOK_AHEAD 20
 

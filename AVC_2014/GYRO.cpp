@@ -22,10 +22,11 @@ MPU6050 accelgyro;
 void setup_mpu6050(){
 	clear_i2c();
 	Wire.begin();
-	// reset gyro
+	//Wire.endTransmission();
 	SERIAL_OUT.println("Resetting gyro...");
-	accelgyro.reset();
-	delay(50);
+	accelgyro.initialize();
+	//accelgyro.reset();
+	//delay(200);
     accelgyro.setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
 
 	// verify connection
@@ -33,9 +34,9 @@ void setup_mpu6050(){
 	SERIAL_OUT.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
 
 	// use the code below to change accel/gyro offset values
-	accelgyro.setXGyroOffset(XGYROOFFSET);  //85
-	accelgyro.setYGyroOffset(YGYROOFFSET);  //-70
-	accelgyro.setZGyroOffset(ZGYROOFFSET);  //-22
+	accelgyro.setXGyroOffset(XGYROOFFSET);
+	accelgyro.setYGyroOffset(YGYROOFFSET);
+	accelgyro.setZGyroOffset(ZGYROOFFSET);
 	SERIAL_OUT.print(accelgyro.getXAccelOffset()); SERIAL_OUT.print("\t"); // 
 	SERIAL_OUT.print(accelgyro.getYAccelOffset()); SERIAL_OUT.print("\t"); // 
 	SERIAL_OUT.print(accelgyro.getZAccelOffset()); SERIAL_OUT.print("\t"); // 
