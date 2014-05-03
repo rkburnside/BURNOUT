@@ -21,6 +21,7 @@ MPU6050 accelgyro;
 
 //PROGRAM FUNCTIONS
 void setup_mpu6050(){
+	//clear_i2c();
 	Wire.begin();
 	
 	// reset gyro
@@ -113,6 +114,29 @@ void read_FIFO(){
 	return ;
 }
 
+void clear_i2c(){
+	pinMode(18, INPUT);
+	delayMicroseconds(100);
+	if(digitalRead(18)) return;
+	SERIAL_OUT.println("i2c appears to be hung. attempting to clear...");
+	while (!digitalRead(18)){		//if SDA is low, then the bus is hung
+		pinMode(19, INPUT);	// making this and input pulls the line high (1)
+		delayMicroseconds(100);
+		pinMode(19, OUTPUT);   // pulls line low (0)
+		digitalWrite(19, LOW);
+		delayMicroseconds(100);
+		pinMode(19, INPUT);   // make line high again
+		delayMicroseconds(100);
+	}
+	SERIAL_OUT.println("OK, generating stop");
+	pinMode(18, OUTPUT);
+	digitalWrite(18, LOW);
+	delayMicroseconds(100);
+	pinMode(18, INPUT);
+	delayMicroseconds(100);
+	return;
+}
+	
 void calculate_null(){
 	SERIAL_OUT.println("CALCULATING NULL");
 	cal_flag = true;		//calibrating,

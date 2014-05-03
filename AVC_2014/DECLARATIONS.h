@@ -6,6 +6,7 @@
 //GYRO FUNCTIONS
 void setup_mpu6050();
 void read_FIFO();
+void clear_i2c();
 void calculate_null();
 void gyro_calibration();
 void watch_angle();
