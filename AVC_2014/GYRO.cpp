@@ -18,12 +18,10 @@ extern int mode;
 //OBJECT DECLARATIONS
 MPU6050 accelgyro;
 
-
 //PROGRAM FUNCTIONS
 void setup_mpu6050(){
-	//clear_i2c();
+	clear_i2c();
 	Wire.begin();
-	
 	// reset gyro
 	SERIAL_OUT.println("Resetting gyro...");
 	accelgyro.reset();
@@ -78,9 +76,9 @@ void setup_mpu6050(){
 
 	SERIAL_OUT.println(F("Enabling FIFO..."));
 	accelgyro.setFIFOEnabled(true);
-	accelgyro.setZGyroFIFOEnabled(true);
+	accelgyro.setZGyroFIFOEnabled(false);
 	accelgyro.setXGyroFIFOEnabled(false);
-	accelgyro.setYGyroFIFOEnabled(false);
+	accelgyro.setYGyroFIFOEnabled(true);
 	accelgyro.setAccelFIFOEnabled(false);
 	SERIAL_OUT.print("Z axis enabled?\t"); SERIAL_OUT.println(accelgyro.getZGyroFIFOEnabled());
 	SERIAL_OUT.print("x axis enabled?\t"); SERIAL_OUT.println(accelgyro.getXGyroFIFOEnabled());
@@ -119,7 +117,8 @@ void clear_i2c(){
 	delayMicroseconds(100);
 	if(digitalRead(18)) return;
 	SERIAL_OUT.println("i2c appears to be hung. attempting to clear...");
-	while (!digitalRead(18)){		//if SDA is low, then the bus is hung
+	int i = 0;
+	while(!digitalRead(18)||(i<1)){		//if SDA is low, then the bus is hung
 		pinMode(19, INPUT);	// making this and input pulls the line high (1)
 		delayMicroseconds(100);
 		pinMode(19, OUTPUT);   // pulls line low (0)
@@ -127,6 +126,7 @@ void clear_i2c(){
 		delayMicroseconds(100);
 		pinMode(19, INPUT);   // make line high again
 		delayMicroseconds(100);
+		i++;
 	}
 	SERIAL_OUT.println("OK, generating stop");
 	pinMode(18, OUTPUT);
