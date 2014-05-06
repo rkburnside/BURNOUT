@@ -237,7 +237,78 @@ void gyro_rate(){
 
 	SERIAL_OUT.println("min/max gyro rates:");
 	do{
-		temp = accelgyro.getRotationZ();
+//		temp = accelgyro.getRotationZ();
+		temp = accelgyro.getAccelerationZ();
+		if (temp > max) max = temp;
+		if (temp < min) min = temp;
+		if((millis() - time) > 250){
+			SERIAL_OUT.print(min);
+			SERIAL_OUT.print('\t');
+			SERIAL_OUT.println(max);
+			time = millis();
+		}
+		delay(2);
+		get_mode();
+	} while(mode == MANUAL);		//keep summing until we turn the mode switch off.
+	return ;
+}	
+
+void lateral_accel(){
+	int16_t temp = 0, max=0, min = 0;
+	static long time = millis();
+	SERIAL_OUT.println();
+	clear_i2c();
+	Wire.begin();
+	SERIAL_OUT.println("Initializing gyro...");
+	accelgyro.initialize();
+	//accelgyro.reset();
+    accelgyro.setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
+
+	// verify connection
+	SERIAL_OUT.println("Testing device connections...");
+	SERIAL_OUT.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
+
+	SERIAL_OUT.println(F("Setting clock source to Z Gyro..."));
+	accelgyro.setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
+	//SERIAL_OUT.println(accelgyro.getClockSource(MPU6050_CLOCK_PLL_ZGYRO);
+
+	SERIAL_OUT.println(F("Setting sample rate to 200Hz..."));
+	accelgyro.setRate(0); // 1khz / (1 + 4) = 200 Hz
+
+// *          |   ACCELEROMETER    |           GYROSCOPE
+// * DLPF_CFG | Bandwidth | Delay  | Bandwidth | Delay  | Sample Rate
+// * ---------+-----------+--------+-----------+--------+-------------
+// * 0        | 260Hz     | 0ms    | 256Hz     | 0.98ms | 8kHz
+// * 1        | 184Hz     | 2.0ms  | 188Hz     | 1.9ms  | 1kHz
+// * 2        | 94Hz      | 3.0ms  | 98Hz      | 2.8ms  | 1kHz
+// * 3        | 44Hz      | 4.9ms  | 42Hz      | 4.8ms  | 1kHz
+// * 4        | 21Hz      | 8.5ms  | 20Hz      | 8.3ms  | 1kHz
+// * 5        | 10Hz      | 13.8ms | 10Hz      | 13.4ms | 1kHz
+// * 6        | 5Hz       | 19.0ms | 5Hz       | 18.6ms | 1kHz
+// * 7        |   -- Reserved --   |   -- Reserved --   | Reserved
+
+	SERIAL_OUT.println(F("Setting DLPF bandwidth"));
+	accelgyro.setDLPFMode(MPU6050_DLPF_BW_42);
+
+	SERIAL_OUT.println(F("Setting accel sensitivity..."));
+	accelgyro.setFullScaleAccelRange(3);   // 0=2g, 1=4g, 2=8g, 3=16g deg/sec
+
+	// use the code below to change accel/gyro offset values
+	accelgyro.setXAccelOffset(-5097);
+	accelgyro.setYAccelOffset(-37);
+	accelgyro.setZAccelOffset(1125);
+	SERIAL_OUT.print(accelgyro.getXAccelOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getYAccelOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getZAccelOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getXGyroOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getYGyroOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print(accelgyro.getZGyroOffset()); SERIAL_OUT.print("\t"); // 
+	SERIAL_OUT.print("\n");
+		
+	SERIAL_OUT.println("min/max gyro rates:");
+	do{
+//		temp = accelgyro.getRotationZ();
+		temp = accelgyro.getAccelerationY();
 		if (temp > max) max = temp;
 		if (temp < min) min = temp;
 		if((millis() - time) > 250){

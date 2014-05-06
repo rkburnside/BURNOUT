@@ -13,6 +13,7 @@ void watch_angle();
 void watch_gyro();
 void reset_FIFO();
 void gyro_rate();
+void lateral_accel();
 
 //WAYPOINT FUNCTIONS
 void set_waypoint();

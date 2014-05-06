@@ -84,7 +84,8 @@ void main_menu(){
 					break;
 
 				case 'k':
-					gyro_rate();
+					//gyro_rate();
+					lateral_accel();
 					menu_choices();
 					break;
 
