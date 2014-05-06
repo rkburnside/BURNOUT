@@ -30,7 +30,7 @@ extern position_structure waypoint;
 //PROGRAM FUNCTIONS
 void update_waypoint(){
 	//waypoint acceptance and move to next waypoint
-	if(proximity < (WAYPOINT_ACCEPT/CLICK_INCHES)){
+	if(proximity < (WAYPOINT_ACCEPT)){
 		x_wp0 = x_wp;
 		y_wp0 = y_wp;
 		wpr_count++;
@@ -40,9 +40,9 @@ void update_waypoint(){
 		SERIAL_OUT.print("read WP #");
 		SERIAL_OUT.print(wpr_count);
 		SERIAL_OUT.print(": ");
-		SERIAL_OUT.print(x_wp*CLICK_INCHES);
+		SERIAL_OUT.print(x_wp);
 		SERIAL_OUT.print(" , ");
-		SERIAL_OUT.println(y_wp*CLICK_INCHES);
+		SERIAL_OUT.println(y_wp);
 		double temp = pow((x_wp-x),2);
 		temp += pow((y_wp-y),2);
 		proximity = sqrt(temp);
@@ -55,8 +55,8 @@ void update_waypoint(){
 
 void update_position(){
 	//calculate position
-	x += sin(angle);
-	y += cos(angle);
+	x += CLICK_INCHES * sin(angle);
+	y += CLICK_INCHES * cos(angle);
 	angle_target = atan2((x_wp - x),(y_wp - y));
 	double temp = pow((x_wp-x),2);
 	temp += pow((y_wp-y),2);
@@ -75,13 +75,13 @@ void cal_steer_lim(){
 void speed(){
 	running = true;			// make sure running is updated.
 
-	if((previous_proximity - proximity) <= (P1/CLICK_INCHES)) esc.writeMicroseconds(S2); //allow car to line up with the next point
-	else if(proximity < (P2/CLICK_INCHES)) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
-	else if(proximity >= (P2/CLICK_INCHES) && proximity < (P3/CLICK_INCHES)){ //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
+	if((previous_proximity - proximity) <= (P1)) esc.writeMicroseconds(S2); //allow car to line up with the next point
+	else if(proximity < (P2)) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
+	else if(proximity >= (P2) && proximity < (P3)){ //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
 		if(speed_cur < BREAKING_SPEED)  esc.writeMicroseconds(SB);  // less than 8000 means high speed, apply brakes
 		else esc.writeMicroseconds(S3);  //once speed is low enough, resume normal slow-down
 	}
-	else if(proximity >= (P3/CLICK_INCHES)) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
+	else if(proximity >= (P3)) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
 
 	return ;
 }
@@ -150,12 +150,12 @@ void calculate_look_ahead(){
 
 void print_coordinates(){ //print target, location, etc.
 	SERIAL_OUT.print("(x,y): ");
-	SERIAL_OUT.print(x*CLICK_INCHES);
+	SERIAL_OUT.print(x);
 	SERIAL_OUT.print(" , ");
-	SERIAL_OUT.print(y*CLICK_INCHES);	SERIAL_OUT.print("   trgt: ");
-	SERIAL_OUT.print(x_wp*CLICK_INCHES);
+	SERIAL_OUT.print(y);	SERIAL_OUT.print("   trgt: ");
+	SERIAL_OUT.print(x_wp);
 	SERIAL_OUT.print(" , ");
-	SERIAL_OUT.println(y_wp*CLICK_INCHES);
+	SERIAL_OUT.println(y_wp);
 
 	return ;
 }

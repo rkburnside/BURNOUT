@@ -27,9 +27,9 @@ void set_waypoint(){ //CLEAR
 	SERIAL_OUT.print("set WP #");
 	SERIAL_OUT.print(wpw_count);
 	SERIAL_OUT.print(": ");
-	SERIAL_OUT.print(waypoint.x*CLICK_INCHES);
+	SERIAL_OUT.print(waypoint.x);
 	SERIAL_OUT.print(" , ");
-	SERIAL_OUT.println(waypoint.y*CLICK_INCHES);
+	SERIAL_OUT.println(waypoint.y);
 
 	wpw_count++;
 	while(mode == WP_MODE) get_mode();
@@ -61,8 +61,8 @@ void import_waypoints(){
 	WAYPOINTS_STRING	//edit this in header file to change waypoints
 	
 	for(int i=0; i < WAYPOINT_COUNT; i++){
-		waypoint.x = float(excel_waypoints[i][0])/CLICK_INCHES;
-		waypoint.y = float(excel_waypoints[i][1])/CLICK_INCHES;
+		waypoint.x = float(excel_waypoints[i][0]);
+		waypoint.y = float(excel_waypoints[i][1]);
 		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
 		wpw_count++;
 	}
@@ -83,15 +83,15 @@ void display_waypoints(){
 
 		Serial.print(i);
 		Serial.print(": ");
-		Serial.print(waypoint.x*CLICK_INCHES);
+		Serial.print(waypoint.x);
 		Serial.print(" , ");
-		Serial.println(waypoint.y*CLICK_INCHES);
+		Serial.println(waypoint.y);
 
 		Serial2.print(i);
 		Serial2.print(": ");
-		Serial2.print(waypoint.x*CLICK_INCHES);
+		Serial2.print(waypoint.x);
 		Serial2.print(" , ");
-		Serial2.println(waypoint.y*CLICK_INCHES);
+		Serial2.println(waypoint.y);
 	}
 
 	SERIAL_OUT.println();
@@ -110,9 +110,9 @@ void edit_waypoint(){
 		
 		SERIAL_OUT.println();
 		SERIAL_OUT.print("current values: ");
-		SERIAL_OUT.print(waypoint.x*CLICK_INCHES);
+		SERIAL_OUT.print(waypoint.x);
 		SERIAL_OUT.print(" , ");
-		SERIAL_OUT.println(waypoint.y*CLICK_INCHES);
+		SERIAL_OUT.println(waypoint.y);
 		SERIAL_OUT.println();
 		
 		SERIAL_OUT.print("enter new coordinates \"x , y\": ");
@@ -120,9 +120,9 @@ void edit_waypoint(){
 		int y_temp = SERIAL_OUT.parseInt();
 		SERIAL_OUT.println();
 		SERIAL_OUT.print("current values: ");
-		SERIAL_OUT.print(waypoint.x*CLICK_INCHES);
+		SERIAL_OUT.print(waypoint.x);
 		SERIAL_OUT.print(" , ");
-		SERIAL_OUT.println(waypoint.y*CLICK_INCHES);
+		SERIAL_OUT.println(waypoint.y);
 		SERIAL_OUT.print("new values: ");
 		SERIAL_OUT.print(x_temp);
 		SERIAL_OUT.print(" , ");
@@ -132,8 +132,8 @@ void edit_waypoint(){
 			SERIAL_OUT.print("accept values (y=1, n=0)? ");
 			int y_or_n = SERIAL_OUT.parseInt();
 			if(y_or_n == 1){
-				waypoint.x = float(x_temp)/CLICK_INCHES;
-				waypoint.y = float(y_temp)/CLICK_INCHES;
+				waypoint.x = float(x_temp);
+				waypoint.y = float(y_temp);
 				EEPROM_writeAnything(i*WP_SIZE, waypoint);
 				SERIAL_OUT.println();
 				SERIAL_OUT.println("waypoint changed");
