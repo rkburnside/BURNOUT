@@ -36,7 +36,7 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 #define STEER_ADJUST 1425		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 3500			//proportional gain, default it 4.0
-#define CLICK_INCHES 2.0		//used to determine the number of inches per click
+#define CLICK_INCHES 2.0		//conversion factoy, inches per click
 
 //FIXED PARAMETERS
 #define CAR_NAME "***MINUTEMAN***" //car name
