@@ -1,6 +1,6 @@
 //AVC SETTINGS
 #define MM			//use either MM (minuteman) or RR (roadrunner)
-#define USB 	//use either BLUETOOTH or USB to define the serial port for program output
+#define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
@@ -37,7 +37,7 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 3500			//proportional gain, default it 4.0
 #define CP_GAIN 0				//cross product gain. if steering is 
-#define CLICK_INCHES 2.0		//conversion factoy, inches per click
+#define CLICK_INCHES 2.33		//conversion factoy, inches per click
 
 //FIXED PARAMETERS
 #define CAR_NAME "***MINUTEMAN***" //car name
