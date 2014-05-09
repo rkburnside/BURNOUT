@@ -50,11 +50,14 @@ void click_calibration_increment(){
 }
 
 void steering_calibration(){
+	esc.detach();
+
 	SERIAL_OUT.println();
 	angle_target = 0.0;
 		
 	steering.attach(STEERING);
 	steering.writeMicroseconds(STEER_ADJUST);
+
 	delay(500);
 	setup_mpu6050();
 	calculate_null();
@@ -64,7 +67,14 @@ void steering_calibration(){
 	while(mode != AUTOMATIC) get_mode();
 	accum = 0;	//this is ONLY used to reset the 0 the gyro angle for real (setting angle to 0 does nothing!!! (never forget last year's debacle))
 	
-	while(mode == AUTOMATIC){
+	delay(250);
+	esc.attach(THROTTLE);
+	delay(1000);
+	esc.writeMicroseconds(S1);
+	delay(1000);
+	esc.writeMicroseconds(S2);
+	
+	while(mode != AUX){
 		read_FIFO();
 		
 		update_steering();
@@ -72,7 +82,7 @@ void steering_calibration(){
 		
 		if((millis() - time) > 200){
 			SERIAL_OUT.print("angle: ");
-			SERIAL_OUT.print(angle,5);
+			SERIAL_OUT.print((angle*180.0/3.1415),5);
 			SERIAL_OUT.print("\tsteering ms: ");
 			SERIAL_OUT.println(steer_us);
 			time = millis();
@@ -81,7 +91,8 @@ void steering_calibration(){
 	}
 
 	steering.detach();
-
+	esc.detach();
+	
 	return ;
 }
 

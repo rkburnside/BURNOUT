@@ -1,6 +1,6 @@
 //AVC SETTINGS
 #define WC			//use either MM (minuteman) or RR (roadrunner)
-#define USB 	//use either BLUETOOTH or USB to define the serial port for program output
+#define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
@@ -36,7 +36,6 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 #define STEER_ADJUST 1425		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 3500			//proportional gain, default it 4.0
-#define CP_GAIN 0				//cross product gain. if steering is 
 #define CLICK_INCHES 2.0		//used to determine the number of inches per click
 
 //FIXED PARAMETERS
@@ -83,7 +82,7 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 #define YGYROOFFSET -9
 #define ZGYROOFFSET 30
 #define PATH_FOLLOWING 1
-#define LOOK_AHEAD 10
+#define LOOK_AHEAD 70
 
 
 //SENSOR PARAMETERS
@@ -91,7 +90,6 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 #define STEER_ADJUST 1480		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 4000			//proportional gain, if navigation gets unstable, reduce.
-#define CP_GAIN 0				//cross product gain. if steering is 
 #define CLICK_INCHES 2.09380	//85 clicks in 25 feet (300 inches)
 
 //FIXED PARAMETERS
@@ -124,10 +122,10 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 //WAYPOINT AND SPEED PARAMETERS
 #define WAYPOINT_ACCEPT 50	//waypoint acceptance radius in inches
 #define S1 1500				//stationary speed
-#define S2 1550				//1650 is a creeping speed
-#define S3 1575				//This is the speed for negotiating wp's 
-#define S4 1600				//1800 is pretty ridiculously fast. Don't use for general use.
-#define SB 1600				//breaking. adjust this parameter to allow creeping up on waypoints
+#define S2 1540				//1650 is a creeping speed
+#define S3 1600				//This is the speed for negotiating wp's 
+#define S4 1625				//1800 is pretty ridiculously fast. Don't use for general use.
+#define SB 1625				//breaking. adjust this parameter to allow creeping up on waypoints
 #define P1 100				//proximity to allow car to align with next waypoint in inches
 #define P2 100				//close proximity to waypoint in inches
 #define P3 200				//far proximity to waypoint in inches
@@ -135,20 +133,20 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 #define L1 5000
 #define L2 20000
 #define L3 200
-#define L4 350
-#define XGYROOFFSET 56
+#define L4 290
+#define XGYROOFFSET 65
 #define YGYROOFFSET 66
-#define ZGYROOFFSET 12
+#define ZGYROOFFSET 15
 #define PATH_FOLLOWING 1
-#define LOOK_AHEAD 10
+#define LOOK_AHEAD 70
 
+//***Note that Wile E. Coyote has the gryo upside down AND the steering is opposite of roadrunner. As a result, the steering gain AND the gyro cal numbers are "-"
 
 //SENSOR PARAMETERS
-#define GYRO_CAL 233302330		//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
+#define GYRO_CAL 232157854	//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
 #define STEER_ADJUST 1480		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 4000			//proportional gain, if navigation gets unstable, reduce.
-#define CP_GAIN 0				//cross product gain. if steering is 
+#define STEER_GAIN -4000		//proportional gain, if navigation gets unstable, reduce.
 #define CLICK_INCHES 2.09380	//85 clicks in 25 feet (300 inches)
 
 //FIXED PARAMETERS
