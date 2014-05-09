@@ -37,12 +37,7 @@ void update_waypoint(){
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		x_wp = waypoint.x;
 		y_wp = waypoint.y;
-		SERIAL_OUT.print("read WP #");
-		SERIAL_OUT.print(wpr_count);
-		SERIAL_OUT.print(": ");
-		SERIAL_OUT.print(x_wp);
-		SERIAL_OUT.print(" , ");
-		SERIAL_OUT.println(y_wp);
+		SERIAL_OUT "#" << wpr_count << "," << x_wp << "," << y_wp;
 		double temp = pow((x_wp-x),2);
 		temp += pow((y_wp-y),2);
 		proximity = sqrt(temp);
@@ -52,6 +47,27 @@ void update_waypoint(){
 	
 	return ;
 }
+
+
+// void map_rates(){
+// /*
+// the following should depend on current speed:
+// max turn rate, steering gain, acceptance radius, lookahead distance
+// */
+// int temp = speed_mph;
+// if ((int)speed_mph < 10) temp = 10;
+// steer_limm = map(temp, 10, 35, 200, 350);
+
+// temp = speed_mph; //if ((int)speed_mph 15) temp = 15;
+// steer_gain = map(temp, 15, 35, 4000, 3500);
+
+// temp = speed_mph; //if ((int)speed_mph 15) temp = 15;
+// waypoint_accept = map(temp, 15, 35, 21, 50);
+
+// temp = speed_mph; //if ((int)speed_mph 5) temp = 5;
+// look_ahead = map(temp, 5, 35, 20, 100);
+
+// }
 
 void update_position(){
 	//calculate position
@@ -94,7 +110,7 @@ void update_steering(){
 	if(angle_diff > 3.14159) angle_diff -= 3.14159*2;	//if angle is greater than 180 deg, then subtract 360
 	// now, we have an angle as -180 < angle_diff < 180.
 	// steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;
-	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;	//cross product gain added  here so that the steering is still limited
+	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;	//
 	if(steer_us < (0-steer_limm)) steer_us = 0-steer_limm;
 	if(steer_us > steer_limm) steer_us = steer_limm;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
@@ -105,22 +121,10 @@ void calculate_speed(){
 	speed_new = micros();
 	speed_cur = speed_new - speed_old;
 	speed_old = speed_new;
+	speed_mph = CLICK_INCHES * 5868.0 / speed_cur;
 	//SERIAL_OUT.println(speed_cur);
 	return ;
 }
-
-// void calculate_look_ahead(){
-	//int time = micros();
-	// double Ru = sqrt(pow(x - x_wp0,2) + pow(y - y_wp0,2));
-	// double theta = atan2(y_wp - y_wp0, x_wp - x_wp0);
-	// double theta_u = atan2(y - y_wp0, x - x_wp0);
-	// double beta = theta - theta_u;
-	// double R = sqrt(pow(Ru,2) - pow(Ru*sin(beta),2));
-	// double x_vtp = (R+LOOK_AHEAD)*cos(theta);
-	// double y_vtp = (R+LOOK_AHEAD)*sin(theta);
-	// double angle_vtp = atan2(y_vtp - y, x_vtp - x);
-	//SERIAL_OUT.println(micros() - time);
-// }
 
 void calculate_look_ahead(){
 	//int time = micros();
@@ -147,6 +151,38 @@ void calculate_look_ahead(){
 	//while (true);
 }
 
+/*
+print x, y, speed, angle, target_angle, gyro rate, accel rate, proximity, 
+use the following commands:
+		temp = accelgyro.getRotationZ();
+		temp = accelgyro.getAccelerationY();
+
+stuff to print on first time through
+steer_gain, steer_lim, look_ahead, target speed, 
+		
+		
+print either to serial or print using the radio module
+will need separate routines for each. enable with ifdef
+
+print to radio ideas:
+it looks like the payload for each packet is 32 bytes. probably have to split up in 2 or 3 packets
+probably use PString library
+
+On the reciever side, simply wait for packets, and write them to the serial port as they arive. 
+
+
+
+*/
+void print_parameters(){
+	SERIAL_OUT '$' << 'speed = '
+}
+
+void print_data(){
+	SERIAL_OUT 'd' << x << ',' << y << ',' << speed_mph << ',' << accelgyro.getRotationZ()
+		<< ',' << accelgyro.getAccelerationY() << ',' << steer_us  << ',' << angle
+		<< ',' << proximity
+
+}
 
 void print_coordinates(){ //print target, location, etc.
 	SERIAL_OUT.print("(x,y): ");
