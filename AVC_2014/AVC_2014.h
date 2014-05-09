@@ -1,5 +1,5 @@
 //AVC SETTINGS
-#define MM			//use either MM (minuteman) or RR (roadrunner)
+#define WC			//use either MM (minuteman) or RR (roadrunner)
 #define USB 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
@@ -119,6 +119,64 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 #define AUX 3
 #define RESET 4
 #endif
+
+#ifdef WC
+//WAYPOINT AND SPEED PARAMETERS
+#define WAYPOINT_ACCEPT 50	//waypoint acceptance radius in inches
+#define S1 1500				//stationary speed
+#define S2 1550				//1650 is a creeping speed
+#define S3 1575				//This is the speed for negotiating wp's 
+#define S4 1600				//1800 is pretty ridiculously fast. Don't use for general use.
+#define SB 1600				//breaking. adjust this parameter to allow creeping up on waypoints
+#define P1 100				//proximity to allow car to align with next waypoint in inches
+#define P2 100				//close proximity to waypoint in inches
+#define P3 200				//far proximity to waypoint in inches
+#define BREAKING_SPEED 7000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
+#define L1 5000
+#define L2 20000
+#define L3 200
+#define L4 350
+#define XGYROOFFSET 56
+#define YGYROOFFSET 66
+#define ZGYROOFFSET 12
+#define PATH_FOLLOWING 1
+#define LOOK_AHEAD 10
+
+
+//SENSOR PARAMETERS
+#define GYRO_CAL 233302330		//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
+#define STEER_ADJUST 1480		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
+#define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
+#define STEER_GAIN 4000			//proportional gain, if navigation gets unstable, reduce.
+#define CP_GAIN 0				//cross product gain. if steering is 
+#define CLICK_INCHES 2.09380	//85 clicks in 25 feet (300 inches)
+
+//FIXED PARAMETERS
+#define CAR_NAME "***WILE E. COYOTE***" //car name
+#define CLICK_MAX 1			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
+#define WP_SIZE 20 			//number of bytes for each waypoint
+
+//Teensy Pin Assignments:
+//Optional manual throttle, autonomous steering - connect ESC signal pin to receiver CH2
+//Teensy Pin Assignments:
+//Optional manual throttle, autonomous steering - connect ESC signal pin to receiver CH2
+#define RESET_PIN 2
+#define MODE_LINE_1 5
+#define MODE_LINE_2 6
+#define FRICKIN_LASER 11
+#define THROTTLE 20
+#define STEERING 21
+#define HALL_EFFECT_SENSOR 22
+#define TOGGLE 23
+
+//CH3 settings
+#define MANUAL 0
+#define AUTOMATIC 1
+#define WP_MODE 2
+#define AUX 3
+#define RESET 4
+#endif
+
 
 
 #ifdef BLUETOOTH
