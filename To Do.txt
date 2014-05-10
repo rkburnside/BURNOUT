@@ -1,0 +1,156 @@
+to do
+
+coyote speed at (set waypoint at 0,1000):
+1550
+1575
+1600
+1625
+1650
+1675
+1700
+1800
+1825
+1850
+1875
+1900
+1925
+1950
+1975
+2000
+which values cause: spin out, too fast for turns, roll overs, WAY too fast, slow/start speed, medium, medium fast, fast
+
+test different click recalculate values and see if it has any effect on accuracy
+
+try out the steering calibration and try to determine the correct steering adjust value
+
+adjust the look ahead value for the coyote and see what is best
+
+determine the click distance for it
+
+determine correct waypoint acceptance radius
+determine near, far, next waypoint values
+
+
+
+
+
+##Testing
+- verify that the car hits EVERY waypoint at all speeds
+- test the affects of the car being lined up incorrectly by 0, 1, 2, 3, 4, 5, and 10 degrees
+- reincorporate braking/deceleration into the system. try out different braking speeds. get it working!
+- quantify the number of clicks to a distance so that we can alter the course as needed on the race day.
+- try black sharpie or a crayon or grease from a hamburger wrapper
+
+##Software
+- AVC: create routine for viewing and modifying vehicle speeds on the go. create speed profiles that may be easily used.
+- change distance/navigation calculations to include a conversion factor, IPC (Inches Per Click) so that everything is in inches: x += IPC*sin(angle); y += IPC*cos(angle);
+  1. Convert acceptance radius and such to inches instead of clicks
+- AVC: reincorporate braking/deceleration into the system
+- AVC: Add leds to start up routine to indicate that the car is ready to run
+- AVC: add the modified "wire" library to the personal library folder. this will ensure that the 400khz wire mode is used at all times (verify that it is in fact working)
+- AVC: move the serial menu system to an android python based system. map out which functions will be needed, maybe use buttons, etc (first set would be moving the printed menu to python, then move the waypoint editing to python, and so forth)
+- AVC: work on getting the new i2c library to compile with the i2c_dev and mpu6050 librarys
+- AVC: incorporate vehicle speed (i.e. tire diameter) and how it affects distance traveled into the code
+- AVC: modify servo.h or another header file to use a digital servo to increase steering update rate digital servo
+
+##Hardware
+- tune losi suspension system
+- consider purchasing replacement losi bumper attachment piece(s)
+- determine tire calibration and how to incorporate it into the calibration routines and menu system  
+  - Have the car drive a straight path and then stop and determine the ratio of how much distance changes with speed  
+  - Take photos of wheel with the go pro as the car is driving by
+- add a digital servo to car
+- replace losi tires
+
+----
+
+- [x] verify that the cross track error routine is working correctly
+- [x] AVC: reincorporate cross track error
+  - [x] generate optimal splines for the car's path, possibly prior to starting the race
+- [x] AVC: confirm that each of the libraries is functioning correctly
+- [x] AVC: remove laser from the code since it is obviously not needed.
+- [x] AVC: create a time print routine. determine read/write/calc times for nearly every step of the MCU process. RECORD THE RESULTS!!! (this will verify that the 400khz mode is working for i2c communication)
+  - [x] gyro read FIFO
+  - [x] hall effect interrupt
+  - [x] gyro calculations
+  - [x] navigation routine
+  - [x] add any others that may be questionable
+- [x] AVC or FAIL_SAFE: why is the car kicking on when set to AUTOMATIC? This is BAD!!!
+- [x] AVC: add flag that indicates if the gyro has been saturated
+- [x] AVC: add serial input and output for everything for both the bluetooth and USB
+- [x] AVC: add a timeout routine or something similar to reset the i2c connection and hopefully get it working. (if all else fails, add a transistor and header pin to do a full reboot of the gyro)
+- [x] AVC: add routine so that AUTOMATIC goes to the race setup and WP_MODE goes to wp_setup routine
+- [x] FAIL_SAFE: add routine to ensure the switch state is stable before changing the switch state pins. Use 5x samples.
+- [x] FAIL_SAFE: add routine to ensure that the car is always in MANUAL mode at start up until the signal changes.
+- [x] FAIL_SAFE: SEE THE WIKI PAGE "How the RX channel 3 reacts to TX signals" FOR A COMPLETE DESCRIPTION. learn and document excatly how the rx ch3 works with the following conditions:
+  1. [x] turn on rx and tx. what signal is received when the tx is offed? does it change? how quickly?
+    - [x] the signal seems to be received almost instantly without steps or a ramp up in the signal.
+  2. [x] turn on rx and tx. set tx to a known channel setting. off the tx. off the rx. on the rx. what is the new signal? did it change or default to something? repeat this for ALL of the ch3 settings.
+  3. [x] add a timer and verify that all the rx outputs are being received by the arduino. this is to learn if all of the signals are being output and if the port is working quickly enough.
+  4. [x] turn on the rx and tx. switch the tx ch3 to other settings. how quickly does the signal change? how many steps are there between 1000us and 2000us? does it differ between with 1000us to 1500us or 1250us?
+  5. [x] use the information above to create/correct the following routines:
+    1. [x] stable signal received
+    1. [x] hold at the beginning of the sketch to ensure that the tx is on manual (or a known state)
+- [x] work on the navigation routine and get it working!
+  1. [x] simply make the car drive at a slow speed and just watch navigation.
+  2. [x] if this isn't working, hardwire the ESC to be full manual control
+- [x] recalibrate the gyro: axises offset, full circular calibration
+- [x] debug the start up routine. it jumps around, doesn't stay stationary, etc.
+- [x] this isn't necessary. add if(Serial2.available() > 0) to the test functions so they may be exited using the bluetooth serial
+- [x] complete. (i actually haven't debugged this, but it does compile correctly and i believe it will work just fine as is.) add the capability to access the MCU using either the bluetooth or the microUSB connection. Add a #define BLUETOOTH or something similar to replace "Serial." or "Serial2."
+- [x] debug the gyro angle. the gyro_start code produces an angle in degrees with a sign. the GYRO.cpp code was in radians AND was positive. FIX THIS!!! (this is NOT causing the navigation to fail.)
+- [x] how does the fail_safe / RX react when the TX is turned off??? the RX will continue relaying the same signal it received prior to the TX being turned off
+- [x] debug the teensy start switch
+- [x] fully incorporate the NULL_FF number into the code (or verify that i did it correctly...i think i did)
+- [x] check the gyro to see if its working any better
+- [x] incorporate the laser line into the code (i.e. turn on, off, enabled by radio or by the android). maybe we should set mode "AUX" on the radio to turn on the laser line.
+- [x] re-add "memory available" code. this is unnecessary since the teensy is significantly more powerful than the arduino (memory and processing power). i did try to incorporate it, but i kept getting compiler errors and gave up since it is not really needed.
+- [x] added several functions to debug the mode and start switch. I'll probably just need to create a new sketch to debug it. should take ~15 minutes.
+- [x] have the on board LED toggle on/off for ~3 seconds to indicated that the code has been uploaded and it's ready to run. this will provide enough time to open the serial port after the upload is completed.
+- [x] replace pro-mini and teensy on board LED declaration to: LED_BUILTIN
+- [x] flush gyro before starting the race
+- [x] incorporate start switch into the car for the competition (pin added to setup file, but not yet tested. the switch should now work as a toggle instead of just setting it to 1 location) see this explanation for the TOGGLE http://arduino.cc/en/Reference/Constants
+- [x] make the reset function interrupt driven. this will require 1 additional pin from the pro mini to the teensy. the pro mini will need additional code to send the reset signal. the teensy will need additional code (with an interrupt) to trigger the software reset
+- [x] test and debug each of the following areas of the code
+  - [x] gyroscope
+  - [x] servo steering
+  - [x] set waypoint by holding down ch3 for ~1 second
+  - [x] import waypoints
+  - [x] export waypoints
+  - [x] switching from manual -> automatic -> waypoint set -> reset
+  - [x] interrupt and hall effect sensor are working correctly and not missing any count
+  - [x] serial line 1 is printing correctly
+  - [x] serial bluetooth is echoing serial line 1
+  - [x] verify that the RESET command functions that way we want it to
+- [x] solder in the toggle switch
+- [x] solder in the toggle pin header
+- [x] solder in 4.7khz pull up resistors
+- [x] set the internal pull up for the toggle switch
+- [x] I declare this finished. there's still more that could be done, but it's not necessary. also, the teensy arduino compiling works just fine with type "byte", etc.). clean up/remove/limit variable scope to individual files (mostly done, but more work can be done on this)
+- [x] this this is also finished. it can too could be updated, but it's really not necessary. change all types to be better used (i.e. byte to int or even long)
+- [x] develop code to monitor the radio status on the pro-mini (mostly complete, but more debugging can be done)
+  - [x] I added in code for setting waypoints, but this needs to be debugged
+- [x] add a second serial line to the code that is for the bluetooth (added, but not yet debugged)
+  - [x] it could/should mirror the hardwired serial out
+- [x] debug manually setting of waypoints in the main code
+- [x] fix menu system there were a few menus items that didn't function correctly (or were repeated). either way, just verify that all of the menu system works correctly. -> this seems to be functioning correctly on the teensy. i declare this issue closed unless it starts popping up again.
+- [x] change the code to 0 out the accumulator to ensure that the angle is 0 at the start of the run
+- [x] verify that the code runs correctly on the car (verify my multi-file modifications)
+- [x] issue a pull request and merge the multi-file branch code into the main branch
+- [x] create a new branch to start the migration to the teensy 3.1
+- [x] verify that the hall effect sensor is working correctly (by navigating at high and low speeds)
+- [x] integrate the teensy pins for each function
+  - [x] laser won't be used now. laser line (pins 11, 12, 14, 15 look good). 2-100ohm and 1-10ohm resistors in parallel from 5V will provide 3V to the laser (laser specs: 3V @ .25mA)
+  - [x] pro mini to teensy reset
+  - [x] start toggle switch
+- [x] laser won't be used. integrate laser line for the car
+- [x] attach the magnets and hall effect sensor in the appropriate locations
+- [x] remove magnets from tire and reuse on the silver colored slipper clutch
+- [x] hot glue the gyro lines in place (or use the other gyro I have to secure the lines and keep them from vibrating (check the gyro wandering after complete)
+- [x] velcro on the board to the battery holder bar
+- [x] fix losi bumper
+- [x] integrate teensy into car
+- [x] integrate radio/MCU switch into car
+- [x] incorporate new radio status monitoring system into the car
+- [x] integrate bluetooth into the car
+- [x] reprogram radio button 3 for additional switch positions. we are only going to be using the 3 position switche... manual -> automatic -> hold to set waypoint -> toggle quickly 3x over 1 sec to reset
