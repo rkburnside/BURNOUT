@@ -134,16 +134,16 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 #define L2 20000
 #define L3 200
 #define L4 290
-#define XGYROOFFSET 65
-#define YGYROOFFSET 66
-#define ZGYROOFFSET 15
+#define XGYROOFFSET 90
+#define YGYROOFFSET 15
+#define ZGYROOFFSET 43
 #define PATH_FOLLOWING 1
 #define LOOK_AHEAD 70
 
 //***Note that Wile E. Coyote has the gryo upside down AND the steering is opposite of roadrunner. As a result, the steering gain AND the gyro cal numbers are "-"
 
 //SENSOR PARAMETERS
-#define GYRO_CAL 232157854	//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
+#define GYRO_CAL 232720112	//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
 #define STEER_ADJUST 1480		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN -4000		//proportional gain, if navigation gets unstable, reduce.

@@ -147,7 +147,6 @@ void calculate_look_ahead(){
 	//while (true);
 }
 
-
 void print_coordinates(){ //print target, location, etc.
 	SERIAL_OUT.print("(x,y): ");
 	SERIAL_OUT.print(x*CLICK_INCHES);

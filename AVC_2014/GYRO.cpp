@@ -98,15 +98,7 @@ void read_FIFO(){
 		accelgyro.getFIFOBytes(buffer, 2);
 		temp = ((((int16_t)buffer[0]) << 8) | buffer[1]);
 		if (abs(temp) > 32765) gyro_error = true;
-		
-		long temp_wc = accum;
 		accum += temp*10 - gyro_null;    
-		
-		#ifdef WC
-		accum = temp_wc;
-		accum += -temp*10 - gyro_null;    
-		#endif
-
 		//accum = temp;    
 		gyro_count++;
 		
@@ -153,7 +145,7 @@ void calculate_null(){
 		gyro_null = 0;			//make sure to not subtract any nulls here
 		gyro_count = 0;
 
-		while(gyro_count < 5000){
+		while(gyro_count < 10000){
 			read_FIFO();
 			//delay(10);
 			//SERIAL_OUT.println(gyro_count);
@@ -162,11 +154,11 @@ void calculate_null(){
 		cal_flag = false;		//stop calibration
 		accum = 0;
 		
-		if((gyro_null > 50) && (gyro_null < -50)){
+		if(gyro_null > 75){
 			SERIAL_OUT.print("Reclaculating null because it was too large: ");
 			SERIAL_OUT.println(gyro_null);
 		}
-	} while((gyro_null > 50) && (gyro_null < -50));
+	} while(gyro_null > 75);
 	
 	//should print null here
 	SERIAL_OUT.print("Null: ");
