@@ -1,10 +1,10 @@
 //AVC SETTINGS
 #define WC			//use either MM (minuteman) or RR (roadrunner)
-#define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
+#define USB 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
+int excel_waypoints[19][2] = {{1000,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
@@ -122,18 +122,18 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 //WAYPOINT AND SPEED PARAMETERS
 #define WAYPOINT_ACCEPT 50	//waypoint acceptance radius in inches
 #define S1 1500				//stationary speed
-#define S2 1540				//1650 is a creeping speed
-#define S3 1600				//This is the speed for negotiating wp's 
-#define S4 1625				//1800 is pretty ridiculously fast. Don't use for general use.
-#define SB 1625				//breaking. adjust this parameter to allow creeping up on waypoints
+#define S2 1560				//1650 is a creeping speed
+#define S3 1560				//This is the speed for negotiating wp's 
+#define S4 1560				//1800 is pretty ridiculously fast. Don't use for general use.
+#define SB 1560				//breaking. adjust this parameter to allow creeping up on waypoints
 #define P1 100				//proximity to allow car to align with next waypoint in inches
 #define P2 100				//close proximity to waypoint in inches
 #define P3 200				//far proximity to waypoint in inches
 #define BREAKING_SPEED 7000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
 #define L1 5000
 #define L2 20000
-#define L3 200
-#define L4 290
+#define L3 100
+#define L4 250
 #define XGYROOFFSET 90
 #define YGYROOFFSET 15
 #define ZGYROOFFSET 43
@@ -144,7 +144,7 @@ int excel_waypoints[19][2] = {{0,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, 
 
 //SENSOR PARAMETERS
 #define GYRO_CAL 232720112	//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
-#define STEER_ADJUST 1480		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
+#define STEER_ADJUST 1500		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN -4000		//proportional gain, if navigation gets unstable, reduce.
 #define CLICK_INCHES 2.09380	//85 clicks in 25 feet (300 inches)
@@ -202,5 +202,13 @@ Millisecond speeds
 1700 - 9000
 1750 - 5400
 1800 - 6100
+
+
+WILE E. COYOTE
+1500 - stop
+1550 - may not even move. DO NOT use
+1560 - creeping speed
+1575 - faster than creeping. probably a good starting speed
+
 
 */

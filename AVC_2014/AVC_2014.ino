@@ -277,7 +277,6 @@ void loop(){
 	}
 
 	if(mode == AUTOMATIC){	//this function get the car started moving and then clicks will take over
-	SERIAL_OUT.println("auto mode");
 	if(first){
 			accum = 0;		//zeros out the accumulator which zeros out the angle
 			reset_FIFO();
@@ -291,7 +290,6 @@ void loop(){
 	}
 	
 	if(mode == WP_MODE){
-	SERIAL_OUT.println("auto mode");
 		long temp = millis();
 		while(mode == WP_MODE){
 			get_mode();
