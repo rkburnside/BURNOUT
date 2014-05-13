@@ -71,7 +71,7 @@ void navigate(){
 		//speed();
 		esc.writeMicroseconds(S4);
 	}
-	//print_data();
+	print_data();
 	return ;
 }
 
@@ -311,7 +311,7 @@ void loop(){
 	
 	static long time = 0;
 	if((millis() - time) > 500){
-		print_coordinates();
+		//print_coordinates();
 		time = millis();
 	}
 }

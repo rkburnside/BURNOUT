@@ -14,6 +14,8 @@ void watch_gyro();
 void reset_FIFO();
 void gyro_rate();
 void lateral_accel();
+int get_gyro_rate();
+int get_accel_rate();
 
 //WAYPOINT FUNCTIONS
 void set_waypoint();
@@ -35,7 +37,7 @@ void update_position();
 void update_waypoint();
 void calculate_look_ahead();
 void print_coordinates();
-
+void print_data();
 
 //CALIBRATION FUNCTIONS
 void steering_calibration();

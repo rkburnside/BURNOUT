@@ -253,6 +253,14 @@ void gyro_rate(){
 	return ;
 }	
 
+int get_gyro_rate() {
+	return accelgyro.getRotationZ();
+}
+
+int get_accel_rate() {
+	return accelgyro.getAccelerationY();
+}
+
 void lateral_accel(){
 	int16_t temp = 0, max=0, min = 0;
 	static long time = millis();

@@ -8,7 +8,7 @@
 int steer_us;
 double x_wp = 0, y_wp = 0, x_wp0 = 0, y_wp0 = 0;
 double target_x=0, target_y=0;
-double angle_last, angle_target, angle_vtp, x=0, y=0;
+double angle_last, angle_target, angle_vtp, x=0, y=0, speed_mph;
 static int steer_limm = 300;
 //static double cross_product=0;
 static double angle_diff;
@@ -37,7 +37,12 @@ void update_waypoint(){
 		EEPROM_readAnything(wpr_count*WP_SIZE, waypoint);
 		x_wp = waypoint.x;
 		y_wp = waypoint.y;
-		SERIAL_OUT "#" << wpr_count << "," << x_wp << "," << y_wp;
+		SERIAL_OUT.print("#");
+		SERIAL_OUT.print(wpr_count);
+		SERIAL_OUT.print(",");
+		SERIAL_OUT.print(x_wp);
+		SERIAL_OUT.print(",");
+		SERIAL_OUT.println(y_wp);
 		double temp = pow((x_wp-x),2);
 		temp += pow((y_wp-y),2);
 		proximity = sqrt(temp);
@@ -121,7 +126,7 @@ void calculate_speed(){
 	speed_new = micros();
 	speed_cur = speed_new - speed_old;
 	speed_old = speed_new;
-	speed_mph = CLICK_INCHES * 5868.0 / speed_cur;
+	speed_mph = CLICK_INCHES * 56818.0 / speed_cur;
 	//SERIAL_OUT.println(speed_cur);
 	return ;
 }
@@ -174,13 +179,19 @@ On the reciever side, simply wait for packets, and write them to the serial port
 
 */
 void print_parameters(){
-	SERIAL_OUT '$' << 'speed = '
 }
 
+
 void print_data(){
-	SERIAL_OUT 'd' << x << ',' << y << ',' << speed_mph << ',' << accelgyro.getRotationZ()
-		<< ',' << accelgyro.getAccelerationY() << ',' << steer_us  << ',' << angle
-		<< ',' << proximity
+	SERIAL_OUT.print('d');
+	SERIAL_OUT.print(x); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(y); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(speed_mph); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(get_gyro_rate()); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(get_accel_rate()); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(steer_us); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(angle); SERIAL_OUT.print(',');
+	SERIAL_OUT.println(proximity);
 
 }
 
