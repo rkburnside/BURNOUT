@@ -29,10 +29,6 @@ void click_calibration(){
 
 	get_mode();
 	while(mode == MANUAL){
-		if((millis() - time) > 1000){
-			SERIAL_OUT.println(click_calibration_counter);
-			time = millis();
-		}
 		get_mode();
 	}
 	
@@ -46,6 +42,7 @@ void click_calibration(){
 
 void click_calibration_increment(){
 	click_calibration_counter++;
+	SERIAL_OUT.println(click_calibration_counter);
 	return ;
 }
 
