@@ -137,22 +137,29 @@ void clear_i2c(){
 }
 	
 void calculate_null(){
-	SERIAL_OUT.println("CALCULATING NULL");
-	cal_flag = true;		//calibrating,
-	accum = 0;				//reset the angle. angle will act as accumulator for null calculation
-	gyro_null = 0;			//make sure to not subtract any nulls here
-	gyro_count = 0;
 
-	while(gyro_count < 5000){
-		read_FIFO();
-		//delay(10);
-		//SERIAL_OUT.println(gyro_count);
-	}
-	gyro_null = accum/gyro_count -1;	//calculate the null. the -30 is a fudge factor for 5000 pts.
-	cal_flag = false;		//stop calibration
-	accum = 0;
+	do{
+		SERIAL_OUT.println("CALCULATING NULL");
+		cal_flag = true;		//calibrating,
+		accum = 0;				//reset the angle. angle will act as accumulator for null calculation
+		gyro_null = 0;			//make sure to not subtract any nulls here
+		gyro_count = 0;
+
+		while(gyro_count < 10000){
+			read_FIFO();
+			//delay(10);
+			//SERIAL_OUT.println(gyro_count);
+		}
+		gyro_null = accum/gyro_count -1;	//calculate the null. the -30 is a fudge factor for 5000 pts.
+		cal_flag = false;		//stop calibration
+		accum = 0;
+		
+		if(gyro_null > 75){
+			SERIAL_OUT.print("Reclaculating null because it was too large: ");
+			SERIAL_OUT.println(gyro_null);
+		}
+	} while(gyro_null > 75);
 	
-
 	//should print null here
 	SERIAL_OUT.print("Null: ");
 	SERIAL_OUT.println(gyro_null);
@@ -188,7 +195,7 @@ void watch_angle(){
 	SERIAL_OUT.println();
 	setup_mpu6050();
 	calculate_null();
-	
+
 	SERIAL_OUT.println("watch angle");
 
 	do{
