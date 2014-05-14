@@ -145,7 +145,7 @@ void calculate_null(){
 		gyro_null = 0;			//make sure to not subtract any nulls here
 		gyro_count = 0;
 
-		while(gyro_count < 10000){
+		while(gyro_count < 5000){
 			read_FIFO();
 			//delay(10);
 			//SERIAL_OUT.println(gyro_count);
@@ -154,11 +154,11 @@ void calculate_null(){
 		cal_flag = false;		//stop calibration
 		accum = 0;
 		
-		if(gyro_null > 75){
+		if(gyro_null > 150){
 			SERIAL_OUT.print("Reclaculating null because it was too large: ");
 			SERIAL_OUT.println(gyro_null);
 		}
-	} while(gyro_null > 75);
+	} while(gyro_null > 150);
 	
 	//should print null here
 	SERIAL_OUT.print("Null: ");
