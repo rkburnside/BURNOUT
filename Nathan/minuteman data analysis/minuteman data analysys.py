@@ -36,19 +36,44 @@ class DataSet():
         self.angle = array([])
         self.proximity = array([])
         self.dist = array([])
+        self.par_WAYPOINT_ACCEPT = None
+        self.par_S1 = None
+        self.par_S2 = None
+        self.par_S3 = None
+        self.par_S4 = None
+        self.par_SB = None
+        self.par_P1 = None
+        self.par_P2 = None
+        self.par_P3 = None
+        self.par_BREAKING_SPEED = None
+        self.par_L1 = None
+        self.par_L2 = None
+        self.par_L3 = None
+        self.par_L4 = None
+        self.par_PATH_FOLLOWING = None
+        self.par_LOOK_AHEAD = None
+        self.par_GYRO_CAL = None
+        self.par_STEER_ADJUST = None
+        self.par_SERVO_LIM = None
+        self.par_STEER_GAIN = None
+        self.par_CLICK_INCHES = None
 
 def wait_init():
     while True:
         temp = ser.readline()
-        if temp == "initialize" :
+        print temp
+        if temp.find("initialize") != -1:
             break
 
 def get_data():
-    #wait_init();
+    wait_init();
+    first = 0
     while True:  # make this break when serial times out
         temp = ser.readline()
         if len(temp) < 2 :
-            break
+            temp = "timeout"
+            if first == 1:
+                break
         if temp[0] == "$":
             temp = temp[1:].split(",")
             for item in temp:
@@ -61,6 +86,7 @@ def get_data():
             ycoor = float(temp[2])
             #plot coordinate on graph, add to databas?
         elif temp[0] == "d":
+            first = 1
             temp = temp[1:].split(",")
             d.x = append(d.x, array([float(temp[0])]))
             d.y = append(d.y, array([float(temp[1])]))
@@ -70,6 +96,30 @@ def get_data():
             d.steer = append(d.steer, array([float(temp[5])]))
             d.angle = append(d.angle, array([float(temp[6])]))
             d.proximity = append(d.proximity, array([float(temp[7])]))
+        elif temp[0] == "p":
+            temp = temp[1:].split(",")
+            d.par_WAYPOINT_ACCEPT = int(temp[0])
+            d.par_S1 = int(temp[1])
+            d.par_S2 = int(temp[2])
+            d.par_S3 = int(temp[3])
+            d.par_S4 = int(temp[4])
+            d.par_SB = int(temp[5])
+            d.par_P1 = int(temp[6])
+            d.par_P2 = int(temp[7])
+            d.par_P3 = int(temp[8])
+            d.par_BREAKING_SPEED = int(temp[9])
+            d.par_L1 = int(temp[10])
+            d.par_L2 = int(temp[11])
+            d.par_L3 = int(temp[12])
+            d.par_L4 = int(temp[13])
+            d.par_PATH_FOLLOWING = int(temp[14])
+            d.par_LOOK_AHEAD = int(temp[15])
+            d.par_GYRO_CAL = int(temp[16])
+            d.par_STEER_ADJUST = int(temp[17])
+            d.par_SERVO_LIM = int(temp[18])
+            d.par_STEER_GAIN = int(temp[19])
+            d.par_CLICK_INCHES = float(temp[20])
+
     ser.close()
     d.dist = arange(0, len(d.x), 1)
     d.dist = d.dist *2.33
@@ -79,6 +129,7 @@ def filter_data():
     import numpy as np
     d.speed = np.convolve(d.speed, np.ones(4)/4, "same")
     d.accel = np.convolve(d.accel, np.ones(10)/10, "same")
+    plot_data()
 
 # print coordinates plot, mark waypoints, draw LOS lines
 # possilbly color by speed

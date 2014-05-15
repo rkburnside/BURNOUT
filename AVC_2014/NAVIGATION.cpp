@@ -179,8 +179,29 @@ On the reciever side, simply wait for packets, and write them to the serial port
 
 */
 void print_parameters(){
+	SERIAL_OUT.print('p');
+	SERIAL_OUT.print(WAYPOINT_ACCEPT); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(S1); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(S2); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(S3); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(S4); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(SB); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(P1); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(P2); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(P3); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(BREAKING_SPEED); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(L1); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(L2); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(L3); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(L4); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(PATH_FOLLOWING); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(LOOK_AHEAD); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(GYRO_CAL); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(STEER_ADJUST); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(SERVO_LIM); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(STEER_GAIN); SERIAL_OUT.print(',');
+	SERIAL_OUT.println(CLICK_INCHES);
 }
-
 
 void print_data(){
 	SERIAL_OUT.print('d');

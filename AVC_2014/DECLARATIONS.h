@@ -38,6 +38,7 @@ void update_waypoint();
 void calculate_look_ahead();
 void print_coordinates();
 void print_data();
+void print_parameters();
 
 //CALIBRATION FUNCTIONS
 void steering_calibration();

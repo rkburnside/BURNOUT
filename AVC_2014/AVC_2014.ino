@@ -69,7 +69,7 @@ void navigate(){
 	if(mode == AUTOMATIC){
 		steering.writeMicroseconds(steer_us);
 		//speed();
-		esc.writeMicroseconds(S4);
+		esc.writeMicroseconds(S4);       // !!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!! NEEDS TO BE REMOVED WHEN DONE WITH TESTING
 	}
 	print_data();
 	return ;
@@ -267,6 +267,8 @@ void setup(){
 		main_menu();
 		race_startup_routine();
 	}
+	SERIAL_OUT.println("initialize");
+	print_parameters();	
 }
 
 void loop(){
