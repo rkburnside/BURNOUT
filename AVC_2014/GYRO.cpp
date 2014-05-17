@@ -154,7 +154,7 @@ void calculate_null(){
 		cal_flag = false;		//stop calibration
 		accum = 0;
 		
-		if(gyro_null > 75){
+		if(gyro_null > 150){
 			SERIAL_OUT.print("Null was rather high: ");
 			SERIAL_OUT.println(gyro_null);
 			SERIAL_OUT.print("Set to Auto to recalculate or WP mode to bypass");
