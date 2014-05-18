@@ -4,7 +4,7 @@
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-int excel_waypoints[19][2] = {{1000,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
+int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-714.42,54.53}, {-716.66,-517.81}, {-527.32,-509.25}, {25,-499.2}, {10,-300}, {10,-150}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
@@ -120,30 +120,30 @@ int excel_waypoints[19][2] = {{1000,100}, {0,125}, {0,150}, {0,200}, {0,0}, {0,0
 
 #ifdef WC
 //WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 50	//waypoint acceptance radius in inches
+#define WAYPOINT_ACCEPT 25	//waypoint acceptance radius in inches
 #define S1 1500				//stationary speed
-#define S2 1560				//1650 is a creeping speed
-#define S3 1560				//This is the speed for negotiating wp's 
-#define S4 1560				//1800 is pretty ridiculously fast. Don't use for general use.
-#define SB 1560				//breaking. adjust this parameter to allow creeping up on waypoints
+#define S2 1625				//slow speed, consider getting a faster one to start
+#define S3 1650				// 
+#define S4 1650				//
+#define SB 1650				//breaking. adjust this parameter to allow creeping up on waypoints
 #define P1 100				//proximity to allow car to align with next waypoint in inches
-#define P2 100				//close proximity to waypoint in inches
-#define P3 200				//far proximity to waypoint in inches
+#define P2 50				//close proximity to waypoint in inches
+#define P3 100				//far proximity to waypoint in inches
 #define BREAKING_SPEED 7000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
 #define L1 5000
 #define L2 20000
 #define L3 100
 #define L4 250
-#define XGYROOFFSET 90
-#define YGYROOFFSET 15
-#define ZGYROOFFSET 43
+#define XGYROOFFSET -30
+#define YGYROOFFSET 32
+#define ZGYROOFFSET -10
 #define PATH_FOLLOWING 1
-#define LOOK_AHEAD 70
+#define LOOK_AHEAD 50
 
-//***Note that Wile E. Coyote has the gryo upside down AND the steering is opposite of roadrunner. As a result, the steering gain AND the gyro cal numbers are "-"
+//***Note that Wile E. Coyote servo is opposite of roadrunner. As a result, the steering gain AND the gyro cal numbers are "-"
 
 //SENSOR PARAMETERS
-#define GYRO_CAL 232720112	//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
+#define GYRO_CAL 234401167	//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
 #define STEER_ADJUST 1500		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN -4000		//proportional gain, if navigation gets unstable, reduce.
