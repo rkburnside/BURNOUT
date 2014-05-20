@@ -1,11 +1,22 @@
+Testing List
+computer
+upload cable
+bluetooth phone
+car(s)
+radio
+batteries
+foam bumper
+
+
 to do
 
 coyote speed at (set waypoint at 0,1000):
-1550
-1575
-1600
-1625
-1650
+1500 stationary
+1550 stationary
+1575 slow, creeping speed
+1600 fast start. can be used. probably nothing faster 'cause it might spin out
+1625 fast start. may also be used. very good speed for the whole course
+1650 this was my pretty fast speed. spinout occurred on waypoints with hard turn.
 1675
 1700
 1800
@@ -30,6 +41,25 @@ determine the click distance for it
 determine correct waypoint acceptance radius
 determine near, far, next waypoint values
 
+1: 30.36 , 199.63
+2: 9.25 , 501.30
+3: -725.98 , 545.44
+4: -714.42 , 54.53
+5: -716.66 , -517.81
+6: -527.32 , -509.25
+7: 26.43 , -499.20
+8: 25.00 , -100.00
+9: 25.00 , 0.00
+10: 0.00 , 0.00
+11: 0.00 , 0.00
+12: 0.00 , 0.00
+13: 0.00 , 0.00
+14: 0.00 , 0.00
+15: 0.00 , 0.00
+16: 0.00 , 0.00
+17: 0.00 , 0.00
+18: 0.00 , 0.00
+19: 0.00 , 0.00
 
 
 
