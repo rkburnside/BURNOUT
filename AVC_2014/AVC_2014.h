@@ -1,5 +1,5 @@
 //AVC SETTINGS
-#define WC			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
+#define RR			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
 #define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
@@ -36,7 +36,7 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 #define STEER_ADJUST 1425		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 3500			//proportional gain, default it 4.0
-#define CLICK_INCHES 2.0		//conversion factoy, inches per click
+#define CLICK_INCHES 2.33		//conversion factor, inches per click
 
 //FIXED PARAMETERS
 #define CAR_NAME "***MINUTEMAN***" //car name
@@ -90,7 +90,7 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 #define STEER_ADJUST 1480		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 4000			//proportional gain, if navigation gets unstable, reduce.
-#define CLICK_INCHES 2.09380	//85 clicks in 25 feet (300 inches)
+#define CLICK_INCHES 2.0689655	//145 clicks in 25 feet (300 inches)
 
 //FIXED PARAMETERS
 #define CAR_NAME "***ROADRUNNER***" //car name
@@ -147,7 +147,7 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 #define STEER_ADJUST 1500		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN -4000		//proportional gain, if navigation gets unstable, reduce.
-#define CLICK_INCHES 2.09380	//85 clicks in 25 feet (300 inches)
+#define CLICK_INCHES 4.3165468	//69~70 clicks in 25 feet (300 inches)
 
 //FIXED PARAMETERS
 #define CAR_NAME "***WILE E. COYOTE***" //car name
