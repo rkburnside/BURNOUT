@@ -7,9 +7,33 @@ radio
 batteries
 foam bumper
 
+testing notes - losi:
+- fix gyro null bypass
+- [x] determine steering offset using the calibration routine
+- do multiple tests to determine s1 (1500 good)
+- do multiple tests to determine s2 (1600~1625 ok, 1650 some spinning of tires)
+- do multiple tests to determine s3
+- do multiple tests to determine s4
+- [x] do multiple tests to determine p1
+- do multiple tests to determine p2
+- do multiple tests to determine p3
+- do multiple tests to determine look-ahead
+- do multiple tests to determine waypoint_accept
 
-to do
+testing notes - beatle:
+- [x] determine steering offset using the calibration routine
+- do multiple tests to determine s1
+- do multiple tests to determine s2
+- do multiple tests to determine s3
+- do multiple tests to determine s4
+- [x] do multiple tests to determine p1
+- do multiple tests to determine p2
+- do multiple tests to determine p3
+- do multiple tests to determine look-ahead
+- do multiple tests to determine waypoint_accept
 
+
+To Do
 coyote speed at (set waypoint at 0,1000):
 1500 stationary
 1550 stationary
@@ -28,41 +52,8 @@ coyote speed at (set waypoint at 0,1000):
 1950
 1975
 2000
+
 which values cause: spin out, too fast for turns, roll overs, WAY too fast, slow/start speed, medium, medium fast, fast
-
-test different click recalculate values and see if it has any effect on accuracy
-
-try out the steering calibration and try to determine the correct steering adjust value
-
-adjust the look ahead value for the coyote and see what is best
-
-determine the click distance for it
-
-determine correct waypoint acceptance radius
-determine near, far, next waypoint values
-
-1: 30.36 , 199.63
-2: 9.25 , 501.30
-3: -725.98 , 545.44
-4: -714.42 , 54.53
-5: -716.66 , -517.81
-6: -527.32 , -509.25
-7: 26.43 , -499.20
-8: 25.00 , -100.00
-9: 25.00 , 0.00
-10: 0.00 , 0.00
-11: 0.00 , 0.00
-12: 0.00 , 0.00
-13: 0.00 , 0.00
-14: 0.00 , 0.00
-15: 0.00 , 0.00
-16: 0.00 , 0.00
-17: 0.00 , 0.00
-18: 0.00 , 0.00
-19: 0.00 , 0.00
-
-
-
 
 ##Testing
 - verify that the car hits EVERY waypoint at all speeds
