@@ -22,10 +22,10 @@ testing notes - losi:
 
 testing notes - beatle:
 - [x] determine steering offset using the calibration routine
-- do multiple tests to determine s1
-- do multiple tests to determine s2
-- do multiple tests to determine s3
-- do multiple tests to determine s4
+- do multiple tests to determine s1 (1500 is good)
+- do multiple tests to determine s2 (1600 is good)
+- do multiple tests to determine s3 (1625 is good, going faster isn't worth it)
+- do multiple tests to determine s4 (
 - [x] do multiple tests to determine p1
 - do multiple tests to determine p2
 - do multiple tests to determine p3

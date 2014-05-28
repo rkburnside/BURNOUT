@@ -81,7 +81,7 @@ int excel_waypoints[19][2] = {{0,435}, {318,971}, {331,1759}, {-764,2199}, {-943
 #define YGYROOFFSET -9
 #define ZGYROOFFSET 30
 #define PATH_FOLLOWING 1
-#define LOOK_AHEAD 70
+#define LOOK_AHEAD 120
 
 
 //SENSOR PARAMETERS
@@ -136,14 +136,14 @@ int excel_waypoints[19][2] = {{0,435}, {318,971}, {331,1759}, {-764,2199}, {-943
 #define YGYROOFFSET 32
 #define ZGYROOFFSET -10
 #define PATH_FOLLOWING 1
-#define LOOK_AHEAD 300
+#define LOOK_AHEAD 240
 
 //***Note that Wile E. Coyote servo is opposite of roadrunner. As a result, the steering gain AND the gyro cal numbers are "-"
 
 //SENSOR PARAMETERS
 #define GYRO_CAL 234401167	//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
 #define STEER_ADJUST 1465		//steering adjustment factor
-#define STEER_GAIN -4000		//proportional gain, if navigation gets unstable, reduce.
+#define STEER_GAIN -2000		//proportional gain, if navigation gets unstable, reduce.
 #define CLICK_INCHES 4.3165468	//69~70 clicks in 25 feet (300 inches)
 
 //FIXED PARAMETERS
