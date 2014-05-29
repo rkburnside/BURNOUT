@@ -1,5 +1,5 @@
 //AVC SETTINGS
-#define WC			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
+#define MM			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
 #define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
@@ -8,31 +8,31 @@ int excel_waypoints[19][2] = {{0,435}, {318,971}, {331,1759}, {-764,2199}, {-943
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 21	//waypoint acceptance radius in inches
+#define WAYPOINT_ACCEPT 50	//waypoint acceptance radius in inches
 #define S1 1500				// some default values:
 #define S2 1540				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
 							//S1 1500, S2 1560, S3 1580, S4 2000, SB 1250
-#define S3 1540				//This is the speed for negotiating wp's 
-#define S4 1540 			//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
-#define SB 1300				//breaking speed default 1300
-#define P1 50				//proximity to allow car to align with next waypoint in inches
+#define S3 1650				//This is the speed for negotiating wp's 
+#define S4 1650 			//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
+#define SB 1650				//breaking speed default 1300
+#define P1 100				//proximity to allow car to align with next waypoint in inches
 #define P2 100				//close proximity to waypoint in inches
-#define P3 625				//far proximity to waypoint in inches
+#define P3 200				//far proximity to waypoint in inches
 #define BREAKING_SPEED 4000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed default 6000
-#define L1 5400
-#define L2 20000
-#define L3 200
-#define L4 350
+#define L1 10
+#define L2 20
+#define L3 350
+#define L4 200
 #define XGYROOFFSET 88	//85
 #define YGYROOFFSET -72	//-70
 #define ZGYROOFFSET -24	//-22
 #define PATH_FOLLOWING 1
-#define LOOK_AHEAD 20
+#define LOOK_AHEAD 120
 
 
 //SENSOR PARAMETERS
 //#define GYRO_CAL 470868410	//this has to be measured by rotating the gyro 360 deg. and reading the output
-#define GYRO_CAL 235434205		//this has to be measured by rotating the gyro 360 deg. and reading the output
+#define GYRO_CAL 233300000		//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define STEER_ADJUST 1425		//steering adjustment factor
 #define STEER_GAIN 3500			//proportional gain, default it 4.0
 #define CLICK_INCHES 2.33		//conversion factor, inches per click
