@@ -1,3 +1,9 @@
+- on the AVC side, test translating the waypoints by some given displacement.
+- set up course and run 3 times, let the car sit for ~5 minutes between each test
+- set up a jump and figure out correct speeds for it
+- get 2 or 3 different vehicle speed profiles that will work for both the losi and the beetle
+- will all the speed profiles hit all the waypoints exactly?
+
 Testing List
 computer
 upload cable
