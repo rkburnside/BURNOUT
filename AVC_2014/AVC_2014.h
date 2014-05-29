@@ -32,7 +32,8 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 
 //SENSOR PARAMETERS
 //#define GYRO_CAL 470868410	//this has to be measured by rotating the gyro 360 deg. and reading the output
-#define GYRO_CAL 235434205		//this has to be measured by rotating the gyro 360 deg. and reading the output
+//#define GYRO_CAL 235434205		//this has to be measured by rotating the gyro 360 deg. and reading the output
+#define GYRO_CAL 233300000		//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define STEER_ADJUST 1425		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 3500			//proportional gain, default it 4.0
