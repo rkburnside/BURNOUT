@@ -1,11 +1,46 @@
-to do
+Testing List
+computer
+upload cable
+bluetooth phone
+car(s)
+radio
+batteries
+foam bumper
 
+testing notes - losi:
+- fix gyro null bypass
+- [x] determine steering offset using the calibration routine
+- do multiple tests to determine s1 (1500 good)
+- do multiple tests to determine s2 (1600~1625 ok, 1650 some spinning of tires)
+- do multiple tests to determine s3
+- do multiple tests to determine s4
+- [x] do multiple tests to determine p1
+- do multiple tests to determine p2
+- do multiple tests to determine p3
+- do multiple tests to determine look-ahead
+- do multiple tests to determine waypoint_accept
+
+testing notes - beatle:
+- [x] determine steering offset using the calibration routine
+- do multiple tests to determine s1 (1500 is good)
+- do multiple tests to determine s2 (1600 is good)
+- do multiple tests to determine s3 (1625 is good, going faster isn't worth it)
+- do multiple tests to determine s4 (
+- [x] do multiple tests to determine p1
+- do multiple tests to determine p2
+- do multiple tests to determine p3
+- do multiple tests to determine look-ahead
+- do multiple tests to determine waypoint_accept
+
+
+To Do
 coyote speed at (set waypoint at 0,1000):
-1550
-1575
-1600
-1625
-1650
+1500 stationary
+1550 stationary
+1575 slow, creeping speed
+1600 fast start. can be used. probably nothing faster 'cause it might spin out
+1625 fast start. may also be used. very good speed for the whole course
+1650 this was my pretty fast speed. spinout occurred on waypoints with hard turn.
 1675
 1700
 1800
@@ -17,22 +52,8 @@ coyote speed at (set waypoint at 0,1000):
 1950
 1975
 2000
+
 which values cause: spin out, too fast for turns, roll overs, WAY too fast, slow/start speed, medium, medium fast, fast
-
-test different click recalculate values and see if it has any effect on accuracy
-
-try out the steering calibration and try to determine the correct steering adjust value
-
-adjust the look ahead value for the coyote and see what is best
-
-determine the click distance for it
-
-determine correct waypoint acceptance radius
-determine near, far, next waypoint values
-
-
-
-
 
 ##Testing
 - verify that the car hits EVERY waypoint at all speeds

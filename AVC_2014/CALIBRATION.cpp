@@ -71,13 +71,13 @@ void steering_calibration(){
 	delay(1000);
 	esc.writeMicroseconds(S2);
 	
-	while(mode != AUX){
+	while(mode == AUTOMATIC){
 		read_FIFO();
 		
 		update_steering();
 		steering.writeMicroseconds(steer_us);
 		
-		if((millis() - time) > 200){
+		if((millis() - time) > 500){
 			SERIAL_OUT.print("angle: ");
 			SERIAL_OUT.print((angle*180.0/3.1415),5);
 			SERIAL_OUT.print("\tsteering ms: ");

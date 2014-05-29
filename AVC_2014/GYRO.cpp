@@ -137,7 +137,7 @@ void clear_i2c(){
 }
 	
 void calculate_null(){
-
+	bool retest = false;
 	do{
 		SERIAL_OUT.println("CALCULATING NULL");
 		cal_flag = true;		//calibrating,
@@ -145,7 +145,7 @@ void calculate_null(){
 		gyro_null = 0;			//make sure to not subtract any nulls here
 		gyro_count = 0;
 
-		while(gyro_count < 10000){
+		while(gyro_count < 5000){
 			read_FIFO();
 			//delay(10);
 			//SERIAL_OUT.println(gyro_count);
@@ -154,11 +154,27 @@ void calculate_null(){
 		cal_flag = false;		//stop calibration
 		accum = 0;
 		
-		if(gyro_null > 75){
-			SERIAL_OUT.print("Reclaculating null because it was too large: ");
+		if(gyro_null > 150){
+			SERIAL_OUT.print("Null was rather high: ");
 			SERIAL_OUT.println(gyro_null);
+			SERIAL_OUT.print("Set to AUX to recalculate or WP mode to bypass");
+			while(1){
+				get_mode();
+				
+				if(mode == WP_MODE){
+					retest = false;
+					break;
+				}
+				if(mode == AUX){
+					retest = true;
+					break;
+				}
+			}
+		
 		}
-	} while(gyro_null > 75);
+		else retest = false;
+
+	} while(retest);
 	
 	//should print null here
 	SERIAL_OUT.print("Null: ");

@@ -46,9 +46,15 @@ void update_waypoint(){
 		y_wp = waypoint.y;
 		SERIAL_OUT.print("#");
 		SERIAL_OUT.print(wpr_count);
+<<<<<<< HEAD
 		SERIAL_OUT.print(",");
 		SERIAL_OUT.print(x_wp);
 		SERIAL_OUT.print(",");
+=======
+		SERIAL_OUT.print(": ");
+		SERIAL_OUT.print(x_wp);
+		SERIAL_OUT.print(" , ");
+>>>>>>> f8e0ce2da5df2aaabe9ebd6f54773891c63212fe
 		SERIAL_OUT.println(y_wp);
 		double temp = pow((x_wp-x),2);
 		temp += pow((y_wp-y),2);
