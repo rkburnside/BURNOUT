@@ -2,7 +2,14 @@
 
 //#INCLUDE FILES
 #include "DECLARATIONS.h"
+#include <PString.h>
+#include <Streaming.h>
+#include <SPI.h>
+#include <RH_NRF24.h>
 
+// Singleton instance of the radio driver
+///RH_NRF24 nrf24;
+RH_NRF24 nrf24(15, 14); // use this to be electrically compatible with Mirf
 
 //INTERNAL VARIABLES
 int steer_us;
@@ -177,42 +184,91 @@ On the reciever side, simply wait for packets, and write them to the serial port
 
 
 
-*/
+
 void print_parameters(){
-	SERIAL_OUT.print('p');
-	SERIAL_OUT.print(WAYPOINT_ACCEPT); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(S1); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(S2); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(S3); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(S4); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(SB); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(P1); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(P2); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(P3); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(BREAKING_SPEED); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(L1); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(L2); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(L3); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(L4); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(PATH_FOLLOWING); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(LOOK_AHEAD); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(GYRO_CAL); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(STEER_ADJUST); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(SERVO_LIM); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(STEER_GAIN); SERIAL_OUT.print(',');
-	SERIAL_OUT.println(CLICK_INCHES);
+	char buffer[32];
+	PString str(buffer, sizeof(buffer));
+	str.print("The value of PI is ");
+	str.print(PI);
+	SERIAL_OUT.println(buffer);
+	PString str(buffer, sizeof(buffer));
+	str.print("$p1,");
+	str.print(WAYPOINT_ACCEPT); str.print(',');
+	str.print(S1); str.print(',');
+	str.print(S2); str.print(',');
+	str.print(S3); str.print(',');
+	str.println(S4); //str.print(',');
+	SERIAL_OUT.println(buffer);
+	PString str(buffer, sizeof(buffer));
+	str.print("$p2,");
+	str.print(SB); str.print(',');
+	str.print(P1); str.print(',');
+	str.print(P2); str.print(',');
+	str.print(P3); str.print(',');
+	str.println(BREAKING_SPEED); //str.print(',');
+	SERIAL_OUT.println(buffer);
+	str.print("$p3,");
+	str.print(L1); str.print(',');
+	str.print(L2); str.print(',');
+	str.print(L3); str.print(',');
+	str.print(L4); //str.print(',');
+	str.println(PATH_FOLLOWING); //str.print(',');
+	SERIAL_OUT.println(buffer);
+	str.print("$p4,");
+	str.print(LOOK_AHEAD); str.print(',');
+	str.print(GYRO_CAL); str.print(',');
+	str.print(STEER_ADJUST); str.print(',');
+	str.println(SERVO_LIM); //str.print(',');
+	SERIAL_OUT.println(buffer);
+	str.print("$p5,");
+	str.print(STEER_GAIN); str.print(',');
+	str.println(CLICK_INCHES);
+	SERIAL_OUT.println(buffer);
+}
+*/
+
+void setup_radio() 
+{
+  SERIAL_OUT.println("setting up radio ***************");
+  if (!nrf24.init())
+    SERIAL_OUT.println("init failed");
+  // Defaults after init are 2.402 GHz (channel 2), 2Mbps, 0dBm
+  if (!nrf24.setChannel(1))
+    SERIAL_OUT.println("setChannel failed");
+  if (!nrf24.setRF(RH_NRF24::DataRate2Mbps, RH_NRF24::TransmitPower0dBm))
+    SERIAL_OUT.println("setRF failed");    
+}
+
+
+void print_parameters(){
+	char buffer[150];
+	PString str(buffer, sizeof(buffer));
+	str << "$p,";
+	str << WAYPOINT_ACCEPT << "," << S1 << "," << S2 << ",";
+	str << S3 << "," << S4 << "," << SB << ",";
+	str << P1 << "," << P2 << "," << P3 << ",";
+	str << BREAKING_SPEED << "," << L1 << "," << L2 << ",";
+	str << L3 << "," << L4 << "," << PATH_FOLLOWING << ",";
+	str << LOOK_AHEAD << "," << GYRO_CAL << "," << STEER_ADJUST << ",";
+	str << SERVO_LIM << "," << STEER_GAIN << "," << CLICK_INCHES << "\r\n";
+	SERIAL_OUT.print(buffer);
+	nrf24.send((uint8_t *)buffer, 31);
+	nrf24.waitPacketSent();
 }
 
 void print_data(){
-	SERIAL_OUT.print('d');
-	SERIAL_OUT.print(x); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(y); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(speed_mph); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(get_gyro_rate()); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(get_accel_rate()); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(steer_us); SERIAL_OUT.print(',');
-	SERIAL_OUT.print(angle); SERIAL_OUT.print(',');
-	SERIAL_OUT.println(proximity);
+	char buffer[150];
+	//uint8_t * cool;
+	//cool = buffer;
+	PString str(buffer, sizeof(buffer));
+	str.print("$d1,");
+	str << x << "," << y << "," << speed_mph << ",";
+	str.print(speed_mph); str.print(',');
+	str.print(get_gyro_rate()); str.print(',');
+	str << steer_us << "," << angle << "," << proximity << "\r\n";
+	SERIAL_OUT.print(buffer);
+	nrf24.send((uint8_t *)buffer, 30);
+	nrf24.waitPacketSent();
 
 }
 

@@ -39,6 +39,7 @@ void calculate_look_ahead();
 void print_coordinates();
 void print_data();
 void print_parameters();
+void setup_radio();
 
 //CALIBRATION FUNCTIONS
 void steering_calibration();

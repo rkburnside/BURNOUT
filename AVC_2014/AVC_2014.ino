@@ -14,6 +14,11 @@ The sketch is parsed for include files. The sketch, all included header files, a
 //#include <i2c_t3.h>
 #include <I2Cdev.h>
 #include <MPU6050.h>
+#include <PString.h>
+#include <Streaming.h>
+#include <SPI.h>
+#include <RH_NRF24.h>
+
 
 //the following are for reseting the teensy. see this link for more details: http://goo.gl/nV8kMs
 #define RESTART_ADDR       0xE000ED0C
@@ -92,7 +97,6 @@ void race_startup_routine(){
 	SERIAL_OUT.println("-----RACE SETUP ROUTINE-----");
 	
 	esc.detach();
-
 	setup_mpu6050();
 	calculate_null();
 	
@@ -162,7 +166,6 @@ void race_startup_routine(){
 	first = true;
 	target_x = x_wp;
 	target_y = y_wp;
-
 	return;
 }
 
@@ -170,7 +173,7 @@ void wp_setup_routine(){
 	SERIAL_OUT.println("-----WP SETUP ROUTINE-----");
 
 	esc.detach();
-
+	setup_radio();
 	setup_mpu6050();
 	calculate_null();
 	
@@ -227,6 +230,7 @@ void wp_setup_routine(){
 }
 
 void setup(){
+	pinMode(10, OUTPUT);			//this is the switch that needs to be toggled to start the race
 	SERIAL_OUT.begin(115200);
 	SERIAL_OUT.setTimeout(100000);
 	SERIAL_OUT.println(CAR_NAME);
@@ -236,8 +240,8 @@ void setup(){
 	pinMode(MODE_LINE_1, INPUT);
 	pinMode(MODE_LINE_2, INPUT);
 	pinMode(TOGGLE, INPUT_PULLUP);			//this is the switch that needs to be toggled to start the race
-	pinMode(FRICKIN_LASER, OUTPUT);
-	digitalWrite(FRICKIN_LASER, LOW);
+	//pinMode(FRICKIN_LASER, OUTPUT);
+	//digitalWrite(FRICKIN_LASER, LOW);
 
 	pinMode(RESET_PIN, INPUT);
 	attachInterrupt(RESET_PIN, reset_requested_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
@@ -253,10 +257,10 @@ void setup(){
 	esc.writeMicroseconds(S1);
 	
 	bool bypass_menu = false;
-	pinMode(LED_BUILTIN, OUTPUT);
+	//pinMode(LED_BUILTIN, OUTPUT);
 	long temp_time = millis();
 	for(int i = 0; i<8; i++){
-		digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+		//digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 		delay(500);
 		get_mode();
 		if(mode == WP_MODE) bypass_menu = true;
