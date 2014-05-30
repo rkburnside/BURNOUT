@@ -1,10 +1,4 @@
-- on the AVC side, test translating the waypoints by some given displacement.
-- set up course and run 3 times, let the car sit for ~5 minutes between each test
-- set up a jump and figure out correct speeds for it
-- get 2 or 3 different vehicle speed profiles that will work for both the losi and the beetle
-- will all the speed profiles hit all the waypoints exactly?
-
-Testing List
+TESTING EQUIPMENT LIST
 computer
 upload cable
 bluetooth phone
@@ -12,85 +6,48 @@ car(s)
 radio
 batteries
 foam bumper
-
-testing notes - losi:
-- fix gyro null bypass
-- [x] determine steering offset using the calibration routine
-- do multiple tests to determine s1 (1500 good)
-- do multiple tests to determine s2 (1600~1625 ok, 1650 some spinning of tires)
-- do multiple tests to determine s3
-- do multiple tests to determine s4
-- [x] do multiple tests to determine p1
-- do multiple tests to determine p2
-- do multiple tests to determine p3
-- do multiple tests to determine look-ahead
-- do multiple tests to determine waypoint_accept
-
-testing notes - beatle:
-- [x] determine steering offset using the calibration routine
-- do multiple tests to determine s1 (1500 is good)
-- do multiple tests to determine s2 (1600 is good)
-- do multiple tests to determine s3 (1625 is good, going faster isn't worth it)
-- do multiple tests to determine s4 (
-- [x] do multiple tests to determine p1
-- do multiple tests to determine p2
-- do multiple tests to determine p3
-- do multiple tests to determine look-ahead
-- do multiple tests to determine waypoint_accept
-
-
-To Do
-coyote speed at (set waypoint at 0,1000):
-1500 stationary
-1550 stationary
-1575 slow, creeping speed
-1600 fast start. can be used. probably nothing faster 'cause it might spin out
-1625 fast start. may also be used. very good speed for the whole course
-1650 this was my pretty fast speed. spinout occurred on waypoints with hard turn.
-1675
-1700
-1800
-1825
-1850
-1875
-1900
-1925
-1950
-1975
-2000
-
-which values cause: spin out, too fast for turns, roll overs, WAY too fast, slow/start speed, medium, medium fast, fast
+* sharpie or motor oil for marking the course
+* angle ruler
 
 ##Testing
-- verify that the car hits EVERY waypoint at all speeds
+###SATURDAY MORNING TESTING
+- translate waypoint(s) using a tape measure, export the waypoints, adjust using spreadsheet, recompile code, reupload, import the waypoints, and run the course again. Check results.
 - test the affects of the car being lined up incorrectly by 0, 1, 2, 3, 4, 5, and 10 degrees
-- reincorporate braking/deceleration into the system. try out different braking speeds. get it working!
-- quantify the number of clicks to a distance so that we can alter the course as needed on the race day.
-- try black sharpie or a crayon or grease from a hamburger wrapper
+- set up course and run 3 times, let the car sit for ~5 minutes between each test
+- set up a jump, test appropriate speeds for hitting the jump: set s2 thru s4 to the same value, have it drive in a straight line, hit the jump, record results
+- create 2~3 vehicle speed profiles. verify that the vehicle correctly navigates course (waypoints, hoop, jump) at all speeds
+- what is the fastest profile I can run? what is it's time? with the hoop? with the jump?
+
+- create a template for tracking the results for the testing i'll be doing 
+- what is the correct MS time for breaking and what is the correct ESC speed to ensure the car doesn't break
+- try black sharpie or a crayon or grease from a hamburger wrapper for marking the course
+- which values cause: spin out, too fast for turns, roll overs, WAY too fast, slow/start speed, medium, medium fast, fast
+
 
 ##Software
-- AVC: create routine for viewing and modifying vehicle speeds on the go. create speed profiles that may be easily used.
-- change distance/navigation calculations to include a conversion factor, IPC (Inches Per Click) so that everything is in inches: x += IPC*sin(angle); y += IPC*cos(angle);
-  1. Convert acceptance radius and such to inches instead of clicks
-- AVC: reincorporate braking/deceleration into the system
-- AVC: Add leds to start up routine to indicate that the car is ready to run
-- AVC: add the modified "wire" library to the personal library folder. this will ensure that the 400khz wire mode is used at all times (verify that it is in fact working)
-- AVC: move the serial menu system to an android python based system. map out which functions will be needed, maybe use buttons, etc (first set would be moving the printed menu to python, then move the waypoint editing to python, and so forth)
-- AVC: work on getting the new i2c library to compile with the i2c_dev and mpu6050 librarys
-- AVC: incorporate vehicle speed (i.e. tire diameter) and how it affects distance traveled into the code
-- AVC: modify servo.h or another header file to use a digital servo to increase steering update rate digital servo
+- add better telemetry to the print out. current click time (i.e. actual speed), ESC write, proximity to waypoint, angle to waypoint, steering write, gyro turn rate, time
+- create routine for viewing and modifying vehicle speeds on the go. create speed profiles that may be easily used.
+- add the modified "wire" library to the personal library folder. this will ensure that the 400khz wire mode is used at all times (verify that it is in fact working)
+- move the serial menu system to an android python based system. map out which functions will be needed, maybe use buttons, etc (first set would be moving the printed menu to python, then move the waypoint editing to python, and so forth)
+- work on getting the new i2c library to compile with the i2c_dev and mpu6050 librarys
+- modify servo.h or another header file to use a digital servo to increase steering update rate digital servo
 
 ##Hardware
 - tune losi suspension system
 - consider purchasing replacement losi bumper attachment piece(s)
-- determine tire calibration and how to incorporate it into the calibration routines and menu system  
-  - Have the car drive a straight path and then stop and determine the ratio of how much distance changes with speed  
-  - Take photos of wheel with the go pro as the car is driving by
 - add a digital servo to car
 - replace losi tires
 
 ----
-
+- [x] no longer relevant. determine tire calibration and how to incorporate it into the calibration routines and menu system  
+- [x] no longer relevant. Have the car drive a straight path and then stop and determine the ratio of how much distance changes with speed  
+- [x] no longer relevant. Take photos of wheel with the go pro as the car is driving by
+- [x] no longer relevant. The car will no longer break since speed is critical. reincorporate braking/deceleration into the system
+- [x] no longer relevant. bluetooth phone is attached to wrist band and provides better information. AVC: Add leds to start up routine to indicate that the car is ready to run
+- [x] no longer relevant. after testing different speeds, the car seems just as accurate as fast speeds as it does at slow speeds AVC: incorporate vehicle speed (i.e. tire diameter) and how it affects distance traveled into the code
+- [x] Convert acceptance radius and such to inches instead of clicks
+- [x] change distance/navigation calculations to include a conversion factor, IPC (Inches Per Click) so that everything is in inches: x += IPC*sin(angle); y += IPC*cos(angle);
+- [x] quantify the number of clicks to a distance so that we can alter the course as needed on the race day.
 - [x] verify that the cross track error routine is working correctly
 - [x] AVC: reincorporate cross track error
   - [x] generate optimal splines for the car's path, possibly prior to starting the race

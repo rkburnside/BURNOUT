@@ -1,0 +1,34 @@
+testing notes - beatle:
+- [x] determine steering offset using the calibration routine
+- do multiple tests to determine s1 (1500 is good)
+- do multiple tests to determine s2 (1600 is good)
+- do multiple tests to determine s3 (1625 is good, going faster isn't worth it)
+- do multiple tests to determine s4 (
+- [x] do multiple tests to determine p1
+- do multiple tests to determine p2
+- do multiple tests to determine p3
+- do multiple tests to determine look-ahead
+- do multiple tests to determine waypoint_accept
+
+
+
+To Do
+coyote speed at (set waypoint at 0,1000):
+1500 stationary
+1550 stationary
+1575 slow, creeping speed
+1600 fast start. can be used. probably nothing faster 'cause it might spin out
+1625 fast start. may also be used. very good speed for the whole course
+1650 this was my pretty fast speed. spinout occurred on waypoints with hard turn.
+1675
+1700
+1800
+1825
+1850
+1875
+1900
+1925
+1950
+1975
+2000
+
