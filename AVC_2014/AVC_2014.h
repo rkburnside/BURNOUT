@@ -1,5 +1,5 @@
 //AVC SETTINGS
-#define MM			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
+#define RR			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
 #define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
@@ -63,10 +63,10 @@ int excel_waypoints[19][2] = {{0,435}, {318,971}, {331,1759}, {-764,2199}, {-943
 
 #ifdef RR
 //WAYPOINT PARAMETERS
-#define WAYPOINT_ACCEPT 50	//waypoint acceptance radius in inches
-#define P1 100				//proximity to allow car to align with next waypoint in inches
-#define P2 100				//close proximity to waypoint in inches
-#define P3 200				//far proximity to waypoint in inches
+#define WAYPOINT_ACCEPT 60	//waypoint acceptance radius in inches
+#define P1 180				//proximity to allow car to align with next waypoint in inches
+#define P2 180				//close proximity to waypoint in inches
+#define P3 300				//far proximity to waypoint in inches
 
 //SPEED PARAMETERS
 #define S1 1500				//stationary speed
@@ -84,7 +84,7 @@ int excel_waypoints[19][2] = {{0,435}, {318,971}, {331,1759}, {-764,2199}, {-943
 #define STEER_ADJUST 1505			//steering adjustment factor
 #define STEER_GAIN 4000				//proportional gain, if navigation gets unstable, reduce.
 #define PATH_FOLLOWING 1
-#define LOOK_AHEAD 120
+#define LOOK_AHEAD 60
 
 //GYRO PARAMETERS
 #define GYRO_CAL 233302330			//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
@@ -120,7 +120,7 @@ int excel_waypoints[19][2] = {{0,435}, {318,971}, {331,1759}, {-764,2199}, {-943
 #ifdef WC
 //WAYPOINT PARAMETERS
 #define WAYPOINT_ACCEPT 60	//waypoint acceptance radius in inches
-#define P1 200				//proximity to allow car to align with next waypoint in inches
+#define P1 180				//proximity to allow car to align with next waypoint in inches
 #define P2 120				//close proximity to waypoint in inches
 #define P3 240				//far proximity to waypoint in inches
 

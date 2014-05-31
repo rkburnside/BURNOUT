@@ -8,6 +8,7 @@ batteries
 foam bumper
 * sharpie or motor oil for marking the course
 * angle ruler
+* tape measure
 
 ##Testing
 ###SATURDAY MORNING TESTING
@@ -18,10 +19,14 @@ foam bumper
 - create 2~3 vehicle speed profiles. verify that the vehicle correctly navigates course (waypoints, hoop, jump) at all speeds
 - what is the fastest profile I can run? what is it's time? with the hoop? with the jump?
 
+- create telemetry output for the vehicles
 - create a template for tracking the results for the testing i'll be doing 
 - what is the correct MS time for breaking and what is the correct ESC speed to ensure the car doesn't break
 - try black sharpie or a crayon or grease from a hamburger wrapper for marking the course
 - which values cause: spin out, too fast for turns, roll overs, WAY too fast, slow/start speed, medium, medium fast, fast
+
+10 bits / byte
+count the number of characters
 
 
 ##Software

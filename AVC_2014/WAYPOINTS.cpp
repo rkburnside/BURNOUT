@@ -82,15 +82,15 @@ void display_waypoints(){
 		EEPROM_readAnything(i*WP_SIZE, waypoint);
 
 		Serial.print(i);
-		Serial.print(": ");
+		Serial.print("\t");
 		Serial.print(waypoint.x);
-		Serial.print(" , ");
+		Serial.print("\t");
 		Serial.println(waypoint.y);
 
 		Serial2.print(i);
-		Serial2.print(": ");
+		Serial2.print("\t");
 		Serial2.print(waypoint.x);
-		Serial2.print(" , ");
+		Serial2.print("\t");
 		Serial2.println(waypoint.y);
 	}
 
