@@ -9,7 +9,7 @@ int steer_us;
 double x_wp = 0, y_wp = 0, x_wp0 = 0, y_wp0 = 0;
 double target_x=0, target_y=0;
 double angle_last, angle_target, angle_vtp, x=0, y=0, speed_mph;
-static int steer_limm = 250;
+static int steer_limm = 300;
 //static double cross_product=0;
 static double angle_diff;
 static long speed_cur=0, speed_new=0, speed_old=0;
@@ -98,7 +98,7 @@ void speed(){
 	running = true;			// make sure running is updated.
 	angle_diff = angle_diff * 180.0/3.14159;
 	angle_diff = abs(angle_diff);
-	if (angle_diff < 10.0)  esc.writeMicroseconds(S4);
+	if (angle_diff < 30.0)  esc.writeMicroseconds(S4);
 	else esc.writeMicroseconds(S2);
 /*	
 	if((previous_proximity - proximity) <= (P1)) esc.writeMicroseconds(S2); //allow car to line up with the next point
