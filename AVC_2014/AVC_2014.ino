@@ -68,10 +68,11 @@ void navigate(){
 	get_mode();
 	if(mode == AUTOMATIC){
 		steering.writeMicroseconds(steer_us);
-		//speed();
-		esc.writeMicroseconds(S4);       // !!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!! NEEDS TO BE REMOVED WHEN DONE WITH TESTING
+		speed();
+		//esc.writeMicroseconds(S4);       // !!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!! NEEDS TO BE REMOVED WHEN DONE WITH TESTING
 	}
-	print_data();
+	//print_data();
+	print_coordinates();
 	return ;
 }
 

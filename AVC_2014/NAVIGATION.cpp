@@ -89,13 +89,18 @@ void update_position(){
 void cal_steer_lim(){
 	steer_limm = (int)map(speed_cur, L1, L2, L3, L4);
 	if(steer_limm > L4) steer_limm = L4;
+	steer_limm = 250;		//********************** cancel this for normal operation !!!!!!!!!!!!!!!!*********************
 	
 	return ;
 }
 
 void speed(){
 	running = true;			// make sure running is updated.
-
+	angle_diff = angle_diff * 180.0/3.14159;
+	angle_diff = abs(angle_diff);
+	if (angle_diff < 10.0)  esc.writeMicroseconds(S4);
+	else esc.writeMicroseconds(S2);
+/*	
 	if((previous_proximity - proximity) <= (P1)) esc.writeMicroseconds(S2); //allow car to line up with the next point
 	else if(proximity < (P2)) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
 	else if(proximity >= (P2) && proximity < (P3)){ //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
@@ -103,7 +108,7 @@ void speed(){
 		else esc.writeMicroseconds(S3);  //once speed is low enough, resume normal slow-down
 	}
 	else if(proximity >= (P3)) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
-
+*/
 	return ;
 }
 
@@ -111,11 +116,11 @@ void update_steering(){
 	// calculate and write angles for steering
 	angle_diff = angle_target - angle;
 	if (PATH_FOLLOWING) angle_diff = angle_vtp - angle;
-	if(angle_diff < -3.14159) angle_diff += 3.14159*2;   //if angle is less than 180 deg, then add 360 deg
-	if(angle_diff > 3.14159) angle_diff -= 3.14159*2;	//if angle is greater than 180 deg, then subtract 360
+	if(angle_diff < -3.14159) angle_diff += 6.2831;   //if angle is less than 180 deg, then add 360 deg
+	if(angle_diff > 3.14159) angle_diff -= 6.2831;	//if angle is greater than 180 deg, then subtract 360
 	// now, we have an angle as -180 < angle_diff < 180.
 	// steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;
-	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;	//
+	steer_us = (int)(angle_diff*STEER_GAIN);	//
 	if(steer_us < (0-steer_limm)) steer_us = 0-steer_limm;
 	if(steer_us > steer_limm) steer_us = steer_limm;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
@@ -141,19 +146,6 @@ void calculate_look_ahead(){
 	double x_vtp = (R+LOOK_AHEAD)*cos(theta) +x_wp0;
 	double y_vtp = (R+LOOK_AHEAD)*sin(theta) +y_wp0;
 	angle_vtp = atan2((x_vtp - x), (y_vtp - y));
-	// SERIAL_OUT.print("Ru = ");
-	// SERIAL_OUT.println(Ru);
-	// SERIAL_OUT.print("theta = ");
-	// SERIAL_OUT.println(theta);
-	// SERIAL_OUT.print("R = ");
-	// SERIAL_OUT.println(R);
-	// SERIAL_OUT.print("xvtp = ");
-	// SERIAL_OUT.println(x_vtp);
-	// SERIAL_OUT.print("y_vtp = ");
-	// SERIAL_OUT.println(y_vtp);
-	// SERIAL_OUT.print("angle vtp = ");
-	// SERIAL_OUT.println(angle_vtp);
-	//while (true);
 }
 
 /*
@@ -223,7 +215,9 @@ void print_coordinates(){ //print target, location, etc.
 	SERIAL_OUT.print(y);	SERIAL_OUT.print("   trgt: ");
 	SERIAL_OUT.print(x_wp);
 	SERIAL_OUT.print(" , ");
-	SERIAL_OUT.println(y_wp);
+	SERIAL_OUT.print(y_wp);
+	SERIAL_OUT.print(" , ");
+	SERIAL_OUT.println(angle_diff);
 
 	return ;
 }

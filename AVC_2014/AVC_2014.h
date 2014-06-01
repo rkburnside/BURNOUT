@@ -8,12 +8,12 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 21	//waypoint acceptance radius in inches
+#define WAYPOINT_ACCEPT 300	//waypoint acceptance radius in inches
 #define S1 1500				// some default values:
 #define S2 1540				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
 							//S1 1500, S2 1560, S3 1580, S4 2000, SB 1250
 #define S3 1540				//This is the speed for negotiating wp's 
-#define S4 1840 			//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
+#define S4 1580 			//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
 #define SB 1300				//breaking speed default 1300
 #define P1 50				//proximity to allow car to align with next waypoint in inches
 #define P2 100				//close proximity to waypoint in inches
@@ -27,7 +27,7 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 #define YGYROOFFSET -72	//-70
 #define ZGYROOFFSET -24	//-22
 #define PATH_FOLLOWING 1
-#define LOOK_AHEAD 70
+#define LOOK_AHEAD 120
 
 
 //SENSOR PARAMETERS
@@ -36,7 +36,7 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 #define GYRO_CAL 233300000		//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define STEER_ADJUST 1425		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 3500			//proportional gain, default it 4.0
+#define STEER_GAIN 200.0			//proportional gain, default it 4.0
 #define CLICK_INCHES 2.33		//used to determine the number of inches per click
 
 //FIXED PARAMETERS
