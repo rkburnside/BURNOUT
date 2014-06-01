@@ -71,8 +71,8 @@ void navigate(){
 		speed();
 		//esc.writeMicroseconds(S4);       // !!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!! NEEDS TO BE REMOVED WHEN DONE WITH TESTING
 	}
-	//print_data();
-	print_coordinates();
+	print_data();
+	//print_coordinates();
 	return ;
 }
 

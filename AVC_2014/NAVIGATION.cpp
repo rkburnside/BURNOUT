@@ -98,7 +98,7 @@ void speed(){
 	running = true;			// make sure running is updated.
 	angle_diff = angle_diff * 180.0/3.14159;
 	angle_diff = abs(angle_diff);
-	if (angle_diff < 30.0)  esc.writeMicroseconds(S4);
+	if (angle_diff < SPEED_TOGGLE_ANGLE)  esc.writeMicroseconds(S4);
 	else esc.writeMicroseconds(S2);
 /*	
 	if((previous_proximity - proximity) <= (P1)) esc.writeMicroseconds(S2); //allow car to line up with the next point
@@ -192,7 +192,10 @@ void print_parameters(){
 	SERIAL_OUT.print(STEER_ADJUST); SERIAL_OUT.print(',');
 	SERIAL_OUT.print(SERVO_LIM); SERIAL_OUT.print(',');
 	SERIAL_OUT.print(STEER_GAIN); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(SPEED_TOGGLE_ANGLE); SERIAL_OUT.print(',');
 	SERIAL_OUT.println(CLICK_INCHES);
+	
+	return ;
 }
 
 void print_data(){
@@ -204,7 +207,8 @@ void print_data(){
 	SERIAL_OUT.print(get_accel_rate()); SERIAL_OUT.print(',');
 	SERIAL_OUT.print(steer_us); SERIAL_OUT.print(',');
 	SERIAL_OUT.print(angle); SERIAL_OUT.print(',');
-	SERIAL_OUT.println(proximity);
+	SERIAL_OUT.print(proximity); SERIAL_OUT.print(',');
+	SERIAL_OUT.println(angle_diff);
 
 }
 

@@ -36,6 +36,7 @@ class DataSet():
         self.angle = array([])
         self.proximity = array([])
         self.dist = array([])
+        self.angle_diff = array([])
         self.par_WAYPOINT_ACCEPT = None
         self.par_S1 = None
         self.par_S2 = None
@@ -56,6 +57,7 @@ class DataSet():
         self.par_STEER_ADJUST = None
         self.par_SERVO_LIM = None
         self.par_STEER_GAIN = None
+        self.par_SPEED_TOGGLE_ANGLE = None
         self.par_CLICK_INCHES = None
 
 def wait_init():
@@ -96,6 +98,8 @@ def get_data():
             d.steer = append(d.steer, array([float(temp[5])]))
             d.angle = append(d.angle, array([float(temp[6])]))
             d.proximity = append(d.proximity, array([float(temp[7])]))
+            d.angle_diff = append(d.angle_diff, array([float(temp[8])]))
+            print "got data"
         elif temp[0] == "p":
             temp = temp[1:].split(",")
             d.par_WAYPOINT_ACCEPT = int(temp[0])
@@ -117,8 +121,10 @@ def get_data():
             d.par_GYRO_CAL = int(temp[16])
             d.par_STEER_ADJUST = int(temp[17])
             d.par_SERVO_LIM = int(temp[18])
-            d.par_STEER_GAIN = int(temp[19])
-            d.par_CLICK_INCHES = float(temp[20])
+            d.par_STEER_GAIN = float(temp[19])
+            d.par_SPEED_TOGGLE_ANGLE = float(temp[20])
+            d.par_CLICK_INCHES = float(temp[21])
+            print "got parameters"
 
     ser.close()
     d.dist = arange(0, len(d.x), 1)

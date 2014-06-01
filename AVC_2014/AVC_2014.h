@@ -23,6 +23,7 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 #define L2 25
 #define L3 350
 #define L4 100
+#define SPEED_TOGGLE_ANGLE 20.0
 #define XGYROOFFSET 88	//85
 #define YGYROOFFSET -72	//-70
 #define ZGYROOFFSET -24	//-22
