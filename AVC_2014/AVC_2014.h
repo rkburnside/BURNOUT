@@ -19,10 +19,10 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 #define P2 100				//close proximity to waypoint in inches
 #define P3 625				//far proximity to waypoint in inches
 #define BREAKING_SPEED 4000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed default 6000
-#define L1 5400
-#define L2 20000
-#define L3 200
-#define L4 350
+#define L1 10
+#define L2 25
+#define L3 350
+#define L4 100
 #define XGYROOFFSET 88	//85
 #define YGYROOFFSET -72	//-70
 #define ZGYROOFFSET -24	//-22

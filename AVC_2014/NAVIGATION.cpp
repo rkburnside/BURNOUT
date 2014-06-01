@@ -9,7 +9,7 @@ int steer_us;
 double x_wp = 0, y_wp = 0, x_wp0 = 0, y_wp0 = 0;
 double target_x=0, target_y=0;
 double angle_last, angle_target, angle_vtp, x=0, y=0, speed_mph;
-static int steer_limm = 300;
+static int steer_limm = 250;
 //static double cross_product=0;
 static double angle_diff;
 static long speed_cur=0, speed_new=0, speed_old=0;
@@ -87,9 +87,9 @@ void update_position(){
 }
 
 void cal_steer_lim(){
-	steer_limm = (int)map(speed_cur, L1, L2, L3, L4);
-	if(steer_limm > L4) steer_limm = L4;
-	steer_limm = 250;		//********************** cancel this for normal operation !!!!!!!!!!!!!!!!*********************
+	steer_limm = map((int)speed_mph, L1, L2, L3, L4);
+	//if(steer_limm > L4) steer_limm = L4;
+	//steer_limm = 250;		//********************** cancel this for normal operation !!!!!!!!!!!!!!!!*********************
 	
 	return ;
 }
@@ -217,7 +217,8 @@ void print_coordinates(){ //print target, location, etc.
 	SERIAL_OUT.print(" , ");
 	SERIAL_OUT.print(y_wp);
 	SERIAL_OUT.print(" , ");
-	SERIAL_OUT.println(angle_diff);
+	SERIAL_OUT.println(steer_limm);
+//	SERIAL_OUT.println(angle_diff);
 
 	return ;
 }
