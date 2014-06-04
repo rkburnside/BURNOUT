@@ -32,7 +32,6 @@ extern byte wpr_count;
 extern int steer_us;
 extern long accum; //this is ONLY used to reset the 0 the gyro angle for real (setting angle to 0 does nothing!!! (never forget last year's debacle))
 extern double x_wp, y_wp;
-extern double target_x, target_y;
 extern double x, y;
 extern position_structure waypoint;
 
@@ -157,8 +156,6 @@ void race_startup_routine(){
 	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
 	clicks = 0;
 	first = true;
-	target_x = x_wp;
-	target_y = y_wp;
 
 	return;
 }
@@ -211,8 +208,6 @@ void wp_setup_routine(){
 	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
 	clicks = 0;
 	first = true;
-	target_x = x_wp;
-	target_y = y_wp;
 
 	digitalWrite(LED_BUILTIN, HIGH);	//this is used to indicate that the car is ready to run
 
@@ -274,6 +269,7 @@ void loop(){
 	if(clicks >= CLICK_MAX){
 		clicks = 0;
 		navigate();
+		print_telemetry();
 	}
 
 	if(mode == AUTOMATIC){	//this function get the car started moving and then clicks will take over
@@ -304,9 +300,9 @@ void loop(){
 		while(true);
 	}
 	
-	static long time = 0;
-	if((millis() - time) > 500){
-		print_coordinates();
-		time = millis();
-	}
+	// static long time = 0;
+	// if((millis() - time) > 500){
+		// print_telemetry();
+		// time = millis();
+	// }
 }

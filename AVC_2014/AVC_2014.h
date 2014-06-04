@@ -1,10 +1,10 @@
 //AVC SETTINGS
 #define RR			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
-#define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
+#define USB 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-int excel_waypoints[19][2] = {{0,435}, {318,971}, {331,1759}, {-764,2199}, {-943,1579}, {-888,1126}, {-967,-13}, {-250,-109}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
+int excel_waypoints[19][2] = {{208,767}, {143,2463}, {-972,2905}, {-2015,2518}, {-4976,2496}, {-5236,1953}, {-5241,1058}, {-5245,715}, {-5245,-1650}, {-4775,-1650}, {-65,-1800}, {-55,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
@@ -70,10 +70,10 @@ int excel_waypoints[19][2] = {{0,435}, {318,971}, {331,1759}, {-764,2199}, {-943
 
 //SPEED PARAMETERS
 #define S1 1500				//stationary speed
-#define S2 1625				//1650 is a creeping speed (was 1600)
-#define S3 1650				//This is the speed for negotiating wp's 
-#define S4 1650				//1800 is pretty ridiculously fast. Don't use for general use.
-#define SB 1650				//breaking. adjust this parameter to allow creeping up on waypoints
+#define S2 1700				//1650 is a creeping speed (was 1600)
+#define S3 1700				//This is the speed for negotiating wp's 
+#define S4 1700				//1800 is pretty ridiculously fast. Don't use for general use.
+#define SB 1700				//breaking. adjust this parameter to allow creeping up on waypoints
 #define BREAKING_SPEED 7000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
 
 //STEERING PARAMETERS
@@ -84,7 +84,7 @@ int excel_waypoints[19][2] = {{0,435}, {318,971}, {331,1759}, {-764,2199}, {-943
 #define STEER_ADJUST 1505			//steering adjustment factor
 #define STEER_GAIN 4000				//proportional gain, if navigation gets unstable, reduce.
 #define PATH_FOLLOWING 1
-#define LOOK_AHEAD 60
+#define LOOK_AHEAD 120
 
 //GYRO PARAMETERS
 #define GYRO_CAL 233302330			//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
@@ -96,7 +96,7 @@ int excel_waypoints[19][2] = {{0,435}, {318,971}, {331,1759}, {-764,2199}, {-943
 #define CAR_NAME "***ROADRUNNER***" //car name
 #define WP_SIZE 20 					//number of bytes for each waypoint
 #define CLICK_INCHES 2.0689655		//145 clicks in 25 feet (300 inches)
-#define CLICK_MAX 1					//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
+#define CLICK_MAX 4				//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 
 //Teensy Pin Assignments:
 //Optional manual throttle, autonomous steering - connect ESC signal pin to receiver CH2
