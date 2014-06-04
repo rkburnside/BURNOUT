@@ -87,10 +87,11 @@ void display_waypoints(){
 		Serial.print(" , ");
 		Serial.println(waypoint.y);
 
+		Serial2.print("#");
 		Serial2.print(i);
-		Serial2.print(": ");
+		Serial2.print(",");
 		Serial2.print(waypoint.x);
-		Serial2.print(" , ");
+		Serial2.print(",");
 		Serial2.println(waypoint.y);
 	}
 

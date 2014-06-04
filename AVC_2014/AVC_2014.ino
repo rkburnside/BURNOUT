@@ -269,7 +269,8 @@ void setup(){
 		race_startup_routine();
 	}
 	SERIAL_OUT.println("initialize");
-	print_parameters();	
+	print_parameters();
+	display_waypoints();
 }
 
 void loop(){

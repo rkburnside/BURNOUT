@@ -27,6 +27,8 @@ def closeserial():
 
 class DataSet():
     def __init__(self):
+        self.wpx = zeros(21, float)
+        self.wpy = zeros(21, float)
         self.x = array([])
         self.y = array([])
         self.speed = array([])
@@ -83,9 +85,9 @@ def get_data():
                 #print item to window
         elif temp[0] == "#":
             temp = temp[1:].split(",")
-            wp = float(temp[0])
-            xcoor = float(temp[1])
-            ycoor = float(temp[2])
+            wp = int(temp[0])
+            d.wpx[wp] = float(temp[1])
+            d.wpy[wp] = float(temp[2])
             #plot coordinate on graph, add to databas?
         elif temp[0] == "d":
             first = 1
@@ -99,7 +101,6 @@ def get_data():
             d.angle = append(d.angle, array([float(temp[6])]))
             d.proximity = append(d.proximity, array([float(temp[7])]))
             d.angle_diff = append(d.angle_diff, array([float(temp[8])]))
-            print "got data"
         elif temp[0] == "p":
             temp = temp[1:].split(",")
             d.par_WAYPOINT_ACCEPT = int(temp[0])
