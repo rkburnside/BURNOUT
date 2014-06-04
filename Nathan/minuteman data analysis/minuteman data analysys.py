@@ -219,6 +219,7 @@ def plot_data():
     plt.draw()
     plt.show()
 
+
 def save_data():
     import pickle
     from tkFileDialog import asksaveasfilename
