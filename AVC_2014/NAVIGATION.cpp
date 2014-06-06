@@ -136,7 +136,7 @@ void calculate_look_ahead(){
 }
 
 void print_telemetry(){ //print target, location, etc.
-//millis()	x	y	wpr_count	x_wp	y_wp	x_wp0	y_wp0	angle	angle_diff	angle_last	angle_target	angle_vtp	proximity	previous_proximity	telem_speed	speed_cur	speed_new	speed_old	steer_us
+//millis()\tx\ty\twpr_count\tx_wp\ty_wp\tx_wp0\ty_wp0\tangle\tangle_diff\tangle_last\tangle_target\tangle_vtp\tproximity\tprevious_proximity\ttelem_speed\tspeed_cur\tspeed_new\tspeed_old\tsteer_us
 	SERIAL_OUT.print(micros());	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(x, 1);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(y, 1);	SERIAL_OUT.print("\t");

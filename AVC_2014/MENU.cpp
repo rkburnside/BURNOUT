@@ -24,6 +24,7 @@ void menu_choices(){
 	SERIAL_OUT.println("d = display waypoints");
 	SERIAL_OUT.println("e = edit waypoint");
 	SERIAL_OUT.println("i = import header waypoint values");
+	SERIAL_OUT.println("r = reset eeprom to 0");
 	SERIAL_OUT.println();
 	SERIAL_OUT.println("GYRO FUNCTIONS");
 	SERIAL_OUT.println("----------");
@@ -67,6 +68,10 @@ void main_menu(){
 					break;
 				case 'i':
 					import_waypoints();
+					menu_choices();
+					break;
+				case 'r':
+					reset_waypoints();
 					menu_choices();
 					break;
 

@@ -137,44 +137,17 @@ void clear_i2c(){
 }
 	
 void calculate_null(){
-	bool retest = false;
-	do{
-		SERIAL_OUT.println("CALCULATING NULL");
-		cal_flag = true;		//calibrating,
-		accum = 0;				//reset the angle. angle will act as accumulator for null calculation
-		gyro_null = 0;			//make sure to not subtract any nulls here
-		gyro_count = 0;
+	SERIAL_OUT.println("CALCULATING NULL");
+	cal_flag = true;		//calibrating,
+	accum = 0;				//reset the angle. angle will act as accumulator for null calculation
+	gyro_null = 0;			//make sure to not subtract any nulls here
+	gyro_count = 0;
 
-		while(gyro_count < 5000){
-			read_FIFO();
-			//delay(10);
-			//SERIAL_OUT.println(gyro_count);
-		}
-		gyro_null = accum/gyro_count -1;	//calculate the null. the -30 is a fudge factor for 5000 pts.
-		cal_flag = false;		//stop calibration
-		accum = 0;
-		
-		if(gyro_null > 150){
-			SERIAL_OUT.print("Null was rather high: ");
-			SERIAL_OUT.println(gyro_null);
-			SERIAL_OUT.print("Set to AUX to recalculate or WP mode to bypass");
-			while(1){
-				get_mode();
-				
-				if(mode == WP_MODE){
-					retest = false;
-					break;
-				}
-				if(mode == AUX){
-					retest = true;
-					break;
-				}
-			}
-		
-		}
-		else retest = false;
+	while(gyro_count < 5000)	read_FIFO();
 
-	} while(retest);
+	gyro_null = accum/gyro_count - 1;	//calculate the null. the -30 is a fudge factor for 5000 pts.
+	cal_flag = false;		//stop calibration
+	accum = 0;
 	
 	//should print null here
 	SERIAL_OUT.print("Null: ");

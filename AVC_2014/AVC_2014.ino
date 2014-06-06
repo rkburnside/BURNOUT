@@ -211,13 +211,12 @@ void wp_setup_routine(){
 
 	digitalWrite(LED_BUILTIN, HIGH);	//this is used to indicate that the car is ready to run
 
-	SERIAL_OUT.println("***READY TO SET WAYPOINTS***");
-	SERIAL_OUT.println();
-	SERIAL_OUT.println();
-	
 	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("CURRENT WAYPOINTS");
 	display_waypoints();
 	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("CURRENT #DEFINE SETTINGS");
+	SERIAL_OUT.println("WAYPOINT_ACCEPT\tP1\tP2\tP3\tS1\tS2\tS3\tS4\tSB\tL1\tL2\tL3\tL4\tSTEER_ADJUST\tSTEER_GAIN\tLOOK_AHEAD\tCLICK_MAX");
 	SERIAL_OUT.print(WAYPOINT_ACCEPT);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(P1);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(P2);	SERIAL_OUT.print("\t");
@@ -237,7 +236,10 @@ void wp_setup_routine(){
 	SERIAL_OUT.print(CLICK_MAX);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.println();
 	SERIAL_OUT.println("---------------------------");
-	
+	SERIAL_OUT.println("***READY TO SET WAYPOINTS***");
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("TELEMETRY");
+	SERIAL_OUT.println("millis()\tx\ty\twpr_count\tx_wp\ty_wp\tx_wp0\ty_wp0\tangle\tangle_diff\tangle_last\tangle_target\tangle_vtp\tproximity\tprevious_proximity\ttelem_speed\tspeed_cur\tspeed_new\tspeed_old\tsteer_us");
 	
 	return;
 }
@@ -270,7 +272,6 @@ void setup(){
 	
 	bool bypass_menu = false;
 	pinMode(LED_BUILTIN, OUTPUT);
-	long temp_time = millis();
 	for(int i = 0; i<8; i++){
 		digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 		delay(500);
