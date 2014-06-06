@@ -214,7 +214,31 @@ void wp_setup_routine(){
 	SERIAL_OUT.println("***READY TO SET WAYPOINTS***");
 	SERIAL_OUT.println();
 	SERIAL_OUT.println();
-
+	
+	SERIAL_OUT.println("---------------------------");
+	display_waypoints();
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.print(WAYPOINT_ACCEPT);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(P1);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(P2);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(P3);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(S1);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(S2);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(S3);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(S4);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(SB);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(L1);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(L2);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(L3);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(L4);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(STEER_ADJUST);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(STEER_GAIN);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(LOOK_AHEAD);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(CLICK_MAX);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.println();
+	SERIAL_OUT.println("---------------------------");
+	
+	
 	return;
 }
 
