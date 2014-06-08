@@ -136,26 +136,17 @@ void calculate_look_ahead(){
 }
 
 void print_telemetry(){ //print target, location, etc.
-//millis()\tx\ty\twpr_count\tx_wp\ty_wp\tx_wp0\ty_wp0\tangle\tangle_diff\tangle_last\tangle_target\tangle_vtp\tproximity\tprevious_proximity\ttelem_speed\tspeed_cur\tspeed_new\tspeed_old\tsteer_us
+//micros()\tx\ty\tangle\tangle_diff\tangle_target\tangle_vtp\tproximity\ttelem_speed\tspeed_cur\tsteer_us
 	SERIAL_OUT.print(micros());	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(x, 1);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(y, 1);	SERIAL_OUT.print("\t");
-	SERIAL_OUT.print(wpr_count);	SERIAL_OUT.print("\t");
-	SERIAL_OUT.print(x_wp);	SERIAL_OUT.print("\t");
-	SERIAL_OUT.print(y_wp);	SERIAL_OUT.print("\t");
-	SERIAL_OUT.print(x_wp0);	SERIAL_OUT.print("\t");
-	SERIAL_OUT.print(y_wp0);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(angle*180.0/3.1415, 1);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(angle_diff*180.0/3.1415, 1);	SERIAL_OUT.print("\t");
-	SERIAL_OUT.print(angle_last*180.0/3.1415, 1);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(angle_target*180.0/3.1415, 1);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(angle_vtp*180.0/3.1415, 1);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(proximity);	SERIAL_OUT.print("\t");
-	SERIAL_OUT.print(previous_proximity);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(telem_speed);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(speed_cur);	SERIAL_OUT.print("\t");
-	SERIAL_OUT.print(speed_new);	SERIAL_OUT.print("\t");
-	SERIAL_OUT.print(speed_old);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(steer_us);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.println();
 	return ;

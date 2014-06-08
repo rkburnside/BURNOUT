@@ -216,7 +216,7 @@ void wp_setup_routine(){
 	display_waypoints();
 	SERIAL_OUT.println("---------------------------");
 	SERIAL_OUT.println("CURRENT #DEFINE SETTINGS");
-	SERIAL_OUT.println("WAYPOINT_ACCEPT\tP1\tP2\tP3\tS1\tS2\tS3\tS4\tSB\tL1\tL2\tL3\tL4\tSTEER_ADJUST\tSTEER_GAIN\tLOOK_AHEAD\tCLICK_MAX");
+	SERIAL_OUT.println("WAYPOINT_ACCEPT\nP1\nP2\nP3\nS1\nS2\nS3\nS4\nSB\nL1\nL2\nL3\nL4\nSTEER_ADJUST\nSTEER_GAIN\nLOOK_AHEAD\nCLICK_MAX\nCLICK_INCHES");
 	SERIAL_OUT.print(WAYPOINT_ACCEPT);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(P1);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(P2);	SERIAL_OUT.print("\t");
@@ -234,12 +234,13 @@ void wp_setup_routine(){
 	SERIAL_OUT.print(STEER_GAIN);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(LOOK_AHEAD);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(CLICK_MAX);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(CLICK_INCHES);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.println();
 	SERIAL_OUT.println("---------------------------");
 	SERIAL_OUT.println("***READY TO SET WAYPOINTS***");
 	SERIAL_OUT.println("---------------------------");
 	SERIAL_OUT.println("TELEMETRY");
-	SERIAL_OUT.println("millis()\tx\ty\twpr_count\tx_wp\ty_wp\tx_wp0\ty_wp0\tangle\tangle_diff\tangle_last\tangle_target\tangle_vtp\tproximity\tprevious_proximity\ttelem_speed\tspeed_cur\tspeed_new\tspeed_old\tsteer_us");
+	SERIAL_OUT.println("micros()\tx\ty\tangle\tangle_diff\tangle_target\tangle_vtp\tproximity\ttelem_speed\tspeed_cur\tsteer_us");
 	
 	return;
 }
