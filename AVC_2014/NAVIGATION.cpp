@@ -147,7 +147,7 @@ void print_telemetry(){ //print target, location, etc.
 	SERIAL_OUT.print(proximity);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(telem_speed);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(speed_cur);	SERIAL_OUT.print("\t");
-	SERIAL_OUT.print(steer_us);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(steer_us);
 	SERIAL_OUT.println();
 	return ;
 }
