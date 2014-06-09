@@ -21,7 +21,7 @@ void eeprom_clear();
 void import_waypoints();
 void display_waypoints();
 void edit_waypoint();
-
+void reset_waypoints();
 
 //NAVIGATION FUNCTIONS
 void end_run();
@@ -33,8 +33,7 @@ void cal_steer_lim();
 void update_position();
 void update_waypoint();
 void calculate_look_ahead();
-void print_coordinates();
-
+void print_telemetry();
 
 //CALIBRATION FUNCTIONS
 void steering_calibration();

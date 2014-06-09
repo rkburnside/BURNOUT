@@ -32,7 +32,6 @@ extern byte wpr_count;
 extern int steer_us;
 extern long accum; //this is ONLY used to reset the 0 the gyro angle for real (setting angle to 0 does nothing!!! (never forget last year's debacle))
 extern double x_wp, y_wp;
-extern double target_x, target_y;
 extern double x, y;
 extern position_structure waypoint;
 
@@ -157,8 +156,6 @@ void race_startup_routine(){
 	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
 	clicks = 0;
 	first = true;
-	target_x = x_wp;
-	target_y = y_wp;
 
 	return;
 }
@@ -211,15 +208,39 @@ void wp_setup_routine(){
 	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
 	clicks = 0;
 	first = true;
-	target_x = x_wp;
-	target_y = y_wp;
 
 	digitalWrite(LED_BUILTIN, HIGH);	//this is used to indicate that the car is ready to run
 
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("CURRENT WAYPOINTS");
+	display_waypoints();
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("CURRENT #DEFINE SETTINGS");
+	SERIAL_OUT.print("WAYPOINT_ACCEPT\t");	SERIAL_OUT.println(WAYPOINT_ACCEPT);
+	SERIAL_OUT.print("P1\t");	SERIAL_OUT.println(P1);
+	SERIAL_OUT.print("P2\t");	SERIAL_OUT.println(P2);
+	SERIAL_OUT.print("P3\t");	SERIAL_OUT.println(P3);
+	SERIAL_OUT.print("S1\t");	SERIAL_OUT.println(S1);
+	SERIAL_OUT.print("S2\t");	SERIAL_OUT.println(S2);
+	SERIAL_OUT.print("S3\t");	SERIAL_OUT.println(S3);
+	SERIAL_OUT.print("S4\t");	SERIAL_OUT.println(S4);
+	SERIAL_OUT.print("SB\t");	SERIAL_OUT.println(SB);
+	SERIAL_OUT.print("L1\t");	SERIAL_OUT.println(L1);
+	SERIAL_OUT.print("L2\t");	SERIAL_OUT.println(L2);
+	SERIAL_OUT.print("L3\t");	SERIAL_OUT.println(L3);
+	SERIAL_OUT.print("L4\t");	SERIAL_OUT.println(L4);
+	SERIAL_OUT.print("STEER_ADJUST\t");	SERIAL_OUT.println(STEER_ADJUST);
+	SERIAL_OUT.print("STEER_GAIN\t");	SERIAL_OUT.println(STEER_GAIN);
+	SERIAL_OUT.print("LOOK_AHEAD\t");	SERIAL_OUT.println(LOOK_AHEAD);
+	SERIAL_OUT.print("CLICK_MAX\t");	SERIAL_OUT.println(CLICK_MAX);
+	SERIAL_OUT.print("CLICK_INCHES\t");	SERIAL_OUT.println(CLICK_INCHES);
+	SERIAL_OUT.println();
+	SERIAL_OUT.println("---------------------------");
 	SERIAL_OUT.println("***READY TO SET WAYPOINTS***");
-	SERIAL_OUT.println();
-	SERIAL_OUT.println();
-
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("TELEMETRY");
+	SERIAL_OUT.println("micros()\tx\ty\tangle\tangle_diff\tangle_target\tangle_vtp\tproximity\ttelem_speed\tspeed_cur\tsteer_us");
+	
 	return;
 }
 
@@ -251,7 +272,6 @@ void setup(){
 	
 	bool bypass_menu = false;
 	pinMode(LED_BUILTIN, OUTPUT);
-	long temp_time = millis();
 	for(int i = 0; i<8; i++){
 		digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 		delay(500);
@@ -274,6 +294,7 @@ void loop(){
 	if(clicks >= CLICK_MAX){
 		clicks = 0;
 		navigate();
+		print_telemetry();
 	}
 
 	if(mode == AUTOMATIC){	//this function get the car started moving and then clicks will take over
@@ -304,9 +325,9 @@ void loop(){
 		while(true);
 	}
 	
-	static long time = 0;
-	if((millis() - time) > 500){
-		print_coordinates();
-		time = millis();
-	}
+	// static long time = 0;
+	// if((millis() - time) > 500){
+		// print_telemetry();
+		// time = millis();
+	// }
 }
