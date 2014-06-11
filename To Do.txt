@@ -1,6 +1,13 @@
+learned:
+1 - proximity all screwed up. car spends most of its time at p2
+2 - look ahead needs to be more aggressive
+3 - waypoint accept radius shouldn't be any more than 48"
+
+
 TESTING EQUIPMENT LIST
 computer
 upload cable
+microUSB cable
 bluetooth phone
 car(s)
 radio

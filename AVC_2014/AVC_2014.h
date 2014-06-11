@@ -1,6 +1,6 @@
 //AVC SETTINGS
 #define RR			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
-#define USB 	//use either BLUETOOTH or USB to define the serial port for program output
+#define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
@@ -63,7 +63,7 @@ int excel_waypoints[19][2] = {{208,767}, {143,2463}, {-972,2905}, {-2015,2518}, 
 
 #ifdef RR
 //WAYPOINT PARAMETERS
-#define WAYPOINT_ACCEPT 12	//waypoint acceptance radius in inches
+#define WAYPOINT_ACCEPT 48	//waypoint acceptance radius in inches
 #define P1 180				//proximity to allow car to align with next waypoint in inches
 #define P2 180				//close proximity to waypoint in inches
 #define P3 300				//far proximity to waypoint in inches
@@ -71,9 +71,9 @@ int excel_waypoints[19][2] = {{208,767}, {143,2463}, {-972,2905}, {-2015,2518}, 
 //SPEED PARAMETERS
 #define S1 1500				//stationary speed
 #define S2 1600				//1650 is a creeping speed (was 1600)
-#define S3 1600				//This is the speed for negotiating wp's 
-#define S4 1600				//1800 is pretty ridiculously fast. Don't use for general use.
-#define SB 1600				//breaking. adjust this parameter to allow creeping up on waypoints
+#define S3 1700				//This is the speed for negotiating wp's 
+#define S4 1750				//1800 is pretty ridiculously fast. Don't use for general use.
+#define SB 1750				//breaking. adjust this parameter to allow creeping up on waypoints
 #define BREAKING_SPEED 7000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed
 
 //STEERING PARAMETERS
@@ -82,7 +82,7 @@ int excel_waypoints[19][2] = {{208,767}, {143,2463}, {-972,2905}, {-2015,2518}, 
 #define L3 200
 #define L4 350
 #define STEER_ADJUST 1505			//steering adjustment factor
-#define STEER_GAIN 4000				//proportional gain, if navigation gets unstable, reduce.
+#define STEER_GAIN 2000				//proportional gain, if navigation gets unstable, reduce.
 #define PATH_FOLLOWING 1
 #define LOOK_AHEAD 80
 
@@ -96,7 +96,7 @@ int excel_waypoints[19][2] = {{208,767}, {143,2463}, {-972,2905}, {-2015,2518}, 
 #define CAR_NAME "***ROADRUNNER***" //car name
 #define WP_SIZE 20 					//number of bytes for each waypoint
 #define CLICK_INCHES 2.0689655		//145 clicks in 25 feet (300 inches)
-#define CLICK_MAX 4			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
+#define CLICK_MAX 2			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 
 //Teensy Pin Assignments:
 //Optional manual throttle, autonomous steering - connect ESC signal pin to receiver CH2
