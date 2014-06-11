@@ -220,6 +220,20 @@ def plot_data():
     plt.draw()
     plt.show()
 
+def plot_xy():
+    from pylab import *
+
+    #t = arange(0.0, 2.0, 0.01)
+    #s = sin(2*pi*t)
+    plot(d.x, d.y)
+
+    xlabel('time (s)')
+    ylabel('voltage (mV)')
+    title('X, Y Inches')
+    grid(True)
+    savefig("test.png")
+    show()
+
 
 def save_data():
     import pickle
@@ -241,7 +255,7 @@ if __name__ == '__main__':
     e = Entry(master)
     e.pack()
     e.delete(0, END)
-    e.insert(0, "32")
+    e.insert(0, "24")
     c = Button(master, text="Get Data", command=get_data)
     c.pack()
 
@@ -259,6 +273,9 @@ if __name__ == '__main__':
 
     j = Button(master, text="Filter Data", command=filter_data)
     j.pack()
+
+    k = Button(master, text="Plot x,y", command=plot_xy)
+    k.pack()
 
 
 

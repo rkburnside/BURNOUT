@@ -8,9 +8,9 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 150	//waypoint acceptance radius in inches
+#define WAYPOINT_ACCEPT 185	//waypoint acceptance radius in inches
 #define S1 1500				// some default values:
-#define S2 1560				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
+#define S2 1550				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
 							//S1 1500, S2 1560, S3 1580, S4 2000, SB 1250
 #define S3 1540				//This is the speed for negotiating wp's 
 #define S4 1820 			//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
@@ -28,7 +28,7 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 #define YGYROOFFSET -72	//-70
 #define ZGYROOFFSET -24	//-22
 #define PATH_FOLLOWING 1
-#define LOOK_AHEAD 120
+#define LOOK_AHEAD 80
 
 
 //SENSOR PARAMETERS
@@ -42,7 +42,7 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 
 //FIXED PARAMETERS
 #define CAR_NAME "***MINUTEMAN***" //car name
-#define CLICK_MAX 3			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
+#define CLICK_MAX 1			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
 #define WP_SIZE 20 			//number of bytes for each waypoint
 
 //Teensy Pin Assignments:
