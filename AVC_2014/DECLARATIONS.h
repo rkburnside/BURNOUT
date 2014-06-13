@@ -43,7 +43,6 @@ void servo_test();
 void mode_test();
 void toggle_test();
 void mode_and_toggle_test();
-void activate_the_frickin_laser();
 
 //STATE STATUS FUNCTIONS
 void get_mode();

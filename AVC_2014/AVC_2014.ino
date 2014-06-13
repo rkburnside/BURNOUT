@@ -84,7 +84,6 @@ void get_mode(){
 }
 
 void race_startup_routine(){
-//	activate_the_frickin_laser();
 	SERIAL_OUT.println("-----RACE SETUP ROUTINE-----");
 	
 	esc.detach();
@@ -114,7 +113,7 @@ void race_startup_routine(){
 	delay(250);
 	esc.attach(THROTTLE);
 	delay(250);
-	esc.writeMicroseconds(S1);
+	esc.writeMicroseconds(S_STOP);
 
 
 	//by turning off the radio, the automatic mode is locked in
@@ -189,7 +188,7 @@ void wp_setup_routine(){
 	delay(250);
 	esc.attach(THROTTLE);
 	delay(250);
-	esc.writeMicroseconds(S1);
+	esc.writeMicroseconds(S_STOP);
 
 	for(int i=0; i<100; i++){	//clears the FIFO buffer and waits 1 sec to start
 		delay(1);
@@ -217,20 +216,16 @@ void wp_setup_routine(){
 	SERIAL_OUT.println("---------------------------");
 	SERIAL_OUT.println("CURRENT #DEFINE SETTINGS");
 	SERIAL_OUT.print("WAYPOINT_ACCEPT\t");	SERIAL_OUT.println(WAYPOINT_ACCEPT);
-	SERIAL_OUT.print("P1\t");	SERIAL_OUT.println(P1);
-	SERIAL_OUT.print("P2\t");	SERIAL_OUT.println(P2);
-	SERIAL_OUT.print("P3\t");	SERIAL_OUT.println(P3);
-	SERIAL_OUT.print("S1\t");	SERIAL_OUT.println(S1);
-	SERIAL_OUT.print("S2\t");	SERIAL_OUT.println(S2);
-	SERIAL_OUT.print("S3\t");	SERIAL_OUT.println(S3);
-	SERIAL_OUT.print("S4\t");	SERIAL_OUT.println(S4);
-	SERIAL_OUT.print("SB\t");	SERIAL_OUT.println(SB);
+	SERIAL_OUT.print("S_STOP\t");	SERIAL_OUT.println(S_STOP);
+	SERIAL_OUT.print("S_LOW\t");	SERIAL_OUT.println(S_LOW);
+	SERIAL_OUT.print("S_HIGH\t");	SERIAL_OUT.println(S_HIGH);
 	SERIAL_OUT.print("L1\t");	SERIAL_OUT.println(L1);
 	SERIAL_OUT.print("L2\t");	SERIAL_OUT.println(L2);
 	SERIAL_OUT.print("L3\t");	SERIAL_OUT.println(L3);
 	SERIAL_OUT.print("L4\t");	SERIAL_OUT.println(L4);
 	SERIAL_OUT.print("STEER_ADJUST\t");	SERIAL_OUT.println(STEER_ADJUST);
 	SERIAL_OUT.print("STEER_GAIN\t");	SERIAL_OUT.println(STEER_GAIN);
+	SERIAL_OUT.print("SPEED_TOGGLE_ANGLE\t");	SERIAL_OUT.println(SPEED_TOGGLE_ANGLE);
 	SERIAL_OUT.print("LOOK_AHEAD\t");	SERIAL_OUT.println(LOOK_AHEAD);
 	SERIAL_OUT.print("CLICK_MAX\t");	SERIAL_OUT.println(CLICK_MAX);
 	SERIAL_OUT.print("CLICK_INCHES\t");	SERIAL_OUT.println(CLICK_INCHES);
@@ -239,7 +234,7 @@ void wp_setup_routine(){
 	SERIAL_OUT.println("***READY TO SET WAYPOINTS***");
 	SERIAL_OUT.println("---------------------------");
 	SERIAL_OUT.println("TELEMETRY");
-	SERIAL_OUT.println("micros()\tx\ty\tangle\tangle_diff\tangle_target\tangle_vtp\tproximity\ttelem_speed\tspeed_cur\tsteer_us");
+	SERIAL_OUT.println("micros()\tx\ty\tangle\tangle_diff\tangle_target\tangle_vtp\tproximity\tdelta_speed\tspeed_mph\tsteer_us");
 	
 	return;
 }
@@ -254,21 +249,19 @@ void setup(){
 	pinMode(MODE_LINE_1, INPUT);
 	pinMode(MODE_LINE_2, INPUT);
 	pinMode(TOGGLE, INPUT_PULLUP);			//this is the switch that needs to be toggled to start the race
-	pinMode(FRICKIN_LASER, OUTPUT);
-	digitalWrite(FRICKIN_LASER, LOW);
 
 	pinMode(RESET_PIN, INPUT);
 	attachInterrupt(RESET_PIN, reset_requested_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
 
 	pinMode(HALL_EFFECT_SENSOR, INPUT);	 
-	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, CHANGE);	//according to the teensy documentation, all pins can be interrupts
+	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
 
 	steering.attach(STEERING);
 	steering.writeMicroseconds(STEER_ADJUST);
 
 	esc.attach(THROTTLE);
 	delay(250);
-	esc.writeMicroseconds(S1);
+	esc.writeMicroseconds(S_STOP);
 	
 	bool bypass_menu = false;
 	pinMode(LED_BUILTIN, OUTPUT);
@@ -305,7 +298,7 @@ void loop(){
 		}
 
 		if(!running){	//this will kick start the car/get it moving when it first starts the race
-			esc.writeMicroseconds(S2);
+			esc.writeMicroseconds(S_LOW);
 			running = true;
 		}
 	}
@@ -321,7 +314,7 @@ void loop(){
 	}
 
 	if((wpr_count >= WAYPOINT_COUNT) || (((int)x_wp == 0) && ((int)y_wp == 0))){	//this locks the car into this loop and makes it go slow when we've reached the max waypoints OR the waypoints are 0,0
-		esc.writeMicroseconds(S2);
+		esc.writeMicroseconds(S_LOW);
 		while(true);
 	}
 	

@@ -73,30 +73,10 @@ void cal_steer_lim(){
 
 void speed(){
 	running = true;			// make sure running is updated.
-
-	if((previous_proximity - proximity) <= (P1)){
-		telem_speed = S2;
-		esc.writeMicroseconds(S2); //allow car to line up with the next point
-	}
-	else if(proximity < (P2)){
-		telem_speed = S2;
-		esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
-	}
-	else if(proximity >= (P2) && proximity < (P3)){ //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
-		if(speed_cur < BREAKING_SPEED){
-			telem_speed = SB;
-			esc.writeMicroseconds(SB);  // less than 8000 means high speed, apply brakes
-		}
-		else{
-			telem_speed = S3;
-			esc.writeMicroseconds(S3);  //once speed is low enough, resume normal slow-down
-		}
-	}
-	else if(proximity >= (P3)){
-		telem_speed = S4;
-		esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
-	}
-	
+	angle_diff = angle_diff * 180.0/3.14159;
+	angle_diff = abs(angle_diff);
+	if (angle_diff < SPEED_TOGGLE_ANGLE)  esc.writeMicroseconds(S_HIGH);
+	else esc.writeMicroseconds(S_LOW);
 	return ;
 }
 
@@ -146,7 +126,7 @@ void print_telemetry(){ //print target, location, etc.
 	SERIAL_OUT.print(angle_vtp*180.0/3.1415, 1);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(proximity);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(telem_speed);	SERIAL_OUT.print("\t");
-	SERIAL_OUT.print(speed_cur);	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(CLICK_INCHES * 56818.0 / speed_cur);	SERIAL_OUT.print("\t");	//56818.182 is the conversion from in/microsecond to mph
 	SERIAL_OUT.print(steer_us);
 	SERIAL_OUT.println();
 	return ;

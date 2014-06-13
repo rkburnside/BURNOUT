@@ -67,9 +67,9 @@ void steering_calibration(){
 	delay(250);
 	esc.attach(THROTTLE);
 	delay(1000);
-	esc.writeMicroseconds(S1);
+	esc.writeMicroseconds(S_STOP);
 	delay(1000);
-	esc.writeMicroseconds(S2);
+	esc.writeMicroseconds(S_LOW);
 	
 	while(mode == AUTOMATIC){
 		read_FIFO();
@@ -168,7 +168,7 @@ void mode_test(){
 				delay(250);
 				esc.attach(THROTTLE);
 				delay(250);
-				esc.writeMicroseconds(S1);
+				esc.writeMicroseconds(S_STOP);
 				attached = true;
 			}
 		}
@@ -247,22 +247,5 @@ void mode_and_toggle_test(){
 		delay(250);
 	}
 
-	return;
-}
-
-void activate_the_frickin_laser(){
-	SERIAL_OUT.println();
-	SERIAL_OUT.println();
-	SERIAL_OUT.println("set CH3 to AUX to activate the FRICKIN LASER");
-	SERIAL_OUT.println("toggle CH3 to exit the routine");
-	get_mode();
-	while(mode != AUX) get_mode();
-	while(mode == AUX){
-		digitalWrite(FRICKIN_LASER, HIGH);
-		get_mode();
-	}
-
-	digitalWrite(FRICKIN_LASER, LOW);
-	
 	return;
 }
