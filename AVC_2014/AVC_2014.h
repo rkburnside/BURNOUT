@@ -1,6 +1,6 @@
 //AVC SETTINGS
 #define RR			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
-#define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
+#define USB 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
@@ -57,12 +57,12 @@ int excel_waypoints[19][2] = {{208,767}, {143,2463}, {-972,2905}, {-2015,2518}, 
 
 #ifdef RR
 //WAYPOINT PARAMETERS
-#define WAYPOINT_ACCEPT 48	//waypoint acceptance radius: speed = 11650 -> 48, speed = 1850 -> 180
+#define WAYPOINT_ACCEPT 120	//waypoint acceptance radius: speed = 11650 -> 48, speed = 1850 -> 180
 
 //SPEED PARAMETERS
 #define S_STOP 1500				//stationary speed
-#define S_LOW 1600				//slow speed: 1600 ~ 1650
-#define S_HIGH 1650				//top speed: 1650 ~ 1800
+#define S_LOW 1650				//slow speed: 1600 ~ 1650
+#define S_HIGH 1750				//top speed: 1650 ~ 1800
 
 //STEERING PARAMETERS
 #define L1 5000
@@ -70,10 +70,10 @@ int excel_waypoints[19][2] = {{208,767}, {143,2463}, {-972,2905}, {-2015,2518}, 
 #define L3 200
 #define L4 350
 #define STEER_ADJUST 1505			//steering adjustment factor
-#define STEER_GAIN 300				//proportional gain, 4000 = servo slammed, 2000 = servo slams less, 300 = supposedly OK
+#define STEER_GAIN 2000				//proportional gain, 4000 = servo slammed, 2000 = servo slams less, 300 = supposedly OK
 #define PATH_FOLLOWING 1
 #define LOOK_AHEAD 80				//120 = too high, 20 = too low, 50 = aggressive, but good, 80 = not aggressive, but OK
-#define SPEED_TOGGLE_ANGLE 20.0		//20 +/- 5 degrees is good
+#define SPEED_TOGGLE_ANGLE 15.0		//20 +/- 5 degrees is good
 
 //GYRO PARAMETERS
 #define GYRO_CAL 233302330			//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
