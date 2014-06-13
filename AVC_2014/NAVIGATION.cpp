@@ -10,6 +10,7 @@ double x_wp = 0, y_wp = 0, x_wp0 = 0, y_wp0 = 0;
 double target_x=0, target_y=0;
 double angle_last, angle_target, angle_vtp, x=0, y=0, speed_mph;
 static int steer_limm = 300;
+static int wp_accept = 185;
 //static double cross_product=0;
 static double angle_diff;
 static long speed_cur=0, speed_new=0, speed_old=0;
@@ -30,7 +31,7 @@ extern position_structure waypoint;
 //PROGRAM FUNCTIONS
 void update_waypoint(){
 	//waypoint acceptance and move to next waypoint
-	if(proximity < (WAYPOINT_ACCEPT)){
+	if(proximity < (wp_accept)){
 		x_wp0 = x_wp;
 		y_wp0 = y_wp;
 		wpr_count++;
@@ -94,21 +95,17 @@ void cal_steer_lim(){
 	return ;
 }
 
+void cal_wp_accept(){
+	wp_accept = map((int)speed_mph, L1, L2, L3, L4);
+	return ;
+}
+
 void speed(){
 	running = true;			// make sure running is updated.
 	angle_diff = angle_diff * 180.0/3.14159;
 	angle_diff = abs(angle_diff);
 	if (angle_diff < SPEED_TOGGLE_ANGLE)  esc.writeMicroseconds(S4);
 	else esc.writeMicroseconds(S2);
-/*	
-	if((previous_proximity - proximity) <= (P1)) esc.writeMicroseconds(S2); //allow car to line up with the next point
-	else if(proximity < (P2)) esc.writeMicroseconds(S2); //ensure that a waypoint can be accepted
-	else if(proximity >= (P2) && proximity < (P3)){ //slow way down  50-200 works well, 50-300 is more conservative for higher speeds
-		if(speed_cur < BREAKING_SPEED)  esc.writeMicroseconds(SB);  // less than 8000 means high speed, apply brakes
-		else esc.writeMicroseconds(S3);  //once speed is low enough, resume normal slow-down
-	}
-	else if(proximity >= (P3)) esc.writeMicroseconds(S4); //go wide open 200 works well for me. 
-*/
 	return ;
 }
 
@@ -133,6 +130,8 @@ void calculate_speed(){
 	speed_old = speed_new;
 	speed_mph = CLICK_INCHES * 56818.0 / speed_cur;
 	//SERIAL_OUT.println(speed_cur);
+	//cal_steer_lim();
+	cal_wp_accept();
 	return ;
 }
 
@@ -172,7 +171,7 @@ On the reciever side, simply wait for packets, and write them to the serial port
 */
 void print_parameters(){
 	SERIAL_OUT.print('p');
-	SERIAL_OUT.print(WAYPOINT_ACCEPT); SERIAL_OUT.print(',');
+	SERIAL_OUT.print(wp_accept); SERIAL_OUT.print(',');
 	SERIAL_OUT.print(S1); SERIAL_OUT.print(',');
 	SERIAL_OUT.print(S2); SERIAL_OUT.print(',');
 	SERIAL_OUT.print(S3); SERIAL_OUT.print(',');

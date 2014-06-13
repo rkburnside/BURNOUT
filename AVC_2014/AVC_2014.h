@@ -20,9 +20,9 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 #define P3 625				//far proximity to waypoint in inches
 #define BREAKING_SPEED 4000	//microseconds should be slightly faster than S3 so that the car slows down to S3 and continues at that speed default 6000
 #define L1 10
-#define L2 25
-#define L3 350
-#define L4 100
+#define L2 27
+#define L3 50
+#define L4 185
 #define SPEED_TOGGLE_ANGLE 20.0
 #define XGYROOFFSET 88	//85
 #define YGYROOFFSET -72	//-70
@@ -38,7 +38,7 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 #define STEER_ADJUST 1425		//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
 #define SERVO_LIM 300			//limits the swing of the servo so it does not get overstressed, default 300
 #define STEER_GAIN 300.0			//proportional gain, default it 4.0
-#define CLICK_INCHES 2.33		//used to determine the number of inches per click
+#define CLICK_INCHES 4.66		//used to determine the number of inches per click originally set to 2.33
 
 //FIXED PARAMETERS
 #define CAR_NAME "***MINUTEMAN***" //car name

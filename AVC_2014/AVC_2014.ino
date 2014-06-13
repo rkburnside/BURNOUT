@@ -61,6 +61,7 @@ void navigate(){
 	calculate_speed();
 	//map_rates();
 	//cal_steer_lim();
+	//cal_wp_accept
 	update_position();
 	update_waypoint();
 	calculate_look_ahead();
@@ -244,7 +245,7 @@ void setup(){
 	attachInterrupt(RESET_PIN, reset_requested_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
 
 	pinMode(HALL_EFFECT_SENSOR, INPUT);	 
-	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, CHANGE);	//according to the teensy documentation, all pins can be interrupts
+	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
 
 	steering.attach(STEERING);
 	steering.writeMicroseconds(STEER_ADJUST);
