@@ -1,19 +1,19 @@
 //AVC SETTINGS
-#define MM
+#define MT
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
 int excel_waypoints[19][2] = {{17,200}, {-200,200}, {17,200}, {0,50}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
 
-#ifdef MM
+#ifdef MT
 //WAYPOINT AND SPEED PARAMETERS
-#define WAYPOINT_ACCEPT 21	//waypoint acceptance radius in inches
-#define S1 1500				// some default values:
-#define S2 1540				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
+#define WAYPOINT_ACCEPT 5	//waypoint acceptance radius in inches
+#define S1 1400				// some default values:
+#define S2 1445				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
 							//S1 1500, S2 1560, S3 1580, S4 2000, SB 1250
-#define S3 1540				//This is the speed for negotiating wp's 
-#define S4 1540 			//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
-#define SB 1300				//breaking speed default 1300
+#define S3 1445				//This is the speed for negotiating wp's 
+#define S4 1445 			//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
+#define SB 1445				//breaking speed default 1300
 #define P1 50				//proximity to allow car to align with next waypoint in inches
 #define P2 100				//close proximity to waypoint in inches
 #define P3 625				//far proximity to waypoint in inches
@@ -27,9 +27,9 @@ int excel_waypoints[19][2] = {{17,200}, {-200,200}, {17,200}, {0,50}, {0,0}, {0,
 //SENSOR PARAMETERS
 //#define GYRO_CAL 470868410	//this has to be measured by rotating the gyro 360 deg. and reading the output
 #define GYRO_CAL 235434205	//this has to be measured by rotating the gyro 360 deg. and reading the output
-#define STEER_ADJUST 1425	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
-#define SERVO_LIM 300		//limits the swing of the servo so it does not get overstressed, default 300
-#define STEER_GAIN 3500		// proportional gain, default it 4.0
+#define STEER_ADJUST 1533	//steering adjustment factor. ***THIS IS JUST A PLACE HOLDER FOR NOW***
+#define SERVO_LIM 200		//limits the swing of the servo so it does not get overstressed, default 300
+#define STEER_GAIN -5000		// proportional gain, default it 4.0  -3500
 #define CP_GAIN 0		//cross product gain. if steering is 
 #define CLICK_INCHES 0.852	//used to determine the number of inches per click
 

@@ -9,7 +9,7 @@ int steer_us;
 double x_wp = 0, y_wp = 0;
 double target_x=0, target_y=0;
 double angle_last, angle_target, x=0, y=0;
-static int steer_limm = 300;
+static int steer_limm = 200;
 static double cross_product=0;
 static double angle_diff;
 static long speed_cur=0, speed_new=0, speed_old=0;
@@ -96,10 +96,13 @@ void update_steering(){
 	if(angle_diff > 3.14159) angle_diff -= 3.14159*2;	//if angle is greater than 180 deg, then subtract 360
 	// now, we have an angle as -180 < angle_diff < 180.
 	// steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;
-	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN + cross_product*CP_GAIN;	//cross product gain added  here so that the steering is still limited
+	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;	//cross product gain added  here so that the steering is still limited
+	//steer_us = 0 - steer_us;
 	if(steer_us < (0-steer_limm)) steer_us = 0-steer_limm;
 	if(steer_us > steer_limm) steer_us = steer_limm;
+	//steer_us = 0;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
+	//Serial.println(steer_us);
 	return ;
 }
 

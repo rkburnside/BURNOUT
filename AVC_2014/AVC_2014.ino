@@ -72,9 +72,9 @@ void encoder_interrupt(){
 
 void navigate(){
 	calculate_speed();
-	cal_steer_lim();
+	//cal_steer_lim();
 	update_position();
-	update_cross_product();
+	//update_cross_product();
 	update_steering();
 	update_waypoint();
 	get_mode();
