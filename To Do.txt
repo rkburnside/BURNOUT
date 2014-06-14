@@ -1,10 +1,4 @@
 1. remove floats and longs from waypoints. make them all consistent.
-1. WP accept: increase from 120 to 185. Test and compare.
-2. look_ahead: decrease from 80 to 50. Test and compare.
-4. decrease speed and test. Develop setting profiles. 1700, 1725, 1750, etc.
-5. verify that the car slows down once the course if completed.
-6. verify that the hoop waypoints are hit right on at every speed.
-
 
 TESTING EQUIPMENT LIST (*optional items)
 computer
@@ -50,6 +44,12 @@ foam bumper
 - replace losi tires
 
 ----
+- [x] 1. WP accept: increase from 120 to 185. Test and compare.
+- [x] 2. look_ahead: decrease from 80 to 50. Test and compare.
+- [x] 4. decrease speed and test. Develop setting profiles. 1700, 1725, 1750, etc.
+- [x] 5. verify that the car slows down once the course is completed.
+- [x] 6. verify that the hoop waypoints are hit right on at every speed.
+
 - [x] create telemetry output for the vehicles
 - [x] create a template for tracking the results for the testing i'll be doing 
 - [x] what is the correct MS time for breaking and what is the correct ESC speed to ensure the car doesn't break

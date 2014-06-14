@@ -122,9 +122,31 @@ void race_startup_routine(){
 	SERIAL_OUT.println();
 	delay(1250);
 
-	SERIAL_OUT.println("3. ***READY TO RUN***");
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("CURRENT WAYPOINTS");
+	display_waypoints();
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("CURRENT #DEFINE SETTINGS");
+	SERIAL_OUT.print("WAYPOINT_ACCEPT\t");	SERIAL_OUT.println(WAYPOINT_ACCEPT);
+	SERIAL_OUT.print("S_STOP\t");	SERIAL_OUT.println(S_STOP);
+	SERIAL_OUT.print("S_LOW\t");	SERIAL_OUT.println(S_LOW);
+	SERIAL_OUT.print("S_HIGH\t");	SERIAL_OUT.println(S_HIGH);
+	SERIAL_OUT.print("L1\t");	SERIAL_OUT.println(L1);
+	SERIAL_OUT.print("L2\t");	SERIAL_OUT.println(L2);
+	SERIAL_OUT.print("L3\t");	SERIAL_OUT.println(L3);
+	SERIAL_OUT.print("L4\t");	SERIAL_OUT.println(L4);
+	SERIAL_OUT.print("STEER_ADJUST\t");	SERIAL_OUT.println(STEER_ADJUST);
+	SERIAL_OUT.print("STEER_GAIN\t");	SERIAL_OUT.println(STEER_GAIN);
+	SERIAL_OUT.print("SPEED_TOGGLE_ANGLE\t");	SERIAL_OUT.println(SPEED_TOGGLE_ANGLE);
+	SERIAL_OUT.print("LOOK_AHEAD\t");	SERIAL_OUT.println(LOOK_AHEAD);
+	SERIAL_OUT.print("CLICK_MAX\t");	SERIAL_OUT.println(CLICK_MAX);
+	SERIAL_OUT.print("CLICK_INCHES\t");	SERIAL_OUT.println(CLICK_INCHES);
 	SERIAL_OUT.println();
-	SERIAL_OUT.println();
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("***READY TO RUN***");
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("TELEMETRY");
+	SERIAL_OUT.println("micros()\tx\ty\tangle\tangle_diff\tangle_target\tangle_vtp\tproximity\tesc_speed\tspeed_mph\tsteer_us");
 
 	digitalWrite(LED_BUILTIN, HIGH);	//this is used to indicate that the car is ready to run
 
@@ -235,7 +257,7 @@ void wp_setup_routine(){
 	SERIAL_OUT.println("***READY TO SET WAYPOINTS***");
 	SERIAL_OUT.println("---------------------------");
 	SERIAL_OUT.println("TELEMETRY");
-	SERIAL_OUT.println("micros()\tx\ty\tangle\tangle_diff\tangle_target\tangle_vtp\tproximity\tdelta_speed\tspeed_mph\tsteer_us");
+	SERIAL_OUT.println("micros()\tx\ty\tangle\tangle_diff\tangle_target\tangle_vtp\tproximity\tesc_speed\tspeed_mph\tsteer_us");
 	
 	return;
 }
@@ -315,7 +337,7 @@ void loop(){
 	}
 
 	if((wpr_count >= WAYPOINT_COUNT) || (((int)x_wp == 0) && ((int)y_wp == 0))){	//this locks the car into this loop and makes it go slow when we've reached the max waypoints OR the waypoints are 0,0
-		esc.writeMicroseconds(S_LOW);
+		esc.writeMicroseconds(1500);
 		while(true);
 	}
 	
