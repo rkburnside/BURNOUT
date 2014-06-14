@@ -25,7 +25,7 @@ The sketch is parsed for include files. The sketch, all included header files, a
 bool running = false, first = true;
 volatile int clicks = 0;
 int mode = MANUAL;
-
+long click_time = 0;
 
 //EXTERNAL VARIABLES
 extern byte wpr_count;
@@ -43,6 +43,7 @@ Servo steering, esc;
 //PROGRAM FUNCTIONS
 void encoder_interrupt(){
 	clicks++;
+	click_time = micros();
 	return ;
 }
 

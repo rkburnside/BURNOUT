@@ -19,7 +19,7 @@ int telem_speed = 0;
 extern double angle;
 extern bool running;
 extern byte wpr_count;
-
+extern long click_time;
 
 //OBJECT DECLARATIONS
 extern Servo steering, esc;
@@ -73,10 +73,16 @@ void cal_steer_lim(){
 
 void speed(){
 	running = true;			// make sure running is updated.
-	angle_diff = angle_diff * 180.0/3.14159;
-	angle_diff = abs(angle_diff);
-	if (angle_diff < SPEED_TOGGLE_ANGLE)  esc.writeMicroseconds(S_HIGH);
-	else esc.writeMicroseconds(S_LOW);
+	double temp_angle_diff = angle_diff * 180.0/3.14159;
+	temp_angle_diff = abs(temp_angle_diff);
+	if (temp_angle_diff < SPEED_TOGGLE_ANGLE){
+		esc.writeMicroseconds(S_HIGH);
+		telem_speed = S_HIGH;
+	}
+	else{
+		esc.writeMicroseconds(S_LOW);
+		telem_speed = S_LOW;
+	}
 	return ;
 }
 
@@ -88,7 +94,7 @@ void update_steering(){
 	if(angle_diff > 3.14159) angle_diff -= 3.14159*2;	//if angle is greater than 180 deg, then subtract 360
 	// now, we have an angle as -180 < angle_diff < 180.
 	// steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;
-	steer_us = angle_diff/(3.14159*2.0)*STEER_GAIN;	//cross product gain added  here so that the steering is still limited
+	steer_us = angle_diff*STEER_GAIN;	//cross product gain added  here so that the steering is still limited
 	if(steer_us < (0-steer_limm)) steer_us = 0-steer_limm;
 	if(steer_us > steer_limm) steer_us = steer_limm;
 	steer_us += STEER_ADJUST;  //adjusts steering so that it will go in a straight line
@@ -117,7 +123,7 @@ void calculate_look_ahead(){
 
 void print_telemetry(){ //print target, location, etc.
 //micros()\tx\ty\tangle\tangle_diff\tangle_target\tangle_vtp\tproximity\ttelem_speed\tspeed_cur\tsteer_us
-	SERIAL_OUT.print(micros());	SERIAL_OUT.print("\t");
+	SERIAL_OUT.print(click_time);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(x, 1);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(y, 1);	SERIAL_OUT.print("\t");
 	SERIAL_OUT.print(angle*180.0/3.1415, 1);	SERIAL_OUT.print("\t");

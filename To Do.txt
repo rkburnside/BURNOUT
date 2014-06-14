@@ -1,3 +1,11 @@
+1. remove floats and longs from waypoints. make them all consistent.
+1. WP accept: increase from 120 to 185. Test and compare.
+2. look_ahead: decrease from 80 to 50. Test and compare.
+4. decrease speed and test. Develop setting profiles. 1700, 1725, 1750, etc.
+5. verify that the car slows down once the course if completed.
+6. verify that the hoop waypoints are hit right on at every speed.
+
+
 TESTING EQUIPMENT LIST (*optional items)
 computer
 upload cable
@@ -25,9 +33,6 @@ foam bumper
 - test the affects of the car being lined up incorrectly by 0, 1, 2, 3, 4, 5, and 10 degrees
 - set up a jump, test appropriate speeds for hitting the jump: set s2 thru s4 to the same value, have it drive in a straight line, hit the jump, record results
 
-- [x] create telemetry output for the vehicles
-- [x] create a template for tracking the results for the testing i'll be doing 
-- [x] what is the correct MS time for breaking and what is the correct ESC speed to ensure the car doesn't break
 - try black sharpie or a crayon or grease from a hamburger wrapper for marking the course
 
 
@@ -45,6 +50,21 @@ foam bumper
 - replace losi tires
 
 ----
+- [x] create telemetry output for the vehicles
+- [x] create a template for tracking the results for the testing i'll be doing 
+- [x] what is the correct MS time for breaking and what is the correct ESC speed to ensure the car doesn't break
+- [x] 9. clean up the chart template once and for all. Here are the changes:
+- [x] 9-1. most of the graphs should have 0 as their time on the bottom.
+- [x] 9-2. add labels to all the axes.
+- [x] 9-3. add (ifblanks, …) to many of the calculated cells.
+- [x] 9-4. make some of the charts have auto resizing axes.
+- [x] 9-5. make the micros chart be only between 1000 and 2000.
+- [x] 9-6. relable delta speed to something that makes sense.
+- [x] 9-7. add settings table to the graphs.
+- [x] steering gain: change value from 2000 to 300. change routine to match nathan’s. the conversion factor is 2000/(3.14159*2) and that results in a 318 gain…nathan’s is 300…so comparable. Test and compare.
+- [x] correct the ESC write speed. It is not outputting correctly (I deleted it accidentally yesterday).
+- [x] why is angle diff at ~3000? Seems REALLY messed up. It’s modified in speed and steering update.
+- [x] Change when the time is recorded
 - [x] add better telemetry to the print out. current click time (i.e. actual speed), ESC write, proximity to waypoint, angle to waypoint, steering write, gyro turn rate, time
 - [x] no longer relevant. determine tire calibration and how to incorporate it into the calibration routines and menu system  
 - [x] no longer relevant. Have the car drive a straight path and then stop and determine the ratio of how much distance changes with speed  
