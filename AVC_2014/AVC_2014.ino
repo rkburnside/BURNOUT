@@ -292,7 +292,7 @@ void loop(){
 		}
 
 		if(!running){	//this will kick start the car/get it moving when it first starts the race
-			esc.writeMicroseconds(S2);
+			esc.writeMicroseconds(S3);
 			running = true;
 		}
 	}

@@ -10,10 +10,10 @@ int excel_waypoints[19][2] = {{30.36,199.63}, {9.25,501.3}, {-725.98,545.44}, {-
 //WAYPOINT AND SPEED PARAMETERS
 #define WAYPOINT_ACCEPT 185	//waypoint acceptance radius in inches
 #define S1 1500				// some default values:
-#define S2 1550				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
+#define S2 1600				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
 							//S1 1500, S2 1560, S3 1580, S4 2000, SB 1250
-#define S3 1540				//This is the speed for negotiating wp's 
-#define S4 1820 			//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
+#define S3 1600				//This is the speed for negotiating wp's 
+#define S4 1650 			//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest
 #define SB 1300				//breaking speed default 1300
 #define P1 50				//proximity to allow car to align with next waypoint in inches
 #define P2 100				//close proximity to waypoint in inches
