@@ -20,8 +20,8 @@ position_structure waypoint;
 
 //PROGRAM FUNCTIONS
 void set_waypoint(){ //CLEAR
-	waypoint.x = int(x);
-	waypoint.y = int(y);
+	waypoint.x = x;
+	waypoint.y = y;
 	//waypoint.last = false
 	EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
 	SERIAL_OUT.print("set WP #");
@@ -61,8 +61,8 @@ void import_waypoints(){
 	WAYPOINTS_STRING	//edit this in header file to change waypoints
 	
 	for(int i=0; i < WAYPOINT_COUNT; i++){
-		waypoint.x = int(excel_waypoints[i][0]);
-		waypoint.y = int(excel_waypoints[i][1]);
+		waypoint.x = float(excel_waypoints[i][0]);
+		waypoint.y = float(excel_waypoints[i][1]);
 		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
 		wpw_count++;
 	}
@@ -132,8 +132,8 @@ void edit_waypoint(){
 			SERIAL_OUT.print("accept values (y=1, n=0)? ");
 			int y_or_n = SERIAL_OUT.parseInt();
 			if(y_or_n == 1){
-				waypoint.x = int(x_temp);
-				waypoint.y = int(y_temp);
+				waypoint.x = float(x_temp);
+				waypoint.y = float(y_temp);
 				EEPROM_writeAnything(i*WP_SIZE, waypoint);
 				SERIAL_OUT.println();
 				SERIAL_OUT.println("waypoint changed");
@@ -167,8 +167,8 @@ void reset_waypoints(){
 	int excel_waypoints[19][2] = {{0,1000}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
 
 	for(int i=0; i < WAYPOINT_COUNT; i++){
-		waypoint.x = int(excel_waypoints[i][0]);
-		waypoint.y = int(excel_waypoints[i][1]);
+		waypoint.x = float(excel_waypoints[i][0]);
+		waypoint.y = float(excel_waypoints[i][1]);
 		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
 		wpw_count++;
 	}
