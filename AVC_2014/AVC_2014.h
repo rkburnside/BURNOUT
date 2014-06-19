@@ -1,6 +1,6 @@
 //AVC SETTINGS
-#define WC_SLOW			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
-#define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
+#define RR_SLOW			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
+#define USB 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
@@ -113,7 +113,7 @@ int excel_waypoints[19][2] = {{127,659},{132,1825},{-2547,1835},{-2542,1231},{-2
 //SPEED PARAMETERS
 #define S_STOP 1500				//stationary speed
 #define S_LOW 1650				//slow speed: 1600 ~ 1650
-#define S_HIGH 1725				//top speed: 1650 ~ 1800
+#define S_HIGH 1700				//top speed: 1650 ~ 1800
 
 //STEERING PARAMETERS
 #define L1 5000

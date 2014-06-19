@@ -337,7 +337,7 @@ void loop(){
 	}
 
 	if((wpr_count >= WAYPOINT_COUNT) || (((int)x_wp == 0) && ((int)y_wp == 0))){	//this locks the car into this loop and makes it go slow when we've reached the max waypoints OR the waypoints are 0,0
-		esc.writeMicroseconds(1500);
+		esc.writeMicroseconds(S_LOW);
 		while(true);
 	}
 	
