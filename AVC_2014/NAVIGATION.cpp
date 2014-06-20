@@ -9,7 +9,8 @@ int steer_us;
 double x_wp = 0, y_wp = 0, x_wp0 = 0, y_wp0 = 0;
 double target_x=0, target_y=0;
 double angle_last, angle_target, angle_vtp, x=0, y=0, speed_mph;
-static int steer_limm = 300;
+static int steer_limm = SERVO_LIM;
+
 static int wp_accept = 50;
 //static double cross_product=0;
 static double angle_diff;
