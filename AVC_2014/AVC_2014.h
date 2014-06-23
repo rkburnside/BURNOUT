@@ -72,7 +72,7 @@ int excel_waypoints[19][2] = {{200,0}, {-200,200}, {0,0}, {-714.42,54.53}, {-716
 //WAYPOINT AND SPEED PARAMETERS
 #define WAYPOINT_ACCEPT 185	//waypoint acceptance radius in inches
 #define S1 1400				// some default values:
-#define S2 1500				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
+#define S2 1460				//S1 1500, S2 1540, S3 1560, S4 1600, S5 1650, SB 1300
 							//S1 1500, S2 1560, S3 1580, S4 2000, SB 1250
 #define S3 1500				//This is the speed for negotiating wp's 
 #define S4 1500 			//1680 is pretty ridiculously fast. Don't use for general use. maybe try 1650, 1720 fastest

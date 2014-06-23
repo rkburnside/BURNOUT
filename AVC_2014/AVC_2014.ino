@@ -61,7 +61,7 @@ void navigate(){
 	calculate_speed();
 	//map_rates();
 	//cal_steer_lim();
-	//cal_wp_accept
+	//cal_wp_accept();
 	update_position();
 	update_waypoint();
 	calculate_look_ahead();
