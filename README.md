@@ -16,7 +16,7 @@ __2013__
 <br>Roadrunner -> 1st in Micro Class
 
 __2014__
-<br>Minuteman -> TBD
-<br>Roadrunner -> TBD
+<br>Minuteman -> 2nd in Alternative Class
+<br>Roadrunner -> 1st in Peleton Class
 
 Our vehicle setup consists of a Losi XXX (triple X), gyro, hall effect sensor, teensy 3.1 (2014) for the main MCU board (ardupilot for 2011-2013), arduino pro mini for a fail safe, and other miscellaneous components.
