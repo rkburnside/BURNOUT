@@ -1,0 +1,29 @@
+Use a wagon to transfer Harare to/from race area
+Try out the full IMU to see if it improves accuracy
+Bring a cooler full of food (1 less thing to worry about)
+The hoop and ramp locations are marked…look for them next time when setting up waypoints
+Bring and use sunscreen regularly
+Bring lots of water
+Don’t worry about justifying helping out kids in the student competition…the indian kids definitely didn’t make that  ‘bot themselves
+Add better functionality to editing waypoints on the fly
+A fully interactive GUI would be difficult to create
+Make critical car settings (i.e. speed, wp accept, angle diff) changeable on the fly
+Use a 2.5 Ghz antenna on the Bluetooth…see if it improves the range at all
+Extend the Bluetooth above the car and test its range
+I found the level worked well
+Cable tray DOES move and is NOT a reliable / repeatable object to use
+Solderless breadboards with hotglue work just fine
+Use IPA to EASILY remove hotglue from a stuff
+We need tee-shirts with Meineke sponsor logos and logos/stickers for our cars along with hats
+Losi XXX-S and get a slipper clutch
+Anything we can do to streamline testing is VERY important
+
+
+Strategy:
+Always be first off the line and fastest…you don’t have to worry about collisions no one is as fast
+Slow / waiting doesn’t always work because someone might hit the hoop and turn it sideways
+We can always get the hoop, but the jump adds way to much complexity
+Ignore the hoop and ramp if not needed. Most cars can’t get the hoop or the ramp. If we get the hoop in the first round and no one else does, ignore it and the ramp from that time on
+Add speed profiles for the hoop and jump…FAST for the first 1.25 of the course, slow for the hoop and jump, fast for the rest
+When setting up waypoints, set up each one at a time. ensure the first works, then the second, etc. 
+

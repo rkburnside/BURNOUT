@@ -1,10 +1,10 @@
 //AVC SETTINGS
-#define RR_SLOW			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
-#define USB 	//use either BLUETOOTH or USB to define the serial port for program output
+#define RR			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
+#define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-int excel_waypoints[19][2] = {{127,659},{132,1825},{-2547,1835},{-2542,1231},{-2542,803},{-2503,-188},{-1800,-174},{114,-250},{114,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}};
+int excel_waypoints[19][2] = {{-230,694},{-736,1098},{-1387,900},{-2900,475},{-2800,-368},{-2650,-1685},{-1500,-1400},{-324,-1150},{-75,-750},{-75,-600},{-75,1000},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}};
 
 
 #ifdef MM
@@ -66,7 +66,7 @@ int excel_waypoints[19][2] = {{127,659},{132,1825},{-2547,1835},{-2542,1231},{-2
 #define RESET 4
 #endif
 
-#ifdef RR_SLOW		//(1675 = ~42 second run)
+#ifdef RR		//(1675 = ~42 second run, 38 seconds on a full charge)
 //WAYPOINT PARAMETERS
 #define WAYPOINT_ACCEPT 80	//waypoint acceptance radius: speed = 11650 -> 48, speed = 1850 -> 180
 
@@ -116,113 +116,13 @@ int excel_waypoints[19][2] = {{127,659},{132,1825},{-2547,1835},{-2542,1231},{-2
 #define RESET 4
 #endif
 
-#ifdef RR_MEDIUM	//(~40 second run)
-//WAYPOINT PARAMETERS
-#define WAYPOINT_ACCEPT 120	//waypoint acceptance radius: speed = 11650 -> 48, speed = 1850 -> 180
-
-//SPEED PARAMETERS
-#define S_STOP 1500				//stationary speed
-#define S_LOW 1650				//slow speed: 1600 ~ 1650
-#define S_HIGH 1700				//top speed: 1650 ~ 1800
-
-//STEERING PARAMETERS
-#define L1 5000
-#define L2 20000
-#define L3 200
-#define L4 350
-#define STEER_ADJUST 1505			//steering adjustment factor
-#define STEER_GAIN 318				//proportional gain, 4000 = servo slammed, 2000 = servo slams less, 300 = supposedly OK
-#define PATH_FOLLOWING 1
-#define LOOK_AHEAD 80				//120 = too high, 20 = too low, 50 = aggressive, but good, 80 = not aggressive, but OK
-#define SPEED_TOGGLE_ANGLE 15.0		//20 +/- 5 degrees is good
-
-//GYRO PARAMETERS
-#define GYRO_CAL 233302330			//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
-#define XGYROOFFSET -861
-#define YGYROOFFSET -9
-#define ZGYROOFFSET 30
-
-//MISCELLANEOUS PARAMETERS
-#define CAR_NAME "***ROADRUNNER***" //car name
-#define WP_SIZE 20 					//number of bytes for each waypoint
-#define CLICK_INCHES 4.137931		//145 clicks in 25 feet (300 inches) = 2.0689655, it is now doubled because the interrupt is set to rising instead of change
-#define CLICK_MAX 1			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
-
-//Teensy Pin Assignments:
-//Optional manual throttle, autonomous steering - connect ESC signal pin to receiver CH2
-#define RESET_PIN 2
-#define MODE_LINE_1 5
-#define MODE_LINE_2 6
-#define THROTTLE 20
-#define STEERING 21
-#define HALL_EFFECT_SENSOR 22
-#define TOGGLE 23
-
-//CH3 settings
-#define MANUAL 0
-#define AUTOMATIC 1
-#define WP_MODE 2
-#define AUX 3
-#define RESET 4
-#endif
-
-#ifdef RR_FAST		//(~35 second run)
-//WAYPOINT PARAMETERS
-#define WAYPOINT_ACCEPT 150	//waypoint acceptance radius: speed = 11650 -> 48, speed = 1850 -> 180
-
-//SPEED PARAMETERS
-#define S_STOP 1500				//stationary speed
-#define S_LOW 1650				//slow speed: 1600 ~ 1650
-#define S_HIGH 1750				//top speed: 1650 ~ 1800
-
-//STEERING PARAMETERS
-#define L1 5000
-#define L2 20000
-#define L3 200
-#define L4 350
-#define STEER_ADJUST 1505			//steering adjustment factor
-#define STEER_GAIN 318				//proportional gain, 4000 = servo slammed, 2000 = servo slams less, 300 = supposedly OK
-#define PATH_FOLLOWING 1
-#define LOOK_AHEAD 80				//120 = too high, 20 = too low, 50 = aggressive, but good, 80 = not aggressive, but OK
-#define SPEED_TOGGLE_ANGLE 15.0		//20 +/- 5 degrees is good
-
-//GYRO PARAMETERS
-#define GYRO_CAL 233302330			//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
-#define XGYROOFFSET -861
-#define YGYROOFFSET -9
-#define ZGYROOFFSET 30
-
-//MISCELLANEOUS PARAMETERS
-#define CAR_NAME "***ROADRUNNER***" //car name
-#define WP_SIZE 20 					//number of bytes for each waypoint
-#define CLICK_INCHES 4.137931		//145 clicks in 25 feet (300 inches) = 2.0689655, it is now doubled because the interrupt is set to rising instead of change
-#define CLICK_MAX 1			//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
-
-//Teensy Pin Assignments:
-//Optional manual throttle, autonomous steering - connect ESC signal pin to receiver CH2
-#define RESET_PIN 2
-#define MODE_LINE_1 5
-#define MODE_LINE_2 6
-#define THROTTLE 20
-#define STEERING 21
-#define HALL_EFFECT_SENSOR 22
-#define TOGGLE 23
-
-//CH3 settings
-#define MANUAL 0
-#define AUTOMATIC 1
-#define WP_MODE 2
-#define AUX 3
-#define RESET 4
-#endif
-
-#ifdef WC_SLOW		//(1600 = ~44 second run)
+#ifdef WC		//(1600 = ~44 second run)
 //WAYPOINT PARAMETERS
 #define WAYPOINT_ACCEPT 60		//waypoint acceptance radius: speed = 1650 -> 48, speed = 1850 -> 180
 
 //SPEED PARAMETERS
 #define S_STOP 1500				//stationary speed
-#define S_LOW 1600				//slow speed: 1600 ~ 1625
+#define S_LOW 1585				//slow speed: 1600 ~ 1625
 #define S_HIGH 1600				//top speed: 1650 ~ 1800
 
 //STEERING PARAMETERS
@@ -236,108 +136,6 @@ int excel_waypoints[19][2] = {{127,659},{132,1825},{-2547,1835},{-2542,1231},{-2
 #define PATH_FOLLOWING 1
 #define LOOK_AHEAD 80				//120 = too high, 20 = too low, 50 = aggressive, but good, 80 = not aggressive, but OK
 #define SPEED_TOGGLE_ANGLE 10		//20 +/- 5 degrees is good
-
-//GYRO PARAMETERS
-#define GYRO_CAL 234401167			//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
-#define XGYROOFFSET -30
-#define YGYROOFFSET 32
-#define ZGYROOFFSET -10
-
-//MISCELLANEOUS PARAMETERS
-#define CAR_NAME "***WILE E. COYOTE***" //car name
-#define WP_SIZE 20 				//number of bytes for each waypoint
-#define CLICK_INCHES 8.6330936	//69~70 clicks in 25 feet (300 inches)
-#define CLICK_MAX 1				//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
-
-//Teensy Pin Assignments:
-//Optional manual throttle, autonomous steering - connect ESC signal pin to receiver CH2
-#define RESET_PIN 2
-#define MODE_LINE_1 5
-#define MODE_LINE_2 6
-#define THROTTLE 20
-#define STEERING 21
-#define HALL_EFFECT_SENSOR 22
-#define TOGGLE 23
-
-//CH3 settings
-#define MANUAL 0
-#define AUTOMATIC 1
-#define WP_MODE 2
-#define AUX 3
-#define RESET 4
-#endif
-
-#ifdef WC_MEDIUM	//(~40 second run)
-//WAYPOINT PARAMETERS
-#define WAYPOINT_ACCEPT 48		//waypoint acceptance radius: speed = 11650 -> 48, speed = 1850 -> 180
-
-//SPEED PARAMETERS
-#define S_STOP 1500				//stationary speed
-#define S_LOW 1600				//slow speed: 1600 ~ 1625
-#define S_HIGH 1650				//top speed: 1650 ~ 1800
-
-//STEERING PARAMETERS
-#define L1 5000
-#define L2 20000
-#define L3 100
-#define L4 250
-#define STEER_ADJUST 1465			//steering adjustment factor
-//***Note that Wile E. Coyote servo is opposite of roadrunner. As a result, the steering gain AND the gyro cal numbers are "-"
-#define STEER_GAIN -318			//proportional gain, 4000 = servo slammed, 2000 = servo slams less, 300 = supposedly OK
-#define PATH_FOLLOWING 1
-#define LOOK_AHEAD 240				//120 = too high, 20 = too low, 50 = aggressive, but good, 80 = not aggressive, but OK
-#define SPEED_TOGGLE_ANGLE 20.0		//20 +/- 5 degrees is good
-
-//GYRO PARAMETERS
-#define GYRO_CAL 234401167			//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
-#define XGYROOFFSET -30
-#define YGYROOFFSET 32
-#define ZGYROOFFSET -10
-
-//MISCELLANEOUS PARAMETERS
-#define CAR_NAME "***WILE E. COYOTE***" //car name
-#define WP_SIZE 20 				//number of bytes for each waypoint
-#define CLICK_INCHES 8.6330936	//69~70 clicks in 25 feet (300 inches)
-#define CLICK_MAX 1				//in the main loop, watch clicks and wait for it to reach CLICK_MAX, then calculate position, default 3
-
-//Teensy Pin Assignments:
-//Optional manual throttle, autonomous steering - connect ESC signal pin to receiver CH2
-#define RESET_PIN 2
-#define MODE_LINE_1 5
-#define MODE_LINE_2 6
-#define THROTTLE 20
-#define STEERING 21
-#define HALL_EFFECT_SENSOR 22
-#define TOGGLE 23
-
-//CH3 settings
-#define MANUAL 0
-#define AUTOMATIC 1
-#define WP_MODE 2
-#define AUX 3
-#define RESET 4
-#endif
-
-#ifdef WC_FAST		//(~35 second run)
-//WAYPOINT PARAMETERS
-#define WAYPOINT_ACCEPT 48		//waypoint acceptance radius: speed = 11650 -> 48, speed = 1850 -> 180
-
-//SPEED PARAMETERS
-#define S_STOP 1500				//stationary speed
-#define S_LOW 1600				//slow speed: 1600 ~ 1625
-#define S_HIGH 1650				//top speed: 1650 ~ 1800
-
-//STEERING PARAMETERS
-#define L1 5000
-#define L2 20000
-#define L3 100
-#define L4 250
-#define STEER_ADJUST 1465			//steering adjustment factor
-//***Note that Wile E. Coyote servo is opposite of roadrunner. As a result, the steering gain AND the gyro cal numbers are "-"
-#define STEER_GAIN -318			//proportional gain, 4000 = servo slammed, 2000 = servo slams less, 300 = supposedly OK
-#define PATH_FOLLOWING 1
-#define LOOK_AHEAD 240				//120 = too high, 20 = too low, 50 = aggressive, but good, 80 = not aggressive, but OK
-#define SPEED_TOGGLE_ANGLE 20.0		//20 +/- 5 degrees is good
 
 //GYRO PARAMETERS
 #define GYRO_CAL 234401167			//this has to be measured by rotating the gyro 360 deg. and reading the output and then dividing by the number of rotations and by 2 to get a 180-deg number
