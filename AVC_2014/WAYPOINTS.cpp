@@ -82,15 +82,15 @@ void display_waypoints(){
 		EEPROM_readAnything(i*WP_SIZE, waypoint);
 
 		Serial.print(i);
-		Serial.print(": ");
+		Serial.print("\t");
 		Serial.print(waypoint.x);
-		Serial.print(" , ");
+		Serial.print("\t");
 		Serial.println(waypoint.y);
 
 		Serial2.print(i);
-		Serial2.print(": ");
+		Serial2.print("\t");
 		Serial2.print(waypoint.x);
-		Serial2.print(" , ");
+		Serial2.print("\t");
 		Serial2.println(waypoint.y);
 	}
 
@@ -156,4 +156,27 @@ void edit_waypoint(){
 	SERIAL_OUT.println();
 	
 	return ;
+}
+
+void reset_waypoints(){
+/* NOTE THAT WHEN USING THIS FUNCTION, THERE MUST BE AT LEAST 1 WAYPOINT THAT IS NOT 0,0 OR ELSE THE CAR WILL NOT SET WAYPOINTS CORRECTLY AFTER THAT*/
+
+	eeprom_clear();
+	
+	wpw_count = 1;	//resets the counter to import correctly
+	int excel_waypoints[19][2] = {{0,1000}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
+
+	for(int i=0; i < WAYPOINT_COUNT; i++){
+		waypoint.x = float(excel_waypoints[i][0]);
+		waypoint.y = float(excel_waypoints[i][1]);
+		EEPROM_writeAnything(wpw_count*WP_SIZE, waypoint);
+		wpw_count++;
+	}
+	
+	wpw_count = 1;	//resets the couter for autonomous mode
+	display_waypoints();
+	SERIAL_OUT.println("ALL POINTS IMPORTED");
+	SERIAL_OUT.println();
+	
+	return;
 }

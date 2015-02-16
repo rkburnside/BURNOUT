@@ -24,6 +24,7 @@ void menu_choices(){
 	SERIAL_OUT.println("d = display waypoints");
 	SERIAL_OUT.println("e = edit waypoint");
 	SERIAL_OUT.println("i = import header waypoint values");
+	SERIAL_OUT.println("r = reset eeprom to 0");
 	SERIAL_OUT.println();
 	SERIAL_OUT.println("GYRO FUNCTIONS");
 	SERIAL_OUT.println("----------");
@@ -35,7 +36,6 @@ void menu_choices(){
 	SERIAL_OUT.println("MISCELLANEOUS FUNCTIONS");
 	SERIAL_OUT.println("----------");
 	SERIAL_OUT.println("c = click calibration");
-	SERIAL_OUT.println("l = activate the FRICKIN LASER");
 	SERIAL_OUT.println("m = combined mode and toggle state test");
 	SERIAL_OUT.println("o = mode state test");
 	SERIAL_OUT.println("t = switch state toggle test");
@@ -69,6 +69,10 @@ void main_menu(){
 					import_waypoints();
 					menu_choices();
 					break;
+				case 'r':
+					reset_waypoints();
+					menu_choices();
+					break;
 
 				case 'a':
 					watch_angle();
@@ -90,10 +94,6 @@ void main_menu(){
 
 				case 'c':
 					click_calibration();
-					menu_choices();
-					break;
-				case 'l':
-					activate_the_frickin_laser();
 					menu_choices();
 					break;
 				case 'm':

@@ -25,14 +25,13 @@ The sketch is parsed for include files. The sketch, all included header files, a
 bool running = false, first = true;
 volatile int clicks = 0;
 int mode = MANUAL;
-
+long click_time = 0;
 
 //EXTERNAL VARIABLES
 extern byte wpr_count;
 extern int steer_us;
 extern long accum; //this is ONLY used to reset the 0 the gyro angle for real (setting angle to 0 does nothing!!! (never forget last year's debacle))
 extern double x_wp, y_wp;
-extern double target_x, target_y;
 extern double x, y;
 extern position_structure waypoint;
 
@@ -44,6 +43,7 @@ Servo steering, esc;
 //PROGRAM FUNCTIONS
 void encoder_interrupt(){
 	clicks++;
+	click_time = micros();
 	return ;
 }
 
@@ -85,7 +85,6 @@ void get_mode(){
 }
 
 void race_startup_routine(){
-//	activate_the_frickin_laser();
 	SERIAL_OUT.println("-----RACE SETUP ROUTINE-----");
 	
 	esc.detach();
@@ -115,7 +114,7 @@ void race_startup_routine(){
 	delay(250);
 	esc.attach(THROTTLE);
 	delay(250);
-	esc.writeMicroseconds(S1);
+	esc.writeMicroseconds(S_STOP);
 
 
 	//by turning off the radio, the automatic mode is locked in
@@ -123,9 +122,31 @@ void race_startup_routine(){
 	SERIAL_OUT.println();
 	delay(1250);
 
-	SERIAL_OUT.println("3. ***READY TO RUN***");
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("CURRENT WAYPOINTS");
+	display_waypoints();
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("CURRENT #DEFINE SETTINGS");
+	SERIAL_OUT.print("WAYPOINT_ACCEPT\t");	SERIAL_OUT.println(WAYPOINT_ACCEPT);
+	SERIAL_OUT.print("S_STOP\t");	SERIAL_OUT.println(S_STOP);
+	SERIAL_OUT.print("S_LOW\t");	SERIAL_OUT.println(S_LOW);
+	SERIAL_OUT.print("S_HIGH\t");	SERIAL_OUT.println(S_HIGH);
+	SERIAL_OUT.print("L1\t");	SERIAL_OUT.println(L1);
+	SERIAL_OUT.print("L2\t");	SERIAL_OUT.println(L2);
+	SERIAL_OUT.print("L3\t");	SERIAL_OUT.println(L3);
+	SERIAL_OUT.print("L4\t");	SERIAL_OUT.println(L4);
+	SERIAL_OUT.print("STEER_ADJUST\t");	SERIAL_OUT.println(STEER_ADJUST);
+	SERIAL_OUT.print("STEER_GAIN\t");	SERIAL_OUT.println(STEER_GAIN);
+	SERIAL_OUT.print("SPEED_TOGGLE_ANGLE\t");	SERIAL_OUT.println(SPEED_TOGGLE_ANGLE);
+	SERIAL_OUT.print("LOOK_AHEAD\t");	SERIAL_OUT.println(LOOK_AHEAD);
+	SERIAL_OUT.print("CLICK_MAX\t");	SERIAL_OUT.println(CLICK_MAX);
+	SERIAL_OUT.print("CLICK_INCHES\t");	SERIAL_OUT.println(CLICK_INCHES);
 	SERIAL_OUT.println();
-	SERIAL_OUT.println();
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("***READY TO RUN***");
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("TELEMETRY");
+	SERIAL_OUT.println("micros()\tx\ty\tangle\tangle_diff\tangle_target\tangle_vtp\tproximity\tesc_speed\tspeed_mph\tsteer_us");
 
 	digitalWrite(LED_BUILTIN, HIGH);	//this is used to indicate that the car is ready to run
 
@@ -157,8 +178,6 @@ void race_startup_routine(){
 	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
 	clicks = 0;
 	first = true;
-	target_x = x_wp;
-	target_y = y_wp;
 
 	return;
 }
@@ -192,7 +211,7 @@ void wp_setup_routine(){
 	delay(250);
 	esc.attach(THROTTLE);
 	delay(250);
-	esc.writeMicroseconds(S1);
+	esc.writeMicroseconds(S_STOP);
 
 	for(int i=0; i<100; i++){	//clears the FIFO buffer and waits 1 sec to start
 		delay(1);
@@ -211,15 +230,35 @@ void wp_setup_routine(){
 	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
 	clicks = 0;
 	first = true;
-	target_x = x_wp;
-	target_y = y_wp;
 
 	digitalWrite(LED_BUILTIN, HIGH);	//this is used to indicate that the car is ready to run
 
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("CURRENT WAYPOINTS");
+	display_waypoints();
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("CURRENT #DEFINE SETTINGS");
+	SERIAL_OUT.print("WAYPOINT_ACCEPT\t");	SERIAL_OUT.println(WAYPOINT_ACCEPT);
+	SERIAL_OUT.print("S_STOP\t");	SERIAL_OUT.println(S_STOP);
+	SERIAL_OUT.print("S_LOW\t");	SERIAL_OUT.println(S_LOW);
+	SERIAL_OUT.print("S_HIGH\t");	SERIAL_OUT.println(S_HIGH);
+	SERIAL_OUT.print("L1\t");	SERIAL_OUT.println(L1);
+	SERIAL_OUT.print("L2\t");	SERIAL_OUT.println(L2);
+	SERIAL_OUT.print("L3\t");	SERIAL_OUT.println(L3);
+	SERIAL_OUT.print("L4\t");	SERIAL_OUT.println(L4);
+	SERIAL_OUT.print("STEER_ADJUST\t");	SERIAL_OUT.println(STEER_ADJUST);
+	SERIAL_OUT.print("STEER_GAIN\t");	SERIAL_OUT.println(STEER_GAIN);
+	SERIAL_OUT.print("SPEED_TOGGLE_ANGLE\t");	SERIAL_OUT.println(SPEED_TOGGLE_ANGLE);
+	SERIAL_OUT.print("LOOK_AHEAD\t");	SERIAL_OUT.println(LOOK_AHEAD);
+	SERIAL_OUT.print("CLICK_MAX\t");	SERIAL_OUT.println(CLICK_MAX);
+	SERIAL_OUT.print("CLICK_INCHES\t");	SERIAL_OUT.println(CLICK_INCHES);
+	SERIAL_OUT.println();
+	SERIAL_OUT.println("---------------------------");
 	SERIAL_OUT.println("***READY TO SET WAYPOINTS***");
-	SERIAL_OUT.println();
-	SERIAL_OUT.println();
-
+	SERIAL_OUT.println("---------------------------");
+	SERIAL_OUT.println("TELEMETRY");
+	SERIAL_OUT.println("micros()\tx\ty\tangle\tangle_diff\tangle_target\tangle_vtp\tproximity\tesc_speed\tspeed_mph\tsteer_us");
+	
 	return;
 }
 
@@ -233,25 +272,22 @@ void setup(){
 	pinMode(MODE_LINE_1, INPUT);
 	pinMode(MODE_LINE_2, INPUT);
 	pinMode(TOGGLE, INPUT_PULLUP);			//this is the switch that needs to be toggled to start the race
-	pinMode(FRICKIN_LASER, OUTPUT);
-	digitalWrite(FRICKIN_LASER, LOW);
 
 	pinMode(RESET_PIN, INPUT);
 	attachInterrupt(RESET_PIN, reset_requested_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
 
 	pinMode(HALL_EFFECT_SENSOR, INPUT);	 
-	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, CHANGE);	//according to the teensy documentation, all pins can be interrupts
+	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
 
 	steering.attach(STEERING);
 	steering.writeMicroseconds(STEER_ADJUST);
 
 	esc.attach(THROTTLE);
 	delay(250);
-	esc.writeMicroseconds(S1);
+	esc.writeMicroseconds(S_STOP);
 	
 	bool bypass_menu = false;
 	pinMode(LED_BUILTIN, OUTPUT);
-	long temp_time = millis();
 	for(int i = 0; i<8; i++){
 		digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 		delay(500);
@@ -274,6 +310,7 @@ void loop(){
 	if(clicks >= CLICK_MAX){
 		clicks = 0;
 		navigate();
+		print_telemetry();
 	}
 
 	if(mode == AUTOMATIC){	//this function get the car started moving and then clicks will take over
@@ -284,7 +321,7 @@ void loop(){
 		}
 
 		if(!running){	//this will kick start the car/get it moving when it first starts the race
-			esc.writeMicroseconds(S2);
+			esc.writeMicroseconds(S_LOW);
 			running = true;
 		}
 	}
@@ -300,13 +337,13 @@ void loop(){
 	}
 
 	if((wpr_count >= WAYPOINT_COUNT) || (((int)x_wp == 0) && ((int)y_wp == 0))){	//this locks the car into this loop and makes it go slow when we've reached the max waypoints OR the waypoints are 0,0
-		esc.writeMicroseconds(S2);
+		esc.writeMicroseconds(S_LOW);
 		while(true);
 	}
 	
-	static long time = 0;
-	if((millis() - time) > 500){
-		print_coordinates();
-		time = millis();
-	}
+	// static long time = 0;
+	// if((millis() - time) > 500){
+		// print_telemetry();
+		// time = millis();
+	// }
 }
