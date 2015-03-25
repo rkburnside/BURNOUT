@@ -1,5 +1,7 @@
 #include <Servo.h>
-#define ESC_NULL_R		1460
+#include <IRremote.h>
+
+#define ESC_NULL_R		1500
 #define ESC_NULL_L		1500
 
 //speed definitions
@@ -12,12 +14,13 @@
 #define FR_PIN A2
 #define RIGHT_PIN A3
 #define LEFT_PIN A0
-#define FR_LINE_PIN 3
-#define FL_LINE_PIN 4
-#define RC_LINE_PIN 5
-#define R_ESC_PIN 2
-#define L_ESC_PIN 7
-#define IR_PIN 12
+//#define FR_LINE_PIN 3
+//#define FL_LINE_PIN 4
+//#define RC_LINE_PIN 5
+#define R_ESC_PIN 3
+#define L_ESC_PIN 2
+#define IR_PIN 4
+
 
 //Sensor bit defines
 #define NUM_SENSORS 0
@@ -50,6 +53,9 @@ byte state, state_cur, state_pre;
 //Initialize objects
 Servo escR;
 Servo escL;
+IRrecv irrecv(IR_PIN);
+
+decode_results results;  // declaration of structure (?) to hold ir results
 
 byte read_sensors(){
 	//Serial.println("rfront");
@@ -150,10 +156,12 @@ void start_IR(){
 		else ir_counter = 0;
 	}
 	digitalWrite(13, LOW);
-	delay(1000);
+	delay(5000);
 }
 
 void setup(){
+
+	// set pins
 	pinMode(R_ESC_PIN, OUTPUT);   // sets the pin as output
 	pinMode(L_ESC_PIN, OUTPUT);   // sets the pin as output
 	pinMode(FL_PIN, INPUT);   // sets the pin as input
@@ -161,10 +169,15 @@ void setup(){
 	pinMode(RIGHT_PIN, INPUT);   // sets the pin as input
 	pinMode(LEFT_PIN, INPUT);   // sets the pin as input
 	pinMode(IR_PIN, INPUT);   // sets the pin as input
+	
+	//Initialize modules
 	escR.attach(R_ESC_PIN);
 	escL.attach(L_ESC_PIN);
 	escR.writeMicroseconds(ESC_NULL_R);
 	escL.writeMicroseconds(ESC_NULL_L);
+	
+	irrecv.enableIRIn(); // Start the receiver
+
 	//while (true);
 	pinMode(9, INPUT_PULLUP);
 	//while(digitalRead(9));
@@ -172,9 +185,11 @@ void setup(){
 	delay(1000);
 	start_IR();
 	ir_counter = 0;
-	randomSeed(analogRead(0));
-	if(random(1000) < 500) last_turn = RIGHT_TURN;
-	else last_turn = LEFT_TURN;
+//	randomSeed(analogRead(0));
+//	if(random(1000) < 500) last_turn = RIGHT_TURN;
+//	else last_turn = LEFT_TURN;
+	last_turn = LEFT_TURN;
+	
 }
 
 void loop(){
