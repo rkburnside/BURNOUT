@@ -1,5 +1,11 @@
+#include <EEPROM.h>
+#include <Arduino.h>  // for type definitions
+#include "EEPROMAnything.h"
 #include <Servo.h>
 #include <IRremote.h>
+#include <Wire.h>
+#include <I2Cdev.h>
+#include <MPU6050.h>
 
 #define ESC_NULL_R		1500
 #define ESC_NULL_L		1500
@@ -56,6 +62,31 @@ Servo escL;
 IRrecv irrecv(IR_PIN);
 
 decode_results results;  // declaration of structure (?) to hold ir results
+
+struct gyro_settings_structure {
+
+/* Using structures to contain location information. Will record old position 
+and new position. The actual structures will be position[0] and position[1], 
+but will use pointers old_pos and new_pos to access them. This way we can simply
+swap the pointers instead of copying entire structure from one to the other. Access
+data in the structures as follows: old_pos->x or new_pos->time, etc. this is equivalent
+to (*old_pos).x.*/
+
+    long gyro_cal;
+	int x_gyro_offset;
+	int y_gyro_offset;
+	int z_gyro_offset;
+    int r_ESC_mid_high;
+    int r_ESC_high;
+    int r_ESC_mid_low;
+    int r_ESC_low;
+    int r_ESC_mid;
+    int l_ESC_mid_high;
+    int l_ESC_high;
+    int l_ESC_mid_low;
+    int l_ESC_low;
+    int l_ESC_mid;
+ } settings;
 
 byte read_sensors(){
 	//Serial.println("rfront");
@@ -160,7 +191,6 @@ void start_IR(){
 }
 
 void setup(){
-
 	// set pins
 	pinMode(R_ESC_PIN, OUTPUT);   // sets the pin as output
 	pinMode(L_ESC_PIN, OUTPUT);   // sets the pin as output
