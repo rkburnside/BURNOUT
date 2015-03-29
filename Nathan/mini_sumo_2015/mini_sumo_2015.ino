@@ -52,7 +52,7 @@
 //misc definitions
 #define RIGHT_TURN 1
 #define LEFT_TURN 0
-#define DELAY_TIME 500
+#define DELAY_TIME 5
 
 //strategy definitions
 #define GOTO_ANGLE 1
@@ -174,16 +174,12 @@ void decide(){
 		
 		else {
 			if (last_turn == RIGHT_TURN) {
-				//escL.writeMicroseconds(FAST + ESC_NULL_L);
-				//escR.writeMicroseconds(-SLOW + ESC_NULL_R);
 				ESCL_percent(99);
-				ESCR_percent(-25);
+				ESCR_percent(0);
 			}
 			else {
-				//escR.writeMicroseconds(FAST + ESC_NULL_R);
-				//escL.writeMicroseconds(-SLOW + ESC_NULL_L);
 				ESCR_percent(99);
-				ESCL_percent(-25);
+				ESCL_percent(0);
 			}
 		}
 	}
@@ -193,31 +189,20 @@ void set_motors(){
 	switch (state) {
 		case FR_BIT:  // right sensor
 			//reset counter
-			//fast forward, right
-			//escL.writeMicroseconds(FAST + ESC_NULL_L);
-			//escR.writeMicroseconds(FAST - 40 + ESC_NULL_R);
 			ESCL_percent(99);
-			ESCR_percent(80);
-			//escR.writeMicroseconds(MEDIUM + ESC_NULL_R);
+			ESCR_percent(85);
 			last_turn = RIGHT_TURN;
 			break;
 		case FL_BIT:  //left sensor
-			//escR.writeMicroseconds(FAST + ESC_NULL_R);
-			//escL.writeMicroseconds(FAST - 40 + ESC_NULL_L);
 			ESCR_percent(99);
-			ESCL_percent(80);
-			//escL.writeMicroseconds(MEDIUM + ESC_NULL_L);
+			ESCL_percent(85);
 			last_turn = LEFT_TURN;
 			break;
 		case FR_BIT+FL_BIT:  //both sensors
-			//escR.writeMicroseconds(FAST + ESC_NULL_R);
-			//escL.writeMicroseconds(FAST + ESC_NULL_L);
 			ESCL_percent(99);
 			ESCR_percent(99);
 			break;
 		default:
-			//escR.writeMicroseconds(ESC_NULL_R);
-			//escL.writeMicroseconds(ESC_NULL_L);
 			ESCL_percent(0);
 			ESCR_percent(0);
 		}
@@ -369,14 +354,6 @@ void PID_angle(){
 	float temp = angle_err * Kp + (float)angle_errSum * Ki;
 }
 
-void left_90(){
-	ESCR_percent(100);
-	float temp;
-	temp = (float)accum/29e4;
-	ESCL_percent((int)temp);
-	//Serial.println(temp);
-}
-
 void goto_angle(){
 	if (accum > 0) {
 		ESCL_percent(100);
@@ -418,7 +395,7 @@ void PID_turn_rate(){
 
 }
 
-///*********GYRO STUFF**************************
+//*********GYRO STUFF**************************
 void watch_angle(){
 	Serial.println("watch angle");
 	while(true) {
@@ -576,8 +553,6 @@ void setup(){
 	//Initialize modules
 	escR.attach(R_ESC_PIN);
 	escL.attach(L_ESC_PIN);
-	//escR.writeMicroseconds(ESC_NULL_R);
-	//escL.writeMicroseconds(ESC_NULL_L);
 	ESCL_percent(0);
 	ESCR_percent(0);
 
@@ -610,14 +585,12 @@ void loop(){
 	if ((millis() - time) > 0) {
 		time = millis();
 		read_FIFO();
-		//decide();
-		goto_angle();
+		decide();
+		//goto_angle();
 	}
 	if (digitalRead(IR_PIN) < 1) ir_counter++;
 	else ir_counter = 0;
 	if (ir_counter > 20) {
-		//escR.writeMicroseconds(ESC_NULL_R);
-		//escL.writeMicroseconds(ESC_NULL_L);
 		ESCL_percent(0);
 		ESCR_percent(0);
 		digitalWrite(13, HIGH);
