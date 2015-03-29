@@ -101,6 +101,7 @@ byte result;
 Servo escR;
 Servo escL;
 IRrecv irrecv(IR_PIN);
+//IRrecv irrecv(9);
 MPU6050 accelgyro;
 
 decode_results results;  // declaration of structure (?) to hold ir results
@@ -173,12 +174,16 @@ void decide(){
 		
 		else {
 			if (last_turn == RIGHT_TURN) {
-				escL.writeMicroseconds(FAST + ESC_NULL_L);
-				escR.writeMicroseconds(-SLOW + ESC_NULL_R);
+				//escL.writeMicroseconds(FAST + ESC_NULL_L);
+				//escR.writeMicroseconds(-SLOW + ESC_NULL_R);
+				ESCL_percent(99);
+				ESCR_percent(-25);
 			}
 			else {
-				escR.writeMicroseconds(FAST + ESC_NULL_R);
-				escL.writeMicroseconds(-SLOW + ESC_NULL_L);
+				//escR.writeMicroseconds(FAST + ESC_NULL_R);
+				//escL.writeMicroseconds(-SLOW + ESC_NULL_L);
+				ESCR_percent(99);
+				ESCL_percent(-25);
 			}
 		}
 	}
@@ -189,24 +194,32 @@ void set_motors(){
 		case FR_BIT:  // right sensor
 			//reset counter
 			//fast forward, right
-			escL.writeMicroseconds(FAST + ESC_NULL_L);
-			escR.writeMicroseconds(FAST - 40 + ESC_NULL_R);
+			//escL.writeMicroseconds(FAST + ESC_NULL_L);
+			//escR.writeMicroseconds(FAST - 40 + ESC_NULL_R);
+			ESCL_percent(99);
+			ESCR_percent(80);
 			//escR.writeMicroseconds(MEDIUM + ESC_NULL_R);
 			last_turn = RIGHT_TURN;
 			break;
 		case FL_BIT:  //left sensor
-			escR.writeMicroseconds(FAST + ESC_NULL_R);
-			escL.writeMicroseconds(FAST - 40 + ESC_NULL_L);
+			//escR.writeMicroseconds(FAST + ESC_NULL_R);
+			//escL.writeMicroseconds(FAST - 40 + ESC_NULL_L);
+			ESCR_percent(99);
+			ESCL_percent(80);
 			//escL.writeMicroseconds(MEDIUM + ESC_NULL_L);
 			last_turn = LEFT_TURN;
 			break;
 		case FR_BIT+FL_BIT:  //both sensors
-			escR.writeMicroseconds(FAST + ESC_NULL_R);
-			escL.writeMicroseconds(FAST + ESC_NULL_L);
+			//escR.writeMicroseconds(FAST + ESC_NULL_R);
+			//escL.writeMicroseconds(FAST + ESC_NULL_L);
+			ESCL_percent(99);
+			ESCR_percent(99);
 			break;
 		default:
-			escR.writeMicroseconds(ESC_NULL_R);
-			escL.writeMicroseconds(ESC_NULL_L);
+			//escR.writeMicroseconds(ESC_NULL_R);
+			//escL.writeMicroseconds(ESC_NULL_L);
+			ESCL_percent(0);
+			ESCR_percent(0);
 		}
 }
 
@@ -269,6 +282,7 @@ void IR_set_angle(){
 	angle_temp *= (float)GYRO_CAL;
 	angle_target = angle_temp;
 	Serial.println(angle_target);
+	accum = (long)angle_target;
 	return;
 }
 
@@ -355,6 +369,37 @@ void PID_angle(){
 	float temp = angle_err * Kp + (float)angle_errSum * Ki;
 }
 
+void left_90(){
+	ESCR_percent(100);
+	float temp;
+	temp = (float)accum/29e4;
+	ESCL_percent((int)temp);
+	//Serial.println(temp);
+}
+
+void goto_angle(){
+	if (accum > 0) {
+		ESCL_percent(100);
+		float temp;
+		temp = 100.0 - (float)accum/20e4;
+		if (temp > 100) temp = 100;
+		if (temp < 0) temp = 0;
+		ESCR_percent(temp);
+		//Serial.println(temp);
+		//Serial.println(accum);
+	}
+	else {
+		ESCR_percent(100);
+		float temp;
+		temp = 100.0 + (float)accum/20e4;
+		if (temp > 100) temp = 100;
+		if (temp < 0) temp = 0;
+		ESCL_percent(temp);		
+		//Serial.println(temp);
+		//Serial.println(accum);
+	}
+}
+
 void ESCR_percent(int value){
 	if (value > 0) value = map(value, 0, 100, 1680, 1970);		
 	else if (value < 0) value = map(value, -100, 0, 1230, 1370);
@@ -439,6 +484,7 @@ void read_FIFO(){
 		if((accum < -GYRO_CAL) && (!cal_flag)) accum += GYRO_CAL*2;
 	}
 	//angle = (float)accum/(float)GYRO_CAL * -3.14159;   //change sign of PI for flipped gyro
+	//accum = 0 - accum;
 	angle = (float)accum/(float)GYRO_CAL * -180;   //using degrees *10, negative for flipped gyro.
 
 	return ;
@@ -530,8 +576,10 @@ void setup(){
 	//Initialize modules
 	escR.attach(R_ESC_PIN);
 	escL.attach(L_ESC_PIN);
-	escR.writeMicroseconds(ESC_NULL_R);
-	escL.writeMicroseconds(ESC_NULL_L);
+	//escR.writeMicroseconds(ESC_NULL_R);
+	//escL.writeMicroseconds(ESC_NULL_L);
+	ESCL_percent(0);
+	ESCR_percent(0);
 
 	Wire.begin();
 	Serial.begin(115200);
@@ -549,20 +597,29 @@ void setup(){
 	//delay(1000);
 	//start_IR();
 	ir_counter = 0;
+	TIMSK2 = 0;  //should disable ir stuff.
 //	randomSeed(analogRead(0));
 //	if(random(1000) < 500) last_turn = RIGHT_TURN;
 //	else last_turn = LEFT_TURN;
 	last_turn = LEFT_TURN;
+	//accum = -14600000;
 }
 
 void loop(){
 	state_cur = read_sensors();
-	decide();
+	if ((millis() - time) > 0) {
+		time = millis();
+		read_FIFO();
+		//decide();
+		goto_angle();
+	}
 	if (digitalRead(IR_PIN) < 1) ir_counter++;
 	else ir_counter = 0;
-	if (ir_counter > 200) {
-		escR.writeMicroseconds(ESC_NULL_R);
-		escL.writeMicroseconds(ESC_NULL_L);
+	if (ir_counter > 20) {
+		//escR.writeMicroseconds(ESC_NULL_R);
+		//escL.writeMicroseconds(ESC_NULL_L);
+		ESCL_percent(0);
+		ESCR_percent(0);
 		digitalWrite(13, HIGH);
 		while (true);
 	}
