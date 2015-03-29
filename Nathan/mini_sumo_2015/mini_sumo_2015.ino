@@ -356,16 +356,16 @@ void PID_angle(){
 }
 
 void ESCR_percent(int value){
-	if (value > 0) value = map(value, 0, 100, 1550, 1900);		
-	else if (value < 0) value = map(value, -100, 0, 1100, 1450);
-	else value = 1500;
+	if (value > 0) value = map(value, 0, 100, 1680, 1970);		
+	else if (value < 0) value = map(value, -100, 0, 1230, 1370);
+	else value = 1480;
 	escR.writeMicroseconds(value);
 }
 
 void ESCL_percent(int value){
-	if (value > 0) value = map(value, 0, 100, 1550, 1900);		
-	else if (value < 0) value = map(value, -100, 0, 1100, 1450);
-	else value = 1500;
+	if (value > 0) value = map(value, 0, 100, 1650, 1950);		
+	else if (value < 0) value = map(value, -100, 0, 1220, 1360);
+	else value = 1470;
 	escL.writeMicroseconds(value);
 }
 
