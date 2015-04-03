@@ -33,22 +33,21 @@
 #define R_ESC_PIN 3
 #define L_ESC_PIN 2
 #define IR_PIN 4
+#define BUTTON_PIN 11
+#define TIMING_PIN 10
 
 //Sensor bit defines
-#define NUM_SENSORS 0
+//#define NUM_SENSORS 2
 #define FL_BIT 1
 #define FR_BIT 2
 #define RIGHT_BIT 4
 #define LEFT_BIT 8
 
 //Line sensor defines
-#define FR_LINE 1
-#define FL_LINE 2
-#define RC_LINE 3
+#define LINE_R 1
+#define LINE_L 2
 
 //sensor limits
-#define SHARP_LIM_FAR	210
-#define SHARP_LIM_CLOSE	350
 #define WHITE_THRESHOLD	200
 
 //misc definitions
@@ -57,12 +56,10 @@
 #define DELAY_TIME 5
 
 //strategy definitions
-#define GOTO_ANGLE 1
-#define LOOP_RIGHT 2
-#define LOOP_LEFT 3
-#define CHARGE_AHEAD 4 
-#define SEARCH_RIGHT 5
-#define SEARCH_LEFT 6
+#define SEARCH_NORMAL 1
+#define SEARCH_GYRO 2
+#define GOTO_ANGLE 3
+#define BACKUP 4 
 
 //IR key definitions
 #define SELECT_BOT_1 0xE2
@@ -87,7 +84,9 @@
 #define POWER_KEY 0xC0
 
 #define NUM_SENSORS   2     // number of sensors used
-#define TIMEOUT       500  // waits for 2500 microseconds for sensor outputs to go low
+#define TIMEOUT       300  // waits for 2500 microseconds for sensor outputs to go low
+#define TO_NORMAL	300
+#define TO_GYRO		300
 #define EMITTER_PIN   0     // emitter is controlled by digital pin 2
 
 // sensors 0 through 7 are connected to digital pins 3 through 10, respectively
@@ -99,12 +98,13 @@ QTRSensorsRC qtrrc((unsigned char[]) {6, 7},
 unsigned int sensorValues[NUM_SENSORS];
 boolean last_turn;
 long timeout = 0, ir_counter = 0;
-byte state, state_cur, state_pre;
+byte state, state_cur, state_pre, mode, front_sensors, attack_mode;
 
 //gyro variables
-boolean gyro_flag = false, cal_flag = false, long_flag = false;
+boolean gyro_flag = false, cal_flag = false, long_flag = false, not_blind = true;
 long gyro_count = 0, gyro_null=0, accum=0, time=0, angle_target = 0;
 int angle_diff, angle_last, angle_camera, angle=0, state_counter = 0;
+int search_timeout=1000, angle_timeout;
 double angle_err, angle_errSum; 
 byte result;
 
@@ -150,23 +150,90 @@ byte read_sensors(){
 	if (flags > 0) {
 		if (flags == FL_BIT) last_turn = LEFT_TURN;
 		else if (flags == FR_BIT) last_turn = RIGHT_TURN;		
-		//state_counter = 100;  //set to zero if you just want to search 
-		timeout = 3000;
-		//accum = 0;
 	}
 	return flags;
 }
 
-byte read_side(){
-	//Serial.println("rside");
+byte read_line_sensors() {
 	byte flags = 0;
+	qtrrc.read(sensorValues);
+	if (sensorValues[0] > WHITE_THRESHOLD) flags += LINE_R;
+	if (sensorValues[1] > WHITE_THRESHOLD) flags += LINE_L;
 	return flags;
 }
 
-void decide_front(){
+void search_normal() {
+	if (front_sensors) search_timeout =0;
+	search_timeout ++;
+	if (search_timeout > TO_NORMAL) {
+		turn_to_last;
+		return;
+	}
+	switch (front_sensors) {  	// MOVE BASED ON SENSORS
+		case FR_BIT:  // right sensor
+			//reset counter
+			ESCL_percent(99);
+			ESCR_percent(85);
+			break;
+		case FL_BIT:  //left sensor
+			ESCR_percent(99);
+			ESCL_percent(85);
+			break;
+		case FR_BIT+FL_BIT:  //both sensors
+			ESCL_percent(99);
+			ESCR_percent(99);
+			break;
+		default: ;	// nothing seen, do nothing
+	}
 }
 
-void decide_side(){
+void search_gyro() {
+	if (front_sensors) {
+		if (front_sensors == FL_BIT) accum = 2000;
+		else if (front_sensors == FR_BIT) accum = -2000;
+		else accum = 0;
+		search_timeout =0;
+	}
+	search_timeout ++;
+	if (search_timeout > TO_GYRO) turn_to_last();
+	else goto_zero();
+
+}
+
+void goto_angle() {
+	if (not_blind) {
+		if (front_sensors) {
+			if (attack_mode = SEARCH_NORMAL) search_timeout = 1000;
+			else {
+				accum = 0;		//
+				search_timeout = 0;
+			}
+			mode = attack_mode;
+			return;
+		}
+	}
+	search_timeout ++;
+	if (search_timeout > angle_timeout) {
+		mode = attack_mode;
+		search_timeout = 1000;   //set timeout high, so that it goes to last_turn search
+	
+	}
+}
+
+void backup() {
+
+}
+
+void turn_to_last() {
+	if (last_turn == RIGHT_TURN) {
+		ESCL_percent(99);
+		ESCR_percent(-1);
+	}
+	else {
+		ESCR_percent(99);
+		ESCL_percent(-1);
+	}
+
 }
 
 void decide(){
@@ -374,7 +441,7 @@ void PID_angle(){
 	float temp = angle_err * Kp + (float)angle_errSum * Ki;
 }
 
-void goto_angle(){
+void goto_zero(){
 	if (accum > 0) {
 		ESCL_percent(100);
 		float temp;
@@ -558,6 +625,24 @@ void setup_mpu6050(){
 	return ;
 }
 
+void test_button(){
+	while (true) {
+	if (digitalRead(BUTTON_PIN)) digitalWrite(13, LOW);
+	else digitalWrite(13, HIGH);
+	}
+}
+
+void test_line_sensors() {
+	while (true) {
+		qtrrc.read(sensorValues);
+		Serial.print(sensorValues[0]);
+		Serial.print("  ");
+		Serial.println(sensorValues[1]);
+		delay(250);
+		
+	}
+}
+
 //************** SETUP ***********************
 
 void setup(){
@@ -566,9 +651,11 @@ void setup(){
 	pinMode(L_ESC_PIN, OUTPUT);   // sets the pin as output
 	pinMode(FL_PIN, INPUT);   // sets the pin as input
 	pinMode(FR_PIN, INPUT);   // sets the pin as input
-	pinMode(RIGHT_PIN, INPUT);   // sets the pin as input
-	pinMode(LEFT_PIN, INPUT);   // sets the pin as input
+//	pinMode(RIGHT_PIN, INPUT);   // sets the pin as input
+//	pinMode(LEFT_PIN, INPUT);   // sets the pin as input
 	pinMode(IR_PIN, INPUT);   // sets the pin as input
+	pinMode(BUTTON_PIN, INPUT_PULLUP);
+	pinMode(TIMING_PIN, OUTPUT);
 	
 	//Initialize modules
 	escR.attach(R_ESC_PIN);
@@ -579,8 +666,8 @@ void setup(){
 	Wire.begin();
 	Serial.begin(115200);
 	setup_mpu6050();
-	pinMode(9, INPUT_PULLUP);
-	pinMode(10, OUTPUT);
+	//test_line_sensors();
+	//test_button();
 	//while(digitalRead(9));
 	calculate_null();
 	//delay(3200);
@@ -610,7 +697,7 @@ void loop(){
 		time = millis();
 		read_FIFO();
 		if (state_counter < 0) decide();
-		else goto_angle();
+		else goto_zero();
 		//new_angle
 	}
 	if (digitalRead(IR_PIN) < 1) ir_counter++;
@@ -620,6 +707,26 @@ void loop(){
 		ESCR_percent(0);
 		digitalWrite(13, HIGH);
 		while (true);
+	}
+	
+	// act on  line sesor routine
+	
+	switch (mode) {
+		case SEARCH_NORMAL:
+			search_normal();
+		break;
+
+		case SEARCH_GYRO:
+			search_gyro();
+		break;
+
+		case GOTO_ANGLE:
+			goto_angle();
+		break;
+
+		case BACKUP:
+			backup();
+		break;
 	}
 	//state = read_sensors();
 	//set_motors();
