@@ -6,6 +6,8 @@
 #include <Wire.h>
 #include <I2Cdev.h>
 #include <MPU6050.h>
+#include <QTRSensors.h>
+
 
 //#define GYRO_CAL 235434200	//this has to be measured by rotating the gyro 180 deg. and reading the output
 #define GYRO_CAL 58408577	// for 1000 deg/sec this has to be measured by rotating the gyro 180 deg. and reading the output
@@ -84,6 +86,15 @@
 #define VOL_UP 0xEC
 #define POWER_KEY 0xC0
 
+#define NUM_SENSORS   2     // number of sensors used
+#define TIMEOUT       500  // waits for 2500 microseconds for sensor outputs to go low
+#define EMITTER_PIN   0     // emitter is controlled by digital pin 2
+
+// sensors 0 through 7 are connected to digital pins 3 through 10, respectively
+QTRSensorsRC qtrrc((unsigned char[]) {6, 7},
+  NUM_SENSORS, TIMEOUT, EMITTER_PIN); 
+
+
 //Initialize variables
 unsigned int sensorValues[NUM_SENSORS];
 boolean last_turn;
@@ -93,7 +104,7 @@ byte state, state_cur, state_pre;
 //gyro variables
 boolean gyro_flag = false, cal_flag = false, long_flag = false;
 long gyro_count = 0, gyro_null=0, accum=0, time=0, angle_target = 0;
-int angle_diff, angle_last, angle_camera, angle=0;
+int angle_diff, angle_last, angle_camera, angle=0, state_counter = 0;
 double angle_err, angle_errSum; 
 byte result;
 
@@ -136,6 +147,13 @@ byte read_sensors(){
 	byte flags = 0;
 	if (digitalRead(FL_PIN)) flags += FL_BIT;
 	if (digitalRead(FR_PIN)) flags += FR_BIT;
+	if (flags > 0) {
+		if (flags == FL_BIT) last_turn = LEFT_TURN;
+		else if (flags == FR_BIT) last_turn = RIGHT_TURN;		
+		//state_counter = 100;  //set to zero if you just want to search 
+		timeout = 3000;
+		//accum = 0;
+	}
 	return flags;
 }
 
@@ -175,11 +193,11 @@ void decide(){
 		else {
 			if (last_turn == RIGHT_TURN) {
 				ESCL_percent(99);
-				ESCR_percent(0);
+				ESCR_percent(-1);
 			}
 			else {
 				ESCR_percent(99);
-				ESCL_percent(0);
+				ESCL_percent(-1);
 			}
 		}
 	}
@@ -244,6 +262,7 @@ void IR_menu(){
 						Serial.println("karaoke");
 						break;
 					case PLAY_KEY:
+						delay(750);
 						return;
 						break;
 				}
@@ -268,6 +287,7 @@ void IR_set_angle(){
 	angle_target = angle_temp;
 	Serial.println(angle_target);
 	accum = (long)angle_target;
+	state_counter = 180;
 	return;
 }
 
@@ -577,16 +597,21 @@ void setup(){
 //	if(random(1000) < 500) last_turn = RIGHT_TURN;
 //	else last_turn = LEFT_TURN;
 	last_turn = LEFT_TURN;
-	//accum = -14600000;
+	//accum = -20600000;
+	//state_counter = 350;
+	//timeout = 1000;
+	delay(4000);
 }
 
 void loop(){
 	state_cur = read_sensors();
 	if ((millis() - time) > 0) {
+		state_counter--;
 		time = millis();
 		read_FIFO();
-		decide();
-		//goto_angle();
+		if (state_counter < 0) decide();
+		else goto_angle();
+		//new_angle
 	}
 	if (digitalRead(IR_PIN) < 1) ir_counter++;
 	else ir_counter = 0;
