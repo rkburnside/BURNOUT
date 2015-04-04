@@ -84,10 +84,11 @@
 #define POWER_KEY 0xC0
 
 #define NUM_SENSORS   2     // number of sensors used
-#define TIMEOUT       300  // waits for 2500 microseconds for sensor outputs to go low
-#define TO_NORMAL	20
-#define TO_GYRO		5
-#define TO_BACKUP	800
+#define TIMEOUT     250  //  QTRC timeout valuse for line sensors
+#define TO_NORMAL	15
+#define TO_GYRO		15
+//#define TO_GYRO		5
+#define TO_BACKUP	100
 #define EMITTER_PIN   0     // emitter is controlled by digital pin 2
 
 // sensors 0 through 7 are connected to digital pins 3 through 10, respectively
@@ -96,7 +97,7 @@ QTRSensorsRC qtrrc((unsigned char[]) {6, 7},
 
 //Initialize variables
 unsigned int sensorValues[NUM_SENSORS];
-boolean last_turn, ignore_line = false;
+boolean last_turn, ignore_line = false, remote_off = true;
 long timeout = 0, ir_counter = 0;
 byte state, state_cur, state_pre, mode, front_sensors, attack_mode;
 byte line_sensors;
@@ -158,8 +159,8 @@ byte read_sensors(){
 byte read_line_sensors() {
 	byte flags = 0;
 	qtrrc.read(sensorValues);
-	if (sensorValues[0] > WHITE_THRESHOLD) flags += LINE_R;
-	if (sensorValues[1] > WHITE_THRESHOLD) flags += LINE_L;
+	if (sensorValues[0] < WHITE_THRESHOLD) flags += LINE_R;
+	if (sensorValues[1] < WHITE_THRESHOLD) flags += LINE_L;
 	return flags;
 }
 
@@ -173,16 +174,16 @@ void search_normal() {
 	switch (front_sensors) {  	// MOVE BASED ON SENSORS
 		case FR_BIT:  // right sensor
 			//reset counter
-			ESCL_percent(20);
-			ESCR_percent(5);
+			ESCL_percent(80);
+			ESCR_percent(60);
 			break;
 		case FL_BIT:  //left sensor
-			ESCR_percent(20);
-			ESCL_percent(5);
+			ESCR_percent(80);
+			ESCL_percent(60);
 			break;
 		case FR_BIT+FL_BIT:  //both sensors
-			ESCL_percent(10);
-			ESCR_percent(10);
+			ESCL_percent(99);
+			ESCR_percent(99);
 			break;
 		default: ;	// nothing seen, do nothing
 	}
@@ -241,8 +242,9 @@ void goto_angle() {
 	if (search_timeout > angle_timeout) {
 		mode = attack_mode;
 		search_timeout = 1000;   //set timeout high, so that it goes to last_turn search
-		turn_to_last();
-		stop_program();
+		//turn_to_last();
+		//while(true);
+		//stop_program();
 	}
 	else goto_zero();
 }
@@ -264,16 +266,16 @@ void backup() {
 	switch (line_sensors) {  	//
 		case LINE_R:  // right sensor
 			//reset counter
-			ESCL_percent(-30);
+			ESCL_percent(-50);
 			ESCR_percent(-99);
 			break;
 		case LINE_L:  //left sensor
-			ESCR_percent(-30);
+			ESCR_percent(-50);
 			ESCL_percent(-99);
 			break;
 		case LINE_L+LINE_R:  //both sensors
-			ESCL_percent(99);
-			ESCR_percent(99);
+			ESCL_percent(-99);
+			ESCR_percent(-99);
 			break;
 		default: ;	// nothing seen, do nothing
 	}
@@ -293,7 +295,6 @@ void turn_to_last() {
 }
 
 // void turn_to_last() {
-	// Serial.println("search last");
 	// if (last_turn == RIGHT_TURN) {
 		// ESCL_percent(40);
 		// ESCR_percent(-1);
@@ -309,6 +310,14 @@ void line_detected() {
 	if (ignore_line) return;   //do nothing if ignoring line sensors
 	search_timeout = 0;
 	mode = BACKUP;
+}
+
+void check_remote_off() {
+	if (digitalRead(IR_PIN) < 1) ir_counter++;
+	else ir_counter = 0;
+	if (ir_counter > 8) {
+		stop_program();
+	}
 }
 
 void decide(){
@@ -379,17 +388,6 @@ void watch_sensors(){
 	delay(300);
 }
 
-void start_IR(){
-	digitalWrite(13, HIGH);
-	ir_counter = 0;
-	while (ir_counter < 1000){
-		if (digitalRead(IR_PIN) < 1) ir_counter++;
-		else ir_counter = 0;
-	}
-	digitalWrite(13, LOW);
-	delay(5000);
-}
-
 void IR_menu(){
 	while (true) {
 		if (irrecv.decode(&results)) {
@@ -409,8 +407,8 @@ void IR_menu(){
 						Serial.println("LEFT TURN");
 						break;
 					case KARAOKE:
-						attack_mode = SEARCH_NORMAL;
-						Serial.println("NORMAL SEARCH");
+						not_blind = true;
+						Serial.println("ignore sensors in opening");
 						break;
 					case FUNCTION_KEY:
 						attack_mode = SEARCH_GYRO;
@@ -505,6 +503,19 @@ byte IR_get_number(){
 }
 
 void ready_to_start(){
+	// attack_mode = SEARCH_NORMAL;
+	// mode = GOTO_ANGLE;
+	// last_turn = RIGHT_TURN;
+	// search_timeout = 0;
+	// angle_timeout = 160;
+	// ignore_line = true;
+
+	attack_mode = SEARCH_NORMAL;
+	mode = GOTO_ANGLE;
+	not_blind = false;
+	last_turn = RIGHT_TURN;
+
+	
 	while (true) {
 		digitalWrite(13, HIGH);
 		if (irrecv.decode(&results)) {
@@ -531,7 +542,8 @@ void ready_to_start(){
 			delay(500);
 			while(digitalRead(BUTTON_PIN) == 0) ;
 			digitalWrite(13, HIGH);
-			delay(5000);
+			delay(4600);
+			remote_off = false;
 			return;
 		}
 	delay(100);
@@ -790,22 +802,30 @@ void setup(){
 	//state_counter = 350;
 	//timeout = 1000;
 	//delay(4000);
-	Serial.println("start!!");
-	attack_mode = SEARCH_GYRO;
-	mode = GOTO_ANGLE;
-	last_turn = RIGHT_TURN;
+	//Serial.println("start!!");
+	//attack_mode = SEARCH_NORMAL;
+	//not_blind = false;
+	//mode = GOTO_ANGLE;
+	//last_turn = RIGHT_TURN;
 	search_timeout = 0;
-	not_blind = true;
-	angle_timeout = 170;
+	angle_timeout = 140;
+	ignore_line = true;
 }
 
 void loop(){
-	delay(1);
+	//delay(1);
+	//digitalWrite(10, HIGH);
 	front_sensors = read_sensors();
+	if (remote_off) check_remote_off();
+    //digitalWrite(10, LOW);
 	read_FIFO();
-	//front_sensors = read_sensors();
-	//line_sensors = read_line_sensors();
-	//if (line_sensors) line_detected();
+	//digitalWrite(10, HIGH);
+	front_sensors = read_sensors();
+	if (remote_off) check_remote_off();
+	line_sensors = read_line_sensors();
+    //digitalWrite(10, LOW);
+	//Serial.println(line_sensors);
+	if (line_sensors) line_detected();
 	//mode = SEARCH_NORMAL;
 	switch (mode) {
 		case SEARCH_NORMAL:
@@ -832,12 +852,6 @@ void loop(){
 		// if (state_counter < 0) decide();
 		// else goto_zero();
 	// }
-	if (digitalRead(IR_PIN) < 1) ir_counter++;
-	else ir_counter = 0;
-	if (ir_counter > 6) {
-		stop_program();
-	}
-	
 	//state = read_sensors();
 	//set_motors();
 	//Serial.println(accum);
