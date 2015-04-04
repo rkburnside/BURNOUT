@@ -85,20 +85,21 @@
 
 #define NUM_SENSORS   2     // number of sensors used
 #define TIMEOUT       300  // waits for 2500 microseconds for sensor outputs to go low
-#define TO_NORMAL	300
-#define TO_GYRO		300
+#define TO_NORMAL	20
+#define TO_GYRO		5
+#define TO_BACKUP	800
 #define EMITTER_PIN   0     // emitter is controlled by digital pin 2
 
 // sensors 0 through 7 are connected to digital pins 3 through 10, respectively
 QTRSensorsRC qtrrc((unsigned char[]) {6, 7},
   NUM_SENSORS, TIMEOUT, EMITTER_PIN); 
 
-
 //Initialize variables
 unsigned int sensorValues[NUM_SENSORS];
-boolean last_turn;
+boolean last_turn, ignore_line = false;
 long timeout = 0, ir_counter = 0;
 byte state, state_cur, state_pre, mode, front_sensors, attack_mode;
+byte line_sensors;
 
 //gyro variables
 boolean gyro_flag = false, cal_flag = false, long_flag = false, not_blind = true;
@@ -163,34 +164,58 @@ byte read_line_sensors() {
 }
 
 void search_normal() {
-	if (front_sensors) search_timeout =0;
+	if (front_sensors > 0) search_timeout =0;
 	search_timeout ++;
 	if (search_timeout > TO_NORMAL) {
-		turn_to_last;
+		turn_to_last();
 		return;
 	}
 	switch (front_sensors) {  	// MOVE BASED ON SENSORS
 		case FR_BIT:  // right sensor
 			//reset counter
-			ESCL_percent(99);
-			ESCR_percent(85);
+			ESCL_percent(20);
+			ESCR_percent(5);
 			break;
 		case FL_BIT:  //left sensor
-			ESCR_percent(99);
-			ESCL_percent(85);
+			ESCR_percent(20);
+			ESCL_percent(5);
 			break;
 		case FR_BIT+FL_BIT:  //both sensors
-			ESCL_percent(99);
-			ESCR_percent(99);
+			ESCL_percent(10);
+			ESCR_percent(10);
 			break;
 		default: ;	// nothing seen, do nothing
 	}
 }
 
+// void search_normal() {
+	// if (front_sensors) search_timeout =0;
+	// search_timeout ++;
+	// if (search_timeout > TO_NORMAL) {
+		// turn_to_last;
+		// return;
+	// }
+	// switch (front_sensors) {  	// MOVE BASED ON SENSORS
+		// case FR_BIT:  // right sensor
+			// ESCL_percent(99);
+			// ESCR_percent(85);
+			// break;
+		// case FL_BIT:  //left sensor
+			// ESCR_percent(99);
+			// ESCL_percent(85);
+			// break;
+		// case FR_BIT+FL_BIT:  //both sensors
+			// ESCL_percent(99);
+			// ESCR_percent(99);
+			// break;
+		// default: ;	// nothing seen, do nothing
+	// }
+// }
+
 void search_gyro() {
 	if (front_sensors) {
-		if (front_sensors == FL_BIT) accum = 2000;
-		else if (front_sensors == FR_BIT) accum = -2000;
+		if (front_sensors == FL_BIT) accum = 0;
+		else if (front_sensors == FR_BIT) accum = 0;
 		else accum = 0;
 		search_timeout =0;
 	}
@@ -216,11 +241,42 @@ void goto_angle() {
 	if (search_timeout > angle_timeout) {
 		mode = attack_mode;
 		search_timeout = 1000;   //set timeout high, so that it goes to last_turn search
-	
+		turn_to_last();
+		stop_program();
 	}
+	else goto_zero();
+}
+
+void stop_program(){
+	ESCL_percent(0);
+	ESCR_percent(0);
+	digitalWrite(13, HIGH);
+	while (true);
 }
 
 void backup() {
+	search_timeout ++;
+	if (search_timeout > TO_BACKUP) {
+		search_timeout = 1000;
+		mode = attack_mode;
+	return;
+	}
+	switch (line_sensors) {  	//
+		case LINE_R:  // right sensor
+			//reset counter
+			ESCL_percent(-30);
+			ESCR_percent(-99);
+			break;
+		case LINE_L:  //left sensor
+			ESCR_percent(-30);
+			ESCL_percent(-99);
+			break;
+		case LINE_L+LINE_R:  //both sensors
+			ESCL_percent(99);
+			ESCR_percent(99);
+			break;
+		default: ;	// nothing seen, do nothing
+	}
 
 }
 
@@ -234,6 +290,25 @@ void turn_to_last() {
 		ESCL_percent(-1);
 	}
 
+}
+
+// void turn_to_last() {
+	// Serial.println("search last");
+	// if (last_turn == RIGHT_TURN) {
+		// ESCL_percent(40);
+		// ESCR_percent(-1);
+	// }
+	// else {
+		// ESCR_percent(40);
+		// ESCL_percent(-1);
+	// }
+
+// }
+
+void line_detected() {
+	if (ignore_line) return;   //do nothing if ignoring line sensors
+	search_timeout = 0;
+	mode = BACKUP;
 }
 
 void decide(){
@@ -325,13 +400,30 @@ void IR_menu(){
 					case TEN_PLUS:
 						IR_set_angle();
 						break;
+					case VOL_UP:
+						last_turn = RIGHT_TURN;
+						Serial.println("right turn");
+						break;
+					case VOL_DOWN:
+						last_turn = LEFT_TURN;
+						Serial.println("LEFT TURN");
+						break;
 					case KARAOKE:
-						Serial.println("karaoke");
+						attack_mode = SEARCH_NORMAL;
+						Serial.println("NORMAL SEARCH");
+						break;
+					case FUNCTION_KEY:
+						attack_mode = SEARCH_GYRO;
+						Serial.println("SEARCH GYRO");
 						break;
 					case PLAY_KEY:
-						delay(750);
+						TIMSK2 = 0;  //should disable ir stuff.
 						return;
 						break;
+					// case POWER_KEY:
+						// delay(750);
+						// return;
+						// break;
 				}
 			}
 			irrecv.resume(); // Receive the next value
@@ -354,7 +446,8 @@ void IR_set_angle(){
 	angle_target = angle_temp;
 	Serial.println(angle_target);
 	accum = (long)angle_target;
-	state_counter = 180;
+	search_timeout = 300;
+	//state_counter = 180;
 	return;
 }
 
@@ -413,14 +506,16 @@ byte IR_get_number(){
 
 void ready_to_start(){
 	while (true) {
+		digitalWrite(13, HIGH);
 		if (irrecv.decode(&results)) {
 			if (results.value/256 == 0x76044f) {
 				byte ir_command = results.value;
 				Serial.println(ir_command, HEX);
 				switch (ir_command) {
 					case SELECT_BOT_1:
+						digitalWrite(13, LOW);
 						IR_menu();
-						return;
+						//return;
 						break;
 					case SELECT_BOT_2:
 						break;
@@ -431,6 +526,14 @@ void ready_to_start(){
 			}
 			irrecv.resume(); // Receive the next value
 		}	
+		if (digitalRead(BUTTON_PIN) == 0) {
+			digitalWrite(13, LOW);
+			delay(500);
+			while(digitalRead(BUTTON_PIN) == 0) ;
+			digitalWrite(13, HIGH);
+			delay(5000);
+			return;
+		}
 	delay(100);
 	}
 }
@@ -672,47 +775,41 @@ void setup(){
 	calculate_null();
 	//delay(3200);
 	accelgyro.resetFIFO();
-
 	irrecv.enableIRIn(); // Start the receiver
 	ready_to_start();
 //	pinMode(9, INPUT_PULLUP);
 	//delay(1000);
 	//start_IR();
 	ir_counter = 0;
-	TIMSK2 = 0;  //should disable ir stuff.
+//	TIMSK2 = 0;  //should disable ir stuff.
 //	randomSeed(analogRead(0));
 //	if(random(1000) < 500) last_turn = RIGHT_TURN;
 //	else last_turn = LEFT_TURN;
-	last_turn = LEFT_TURN;
+	//last_turn = LEFT_TURN;
 	//accum = -20600000;
 	//state_counter = 350;
 	//timeout = 1000;
-	delay(4000);
+	//delay(4000);
+	Serial.println("start!!");
+	attack_mode = SEARCH_GYRO;
+	mode = GOTO_ANGLE;
+	last_turn = RIGHT_TURN;
+	search_timeout = 0;
+	not_blind = true;
+	angle_timeout = 170;
 }
 
 void loop(){
-	state_cur = read_sensors();
-	if ((millis() - time) > 0) {
-		state_counter--;
-		time = millis();
-		read_FIFO();
-		if (state_counter < 0) decide();
-		else goto_zero();
-		//new_angle
-	}
-	if (digitalRead(IR_PIN) < 1) ir_counter++;
-	else ir_counter = 0;
-	if (ir_counter > 20) {
-		ESCL_percent(0);
-		ESCR_percent(0);
-		digitalWrite(13, HIGH);
-		while (true);
-	}
-	
-	// act on  line sesor routine
-	
+	delay(1);
+	front_sensors = read_sensors();
+	read_FIFO();
+	//front_sensors = read_sensors();
+	//line_sensors = read_line_sensors();
+	//if (line_sensors) line_detected();
+	//mode = SEARCH_NORMAL;
 	switch (mode) {
 		case SEARCH_NORMAL:
+			//Serial.println("search normal");
 			search_normal();
 		break;
 
@@ -728,6 +825,19 @@ void loop(){
 			backup();
 		break;
 	}
+	// if ((millis() - time) > 0) {
+		// state_counter--;
+		// time = millis();
+		// read_FIFO();
+		// if (state_counter < 0) decide();
+		// else goto_zero();
+	// }
+	if (digitalRead(IR_PIN) < 1) ir_counter++;
+	else ir_counter = 0;
+	if (ir_counter > 6) {
+		stop_program();
+	}
+	
 	//state = read_sensors();
 	//set_motors();
 	//Serial.println(accum);
