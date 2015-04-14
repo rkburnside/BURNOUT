@@ -19,7 +19,7 @@
 
 //speed definitions
 #define FAST 500    //500
-#define MEDIUM 250     //250
+#define MEDIUM 250  //250
 #define SLOW 80		//80
 
 //Pin definitions
@@ -86,7 +86,7 @@
 #define NUM_SENSORS   2     // number of sensors used
 #define TIMEOUT     250  //  QTRC timeout valuse for line sensors
 #define TO_NORMAL	15
-#define TO_GYRO		15
+#define TO_GYRO		15	// default 15 
 //#define TO_GYRO		5
 #define TO_BACKUP	100
 #define EMITTER_PIN   0     // emitter is controlled by digital pin 2
@@ -215,8 +215,8 @@ void search_normal() {
 
 void search_gyro() {
 	if (front_sensors) {
-		if (front_sensors == FL_BIT) accum = 0;
-		else if (front_sensors == FR_BIT) accum = 0;
+		if (front_sensors == FL_BIT) accum = 0;    // use 0 sometimes 5000000
+		else if (front_sensors == FR_BIT) accum = 0;  // use 0 sometimes
 		else accum = 0;
 		search_timeout =0;
 	}
@@ -293,18 +293,6 @@ void turn_to_last() {
 	}
 
 }
-
-// void turn_to_last() {
-	// if (last_turn == RIGHT_TURN) {
-		// ESCL_percent(40);
-		// ESCR_percent(-1);
-	// }
-	// else {
-		// ESCR_percent(40);
-		// ESCL_percent(-1);
-	// }
-
-// }
 
 void line_detected() {
 	if (ignore_line) return;   //do nothing if ignoring line sensors
@@ -510,10 +498,10 @@ void ready_to_start(){
 	// angle_timeout = 160;
 	// ignore_line = true;
 
-	attack_mode = SEARCH_NORMAL;
-	mode = GOTO_ANGLE;
-	not_blind = false;
-	last_turn = RIGHT_TURN;
+//	attack_mode = SEARCH_NORMAL;		//attack mode determine the default mode after the opening move
+	mode = GOTO_ANGLE;		// this is the opening mode. should be goto_angle
+	not_blind = false;		// whether to detect oponent during opening move. 
+	last_turn = RIGHT_TURN; // the defalt turn direction
 
 	
 	while (true) {
@@ -531,22 +519,48 @@ void ready_to_start(){
 					case SELECT_BOT_2:
 						break;
 					case POWER_KEY:
+						remote_off = true;
+						TIMSK2 = 0;
+						random_setup();
 						return;
 						break;
 				}
 			}
 			irrecv.resume(); // Receive the next value
 		}	
-		if (digitalRead(BUTTON_PIN) == 0) {
+		if (digitalRead(BUTTON_PIN) == 0) {		// should be used for competition mode.
 			digitalWrite(13, LOW);
 			delay(500);
 			while(digitalRead(BUTTON_PIN) == 0) ;
 			digitalWrite(13, HIGH);
-			delay(4600);
-			remote_off = false;
+			delay(4700);   // 4600 is the proper delay. Set to 4700 for something more conservative
+			remote_off = false;		//  make sure to ignore IR pulses that could disable bot in competition
+			TIMSK2 = 0;  			//  should disable ir stuff.
+			random_setup();
 			return;
 		}
 	delay(100);
+	}
+}
+
+void random_setup() {
+	attack_mode = SEARCH_GYRO;		//attack mode determine the default mode after the opening move
+	//randomSeed(analogRead(0));
+	not_blind = true;		// whether to detect oponent during opening move. 
+	//int temp = random(0,100);
+	//Serial.print("random number is: ");
+	boolean rand;
+	rand = millis() & 0x01;
+	//Serial.println(rand);
+	//while (true);
+	//if (random(0, 100) > 50) {
+	if (rand) {
+		last_turn = LEFT_TURN;
+		accum = 14000000;
+	}
+	else {
+		last_turn = RIGHT_TURN;
+		accum = -14000000;
 	}
 }
 
@@ -560,7 +574,7 @@ void goto_zero(){
 	if (accum > 0) {
 		ESCL_percent(100);
 		float temp;
-		temp = 100.0 - (float)accum/20e4;
+		temp = 100.0 - (float)accum/40e4;		// virtual gain. default is 20e4
 		if (temp > 100) temp = 100;
 		if (temp < 0) temp = 0;
 		ESCR_percent(temp);
@@ -570,7 +584,7 @@ void goto_zero(){
 	else {
 		ESCR_percent(100);
 		float temp;
-		temp = 100.0 + (float)accum/20e4;
+		temp = 100.0 + (float)accum/40e4;      // virtual gain. default is 20e4
 		if (temp > 100) temp = 100;
 		if (temp < 0) temp = 0;
 		ESCL_percent(temp);		
@@ -804,13 +818,35 @@ void setup(){
 	//delay(4000);
 	//Serial.println("start!!");
 	//attack_mode = SEARCH_NORMAL;
-	//not_blind = false;
+	not_blind = true;
 	//mode = GOTO_ANGLE;
 	//last_turn = RIGHT_TURN;
 	search_timeout = 0;
-	angle_timeout = 140;
+	angle_timeout = 120;  //default 140
 	ignore_line = true;
 }
+
+/********
+	The main loop here reads the various sensors, then decides what to do, based on the current mode. The default
+	opening mode is to goto a given angle and duration. it will then turn toward last_turn, and start searching 
+	using attack_mode (either gyro-based, or simple).
+	
+	The gyro-based search watches for any activity on the sensors, then sets the angle on the gyro to 0. it will then
+	turn and move toward angle 0 for a certain duration. if that duration times-out without seening any further activity,
+	it will continue to search.
+	
+	The normal search will watch the front sensors, and turn forward and toward either sensor that is detecting. if both sensors
+	detect it will go fast straight forward. Each sensor read records the final direction in which the oponent was seen (last_turn).
+	If nothing is seen after a duration of timeout, it will turn in the direction of last_turn. 
+	
+	
+	reading the sensors: The front sensors are digital and read in < 50 us. the line sensors read in about 800 us,
+	depending on the delay set for the qtrc library. The gyro takes about 400-500 us per 1000 us. A full loop here reads
+	the gyro, then the line sensors. It interleaves reads of the front sensors. Between the various long reads, it takes
+	around 2ms per loop. At this point, the gyro has 2 samples ready, so the read is about 800 us.
+	
+	
+*/
 
 void loop(){
 	//delay(1);
