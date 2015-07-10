@@ -13,6 +13,9 @@ void watch_angle();
 void watch_gyro();
 void reset_FIFO();
 void gyro_rate();
+void lateral_accel();
+int get_gyro_rate();
+int get_accel_rate();
 
 //WAYPOINT FUNCTIONS
 void set_waypoint();
@@ -29,11 +32,14 @@ void update_cross_product();
 void update_steering();
 void calculate_speed();
 void speed();
-void cal_steer_lim();
+void cal_wp_accept();
 void update_position();
 void update_waypoint();
 void calculate_look_ahead();
-void print_telemetry();
+void print_telemetry(); //compare to print coordinates, data, parameters
+void print_coordinates(); //compare to print telemetry
+void print_data(); //compare to print telemetry
+void print_parameters(); //compare to print telemetry
 
 //CALIBRATION FUNCTIONS
 void steering_calibration();
@@ -82,8 +88,8 @@ The sketch is parsed for include files. The sketch, all included header files, a
 
 struct position_structure {
 
-/* Using structures to contain location information. Will record old position 
-and new position. The actual structures will be position[0] and position[1], 
+/* Using structures to contain location information. Will record old position
+and new position. The actual structures will be position[0] and position[1],
 but will use pointers old_pos and new_pos to access them. This way we can simply
 swap the pointers instead of copying entire structure from one to the other. Access
 data in the structures as follows: old_pos->x or new_pos->time, etc. this is equivalent
