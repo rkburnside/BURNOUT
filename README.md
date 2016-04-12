@@ -4,7 +4,7 @@
 We are a group of 2~4 people that are developing code and hardware for the Sparkfun Autonomous Vehicle Compeition. 2014 will be our 4th year competing. Our competition record is as follows:
 
 __2015__
-<br>Minuteman -> 1st in Non-Traditional Class
+<br>Minuteman -> 1st in Doping Class
 <br>Quixote -> 1st in Non-Traditional Class
 <br>Roadrunner -> 1st in Peleton Class (highest score of all classes)
 <br>Wile E. Coyote -> Did not place in Micro/PBR Class
