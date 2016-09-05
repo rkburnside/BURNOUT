@@ -13,7 +13,7 @@ void watch_angle();
 void watch_gyro();
 void reset_FIFO();
 void gyro_rate();
-void lateral_accel();
+//void lateral_accel();
 int get_gyro_rate();
 int get_accel_rate();
 
@@ -40,6 +40,7 @@ void print_telemetry(); //compare to print coordinates, data, parameters
 void print_coordinates(); //compare to print telemetry
 void print_data(); //compare to print telemetry
 void print_parameters(); //compare to print telemetry
+void cal_steer_lim();
 
 //CALIBRATION FUNCTIONS
 void steering_calibration();
@@ -62,7 +63,7 @@ void main_menu();
 #ifndef __INCLUDE_FILES__
 #define __INCLUDE_FILES__
 
-#include "AVC_2015.h"
+#include "AVC_2016.h"
 #include "EEPROMAnything.h"
 #include <Servo.h>
 #include <I2Cdev.h> //declared 2x (1 here and 1 in the .ino)(shouldn't be, but arduino is dumb...see note below)
