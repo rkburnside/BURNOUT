@@ -1,11 +1,21 @@
 //AVC SETTINGS
+/* SET UP PROCESS
+set vehicle name
+set set communication method
+set waypoints from a file!!!
+set starting position x
+set starting position y
+upload the code
+*/
+
 #define OB			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
 #define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
 
 #define WAYPOINT_COUNT 19
 #define WAYPOINTS_STRING \
-int excel_waypoints[19][2] = {{0,600}, {-600,600}, {0,650}, {0,1}, {0,0}, {0,0}, {1715,-300}, {1645,-608}, {1500,-675}, {380,-801}, {125,-601}, {88,-145}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
-
+int excel_waypoints[19][2] = {{0,144}, {142,144}, {142,56}, {220,56}, {220,-144}, {142,-144}, {160,0}, {142,0}, {0,-144}, {0,200}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}, {0,0}};
+#define STARTING_POSITION_X 0.0
+#define STARTING_POSITION_Y -200.0
 
 #ifdef MM
 //WAYPOINT AND SPEED PARAMETERS

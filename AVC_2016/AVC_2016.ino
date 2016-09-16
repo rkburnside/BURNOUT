@@ -172,8 +172,12 @@ void race_startup_routine(){
 	x_wp = waypoint.x;
 	y_wp = waypoint.y;
 
-	x=0;
-	y=0;
+	x=STARTING_POSITION_X;
+	y=STARTING_POSITION_Y;
+	SERIAL_OUT.print(x);
+	SERIAL_OUT.print(", ");
+	SERIAL_OUT.println(y);
+
 	reset_FIFO();
 	accum=0;			//***ZEROS out the accumulator which zeros out the gyro angle
 	clicks = 0;
