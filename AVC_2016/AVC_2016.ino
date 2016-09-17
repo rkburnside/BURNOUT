@@ -278,10 +278,12 @@ void setup(){
 	pinMode(TOGGLE, INPUT_PULLUP);			//this is the switch that needs to be toggled to start the race
 
 	pinMode(RESET_PIN, INPUT);
-	attachInterrupt(RESET_PIN, reset_requested_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
+//	attachInterrupt(RESET_PIN, reset_requested_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
+	attachInterrupt(RESET_PIN, reset_requested_interrupt, CHANGE);	//according to the teensy documentation, all pins can be interrupts
 
 	pinMode(HALL_EFFECT_SENSOR, INPUT);	 
-	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
+//	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, RISING);	//according to the teensy documentation, all pins can be interrupts
+	attachInterrupt(HALL_EFFECT_SENSOR, encoder_interrupt, CHANGE);	//according to the teensy documentation, all pins can be interrupts
 
 	steering.attach(STEERING);
 	steering.writeMicroseconds(STEER_ADJUST);

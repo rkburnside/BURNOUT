@@ -25,7 +25,8 @@ void click_calibration(){
 	SERIAL_OUT.println();
 	click_calibration_counter = 0;
 	pinMode(HALL_EFFECT_SENSOR, INPUT);
-	attachInterrupt(HALL_EFFECT_SENSOR, click_calibration_increment, RISING);	//according to the teensy documentation, all pins can be interrupts
+//	attachInterrupt(HALL_EFFECT_SENSOR, click_calibration_increment, RISING);	//according to the teensy documentation, all pins can be interrupts
+	attachInterrupt(HALL_EFFECT_SENSOR, click_calibration_increment, CHANGE);	//according to the teensy documentation, all pins can be interrupts
 
 	get_mode();
 	while(mode == MANUAL){
