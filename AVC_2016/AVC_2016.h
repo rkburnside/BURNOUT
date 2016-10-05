@@ -11,11 +11,11 @@ upload the code
 #define TAM			//use either MM (minuteman) or RR (roadrunner) or WC (Wile E. Coyote)
 #define BLUETOOTH 	//use either BLUETOOTH or USB to define the serial port for program output
 
-#define WAYPOINT_COUNT 29
+#define WAYPOINT_COUNT 99
 #define WAYPOINTS_STRING \
-int excel_waypoints[30][2] = {{36,293}, {572,329}, {638,244}, {649,-111}, {1000,-186}, {1065,-257}, {1013,-1034}, {845,-1074}, {715,-761}, {818,-465}, {671,-389}, {390,-720}, {275,-900}, {175,-1025}, {83,-1042}, {-12,-980}, {64,50}, {0,1}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}};
+int excel_waypoints[100][2] = {{35,243}, {126,350}, {508,341}, {629,256}, {627,-16}, {702,-132}, {953,-167}, {1061,-262}, {1053,-735}, {1038,-968}, {946,-1068}, {794,-951}, {722,-752}, {827,-550}, {779,-450}, {670,-460}, {420,-768}, {163,-1100}, {40,-988}, {26,-362}, {21,14}, {35,243}, {126,350}, {508,341}, {629,256}, {627,-16}, {702,-132}, {953,-167}, {1061,-262}, {1053,-735}, {1038,-968}, {946,-1068}, {794,-951}, {722,-752}, {827,-550}, {779,-450}, {670,-460}, {420,-768}, {163,-1100}, {40,-988}, {26,-362}, {21,14}, {35,243}, {126,350}, {508,341}, {629,256}, {627,-16}, {702,-132}, {953,-167}, {1061,-262}, {1053,-735}, {1038,-968}, {946,-1068}, {794,-951}, {722,-752}, {827,-550}, {779,-450}, {670,-460}, {420,-768}, {163,-1100}, {40,-988}, {26,-362}, {21,14}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,250}, {0,0}};
 #define STARTING_POSITION_X 0.0
-#define STARTING_POSITION_Y 0.0
+#define STARTING_POSITION_Y -48.0
 
 #ifdef TIT
 //WAYPOINT AND SPEED PARAMETERS
@@ -161,8 +161,8 @@ int excel_waypoints[30][2] = {{36,293}, {572,329}, {638,244}, {649,-111}, {1000,
 #define L2 20000
 #define L3 100
 #define L4 250
-#define STEER_ADJUST 1425			//steering adjustment factor
-#define STEER_GAIN 500			//proportional gain, 4000 = servo slammed, 2000 = servo slams less, 300 = supposedly OK
+#define STEER_ADJUST 1425 			//steering adjustment factor
+#define STEER_GAIN 4000			//proportional gain, 4000 = servo slammed, 2000 = servo slams less, 300 = supposedly OK
 #define PATH_FOLLOWING 1
 #define LOOK_AHEAD 80				//120 = too high, 20 = too low, 50 = aggressive, but good, 80 = not aggressive, but OK
 #define SPEED_TOGGLE_ANGLE 20		//20 +/- 5 degrees is good
